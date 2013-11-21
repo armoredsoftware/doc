@@ -15,8 +15,8 @@
 \usetikzlibrary{arrows,shadows}
 \usepackage[underline=false]{pgf-umlsd}
 
-\lhead{}
-\rhead{}
+\lhead{ArmoredSoftware Architecture}
+\rhead{Alexander, Gill, Kulkarni, Searl}
 \lfoot{\copyright The University of Kansas, 2013}
 \cfoot{\thepage}
 
@@ -38,7 +38,7 @@
 
 \bibliographystyle{abbrvnat}
 
-\title{ArmoredSoftware Architecture}
+\title{ArmoredSoftware Architecture Version 0.0}
 \author{Perry Alexander \and Andy Gill \and Prasad Kuklarni \and Leon
   Searl \\
 Information and Telecommunication Technology Center \\
@@ -50,10 +50,15 @@ The University of Kansas \\
 \maketitle
 \tableofcontents
 \listoffigures
-\listoftables
+%\listoftables
 
 \begin{abstract}
-  This document describes the evolving ArmoredSoftware architecture.
+  This document describes the evolving \textsc{ArmoredSoftware}
+  architecture.  This includes the system architecture and
+  descriptions of appraisal, attestation, measurement, and the vTPM
+  infrastructure.  Basic interactions among components are documented
+  to define the overall \textsc{ArmoredSoftware} architecture.  This
+  is a living document and will be updated frequently.
 \end{abstract}
 
 \section{Introduction}
@@ -118,8 +123,10 @@ appraised.\footnote{Note that the same process occurs when appraising
 
 \begin{figure}[hbtp]
   \centering
-  \includegraphics[width=0.5\textwidth]{figures/system.pdf}
-  \caption{System Architecture}
+  \includegraphics[width=0.85\textwidth]{figures/system.pdf}
+  \caption{Typical interaction among armored components with an
+    appraiser interacting with an attestation agent to gather
+    information.}
   \label{fig:system}
 \end{figure}
 
@@ -240,24 +247,30 @@ appraisal is responsible for assessing it.
 \subsection{TPM and vTPM}
 
 Elements of the ArmoredSoftware capsule will share access to a vTPM
-associated with the capsule.  That vTPM will be constructed with
+associated with each armor instance.  That vTPM will be constructed with
 root-of-trust in a hardware TPM (hTPM), but must be migratable among
 elements of the cloud infrastructure.
 
 \subsection{Access Control}
 
-Access control is omnipresent in the capsule and is responsible for
+Access control is omnipresent in the armor and is responsible for
 protecting both the application and elements of the armor.  We
 anticipate using a Flask-based MAC style, but may change that approach
 as we become more aware of our needs.
 
 \section{Component Interaction}
 
+\subsection{Remote Attestation}
+
+\subsection{Access Control}
+
+\subsection{vTPM Management and Access}
+
 \subsection{Migration}
 
 \appendix
 
-%%\input{glossary}
+\section{Glossary}
 
 %%\nocite{}
 
