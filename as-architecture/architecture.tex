@@ -6,8 +6,10 @@
 \usepackage{graphicx}
 \usepackage{url}
 \usepackage{fancyhdr}
-\usepackage{trust}
 \pagestyle{fancy}
+\usepackage{trust}
+\usepackage{subfigure}
+\usepackage{ifthen}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows}
@@ -19,13 +21,6 @@
 \cfoot{\thepage}
 
 
-\newtheorem{conjecture}{Conjecture}
-\newtheorem{obligation}{Obligation}
-\newtheorem{definition}{Definition}
-
-
-\usepackage{subfigure}
-\usepackage{ifthen}
 \newboolean{submission}  %%set to true for the submission version
 \setboolean{submission}{false}
 %\setboolean{submission}{true}
@@ -35,9 +30,11 @@
 { \newcommand{\todo}[1]{ % show todo
    \marginpar{\raggedright\footnotesize{#1}}
                }}
+\newcommand{\squash}{\parskip=0pt\itemsep=0pt}
 
 \parskip=\medskipamount
 \parindent=0pt
+
 
 \bibliographystyle{abbrvnat}
 
@@ -161,20 +158,33 @@ request is processed while Figure~\ref{fig:measurement-2} shows how a
 response is generated.
 
 The measurement component is a collection of measurement capabilities
-for achieving various measurement goals.
+for achieving various measurement goals.  Measurement capabilities
+will range from simple checks to determine the presence or absence of
+resources to sophisticated run-time monitoring capabilities.  It will
+be possible to add and remove measurement capabilities from the
+measurer at run-time.
 
 Measurement selection chooses and instantiates a measurement
-capability for a particular measurement task.
+capability for a particular measurement task.  Measurement tasks from
+the attestation component are abstract requests for information.
+Measurement selection is responsible for instantiating those requests
+with specific, executable measurement instances.
 
 Measurement execution causes a measurement capability to execute,
-manages execution and returns measurement results.
+manages execution and returns measurement results.  Execution is more
+than simply execution of a program and includes monitoring, exception
+handling and any bookkeeping required to prepare and clean up
+following execution.
 
 Measurement capabilities may need to access the vTPM for storing
 measurement results, accessing stored results, or for generating
-cryptographic evidence in support of assessment.
+cryptographic evidence in support of assessment.  The vTPM will not be
+a part of the measurer, but will be shared by all components
+comprising the armor.
 
-The measurement subsystem is protected by access control and is
-responsible for protecting the application.
+The measurement subsystem is protected by access control.  It
+is responsible for protecting the application and ensuring sensitive
+information is not leaked via the measurement process.
 
 \begin{figure}
 \centering 
@@ -219,22 +229,31 @@ appraiser requesting information that evidence can be trusted.
 Finally, the evidence package is returned to the requesting appraiser
 where it is evaluated.
 
-% \begin{figure}[hbtp]
-%   \centering
-%   \includegraphics[width=0.50\textwidth]{figures/attestation-2.pdf}
-%   \caption{Attestation evidence processing}
-%   \label{fig:attestation-2}
-% \end{figure}
-
-\subsubsection{TPM and vTPM}
-
 \subsection{Appraisal}
 
-\subsubsection{Migration}
+Appraisal assesses the result of an attestation request to determine
+if: (i) the evidence received is trustworthy; and (ii) if the
+system described by that evidence is trustworthy.  While attestation
+is responsible for gathering and delivering measurement information,
+appraisal is responsible for assessing it.
+
+\subsection{TPM and vTPM}
+
+Elements of the ArmoredSoftware capsule will share access to a vTPM
+associated with the capsule.  That vTPM will be constructed with
+root-of-trust in a hardware TPM (hTPM), but must be migratable among
+elements of the cloud infrastructure.
 
 \subsection{Access Control}
 
+Access control is omnipresent in the capsule and is responsible for
+protecting both the application and elements of the armor.  We
+anticipate using a Flask-based MAC style, but may change that approach
+as we become more aware of our needs.
+
 \section{Component Interaction}
+
+\subsection{Migration}
 
 \appendix
 
