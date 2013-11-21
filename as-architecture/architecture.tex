@@ -15,7 +15,7 @@
 
 \lhead{}
 \rhead{}
-\lfoot{\copyright The University of Kansas, 2012}
+\lfoot{\copyright The University of Kansas, 2013}
 \cfoot{\thepage}
 
 
@@ -75,6 +75,8 @@ functions:
   manner that assures measurement integrity
 \end{description}
 
+\noindent and is based on concepts from \citet{Coker::Principles-of-R}. 
+
 Figure~\ref{fig:architecture} graphically depicts the major
 architectural components of a protected application.  The
 \emph{application} is the application to be protected by the
@@ -91,23 +93,30 @@ information flow restrictions.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/architecture.pdf}
-  \caption{AS Architecture}
+  \caption{\textsc{ArmoredSoftware} component architecture showing
+    major components of the remote attestation process.}
   \label{fig:architecture}
 \end{figure}
 
 Figure~\ref{fig:system} graphically represents the interaction among
-protected components while figure~\ref{fig:sequence} shows the
+protected components while Figure~\ref{fig:sequence} shows the
 sequencing of interactions during appraisal.  A component's appraisal
 module will request information from a second component's attestation
 module.  The attestation model will select an attestation protocol
 that instructs the measurer what information to gather and in what
-sequence.  The attestation module packages measurement results in a
-evidence packet that is return to the appraiser requesting
-information.  The appraiser then assesses cryptographic signatures and
-encryption to determine the trustworthiness of the measurements, then
-assesses measurements to determine the trustworthiness of the
-component being appraised.  Note that the same process occurs when
-appraising the component's operational environment.
+sequence.  The measurer executes that protocol that in turn gathers
+information from the running process, accesses the module's virtual
+TPM (vTPM) and makes appraisal requests of other
+\textsc{ArmoredSoftware} instances.  The attestation module assembles
+measurement results into a evidence package that is returned to the
+requesting appraiser with cryptographic assurances of integrity and
+confidentiality as required.  Upon receiving the package, the
+appraiser assesses cryptographic signatures and encryption to
+determine the trustworthiness of the measurements, then assesses
+measurements to determine the trustworthiness of the component being
+appraised.\footnote{Note that the same process occurs when appraising
+  the component's operational environment with either the appraiser or
+  target replaced by operational infrastructure.}
 
 \begin{figure}[hbtp]
   \centering
@@ -143,6 +152,9 @@ appraising the component's operational environment.
 \section{System Architecture}
 
 \subsection{Measurement}
+
+Figure~\ref{fig:measurement-1} graphically shows the processing of
+requests for measurements by the measurement component.
 
 \subsection{Attestation}
 
@@ -201,6 +213,6 @@ where it is evaluated.
 
 %%\nocite{}
 
-\bibliography{sldg}
+\bibliography{architecture}
 
 \end{document}
