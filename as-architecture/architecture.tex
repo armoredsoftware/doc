@@ -154,12 +154,39 @@ appraised.\footnote{Note that the same process occurs when appraising
 
 \subsection{Measurement}
 
-Figure~\ref{fig:measurement-1} graphically shows the processing of
-requests for measurements by the measurement component.
+Figure~\ref{fig:measurement} graphically shows the processing of
+requests for measurements by the measurement
+component. Figure~\ref{fig:measurement-1} shows how a measurement
+request is processed while Figure~\ref{fig:measurement-2} shows how a
+response is generated.
+
+The measurement component is a collection of measurement capabilities
+for achieving various measurement goals.
+
+Measurement selection chooses and instantiates a measurement
+capability for a particular measurement task.
+
+Measurement execution causes a measurement capability to execute,
+manages execution and returns measurement results.
+
+Measurement capabilities may need to access the vTPM for storing
+measurement results, accessing stored results, or for generating
+cryptographic evidence in support of assessment.
+
+The measurement subsystem is protected by access control and is
+responsible for protecting the application.
+
+\begin{figure}
+\centering 
+\subfigure[Request processing]{\includegraphics[width=0.450\textwidth]{figures/measurement-1.pdf}\label{fig:measurement-1}}
+\subfigure[Response processing]{\includegraphics[width=0.450\textwidth]{figures/measurement-2.pdf}\label{fig:measurement-2}}
+  \caption{Measurement request processing and response}
+  \label{fig:measurement}
+\end{figure}
 
 \subsection{Attestation}
 
-Figure~\ref{fig:attestation-1} graphically shows the processing of an
+Figure~\ref{fig:attestation} graphically shows the processing of an
 attestation request by an ArmoredSoftware attestation component.  The
 attestation request specifies information requested by an appraiser.
 Upon receipt, the \emph{Attestation Protocol Selector} or \emph{AP
@@ -172,11 +199,12 @@ making requests to the component's vTPM; making requests to another
 components attestation service; or (iii) invoking the measurer on the
 component's associated application.
 
-\begin{figure}[hbtp]
-  \centering
-  \includegraphics[width=0.50\textwidth]{figures/attestation-1.pdf}
-  \caption{Attestation request processing}
-  \label{fig:attestation-1}
+\begin{figure}
+\centering 
+\subfigure[Request processing]{\includegraphics[width=0.450\textwidth]{figures/attestation-1.pdf}}
+\subfigure[Response processing]{\includegraphics[width=0.450\textwidth]{figures/attestation-2.pdf}}
+  \caption{Attestation request processing and response}
+  \label{fig:attestation}
 \end{figure}
 
 The results of request to the vTPM, another attestation component, and
@@ -191,12 +219,12 @@ appraiser requesting information that evidence can be trusted.
 Finally, the evidence package is returned to the requesting appraiser
 where it is evaluated.
 
-\begin{figure}[hbtp]
-  \centering
-  \includegraphics[width=0.50\textwidth]{figures/attestation-2.pdf}
-  \caption{Attestation evidence processing}
-  \label{fig:attestation-2}
-\end{figure}
+% \begin{figure}[hbtp]
+%   \centering
+%   \includegraphics[width=0.50\textwidth]{figures/attestation-2.pdf}
+%   \caption{Attestation evidence processing}
+%   \label{fig:attestation-2}
+% \end{figure}
 
 \subsubsection{TPM and vTPM}
 
