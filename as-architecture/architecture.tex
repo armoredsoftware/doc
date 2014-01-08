@@ -167,7 +167,34 @@ response is generated.
 The measurement component is a collection of measurement capabilities
 for achieving various measurement goals.  Measurement capabilities
 will range from simple checks to determine the presence or absence of
-resources to sophisticated run-time monitoring capabilities.  It will
+resources to sophisticated run-time monitoring capabilities.
+Measurement capabilities are broadly classified into four major
+groups:
+
+\begin{itemize}
+  \squash
+\item Application measurers---Measurement capabilities targeting a
+  specific application protected by armor.  Such capabilities range
+  from simple hashes to persistent run-time monitoring with periodic
+  measurement.
+\item Appraisal requests---Capabilities that will request attestation
+  results from other armored components or components in the
+  environment capable of performing attestation.  Such capabilities
+  reflect a means of reaching outside the component to other,
+  armored components.
+\item Environment measurers---Measurement capabilities targeting
+  the operational environment.  Such capabilities target aspects of
+  the environment that are not armored or do not otherwise have
+  attestation capabilities.  A significant application of environment
+  measurers will be legacy operating systems and applications.
+\item vTPM interactions---Capabilities that interact with the vTPM to
+  both store and save measurement artifacts and perform other vTPM
+  operations as needed.  Such capabilities will enforce
+  access control over PCRs and other operations in the vTPM in
+  addition to performing their primary functions.
+\end{itemize}
+
+It will
 be possible to add and remove measurement capabilities from the
 measurer at run-time.
 
@@ -195,8 +222,8 @@ information is not leaked via the measurement process.
 
 \begin{figure}
 \centering 
-\subfigure[Request processing]{\includegraphics[width=0.450\textwidth]{figures/measurement-1.pdf}\label{fig:measurement-1}}
-\subfigure[Response processing]{\includegraphics[width=0.450\textwidth]{figures/measurement-2.pdf}\label{fig:measurement-2}}
+\subfigure[Request processing]{\includegraphics[width=0.40\textwidth]{figures/measurement-1.pdf}\label{fig:measurement-1}}
+\subfigure[Response processing]{\includegraphics[width=0.40\textwidth]{figures/measurement-2.pdf}\label{fig:measurement-2}}
   \caption{Measurement request processing and response}
   \label{fig:measurement}
 \end{figure}
@@ -270,11 +297,18 @@ as we become more aware of our needs.
 
 \begin{figure}
 \centering 
-\subfigure[Attestation Processing]{\includegraphics[width=0.450\textwidth]{figures/ap-1.pdf}\label{fig:ap-1}}
-\subfigure[Evidence Processing]{\includegraphics[width=0.450\textwidth]{figures/ap-2.pdf}\label{fig:ap-2}}
-  \caption{Interaction between the Attestation and Measurement
-    subsystems when processing an attestation request and resulting evidence.}
-  \label{fig:ap}
+\includegraphics[width=0.950\textwidth]{figures/ap-1.pdf}
+\caption{Interaction between the Attestation and Measurement
+  subsystems when processing an attestation request.}
+\label{fig:ap-1}
+\end{figure}
+
+\begin{figure}
+\centering 
+\includegraphics[width=0.750\textwidth]{figures/ap-2.pdf}
+\caption{Interaction between the Attestation and Measurement
+  subsystems when processing an evidence package.}
+\label{fig:ap-2}
 \end{figure}
 
 \appendix
