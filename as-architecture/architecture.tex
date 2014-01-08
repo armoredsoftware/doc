@@ -158,7 +158,7 @@ appraised.\footnote{Note that the same process occurs when appraising
 
 \subsection{Measurement}
 
-Figure~\ref{fig:measurement} graphically shows the processing of
+Figure~\ref{fig:measurement} graphically depicts the processing of
 requests for measurements by the measurement
 component. Figure~\ref{fig:measurement-1} shows how a measurement
 request is processed while Figure~\ref{fig:measurement-2} shows how a
@@ -203,7 +203,7 @@ information is not leaked via the measurement process.
 
 \subsection{Attestation}
 
-Figure~\ref{fig:attestation} graphically shows the processing of an
+Figure~\ref{fig:attestation} graphically depicts the processing of an
 attestation request by an ArmoredSoftware attestation component.  The
 attestation request specifies information requested by an appraiser.
 Upon receipt, the \emph{Attestation Protocol Selector} or \emph{AP
@@ -267,6 +267,15 @@ as we become more aware of our needs.
 \subsection{vTPM Management and Access}
 
 \subsection{Migration}
+
+\begin{figure}
+\centering 
+\subfigure[Attestation Processing]{\includegraphics[width=0.450\textwidth]{figures/ap-1.pdf}\label{fig:ap-1}}
+\subfigure[Evidence Processing]{\includegraphics[width=0.450\textwidth]{figures/ap-2.pdf}\label{fig:ap-2}}
+  \caption{Interaction between the Attestation and Measurement
+    subsystems when processing an attestation request and resulting evidence.}
+  \label{fig:ap}
+\end{figure}
 
 \appendix
 
