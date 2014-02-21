@@ -167,9 +167,8 @@ response is generated.
 The measurement component is a collection of measurement capabilities
 for achieving various measurement goals.  Measurement capabilities
 will range from simple checks to determine the presence or absence of
-resources to sophisticated run-time monitoring capabilities.
-Measurement capabilities are broadly classified into four major
-groups:
+resources to more sophisticated run-time monitoring.  Measurement
+capabilities are broadly classified into four major groups:
 
 \begin{itemize}
   \squash
@@ -194,13 +193,13 @@ groups:
   addition to performing their primary functions.
 \end{itemize}
 
-Measurement selection chooses and instantiates a measurement
+\emph{Measurer Instantiation} chooses and instantiates a measurement
 capability for a particular measurement task.  Measurement tasks from
 the attestation component are abstract requests for information.
 Measurement selection is responsible for instantiating those requests
 with specific, executable measurement instances.
 
-Measurement execution causes a measurement capability to execute,
+\emph{Measurement Execution} causes a measurement capability to execute,
 manages execution and returns measurement results.  Execution is more
 than simply execution of a program and includes monitoring, exception
 handling and any bookkeeping required to prepare and clean up
