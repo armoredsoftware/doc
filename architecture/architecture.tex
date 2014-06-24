@@ -134,16 +134,23 @@ appraised.\footnote{Note that the same process occurs when appraising
 \begin{footnotesize}
   \begin{sequencediagram}
     \newthread[white]{appr}{Appraiser}
-    \newinst[2]{attest}{Attestation}
+    \newinst[1.25]{attest}{Attestation}
     \newinst[2]{meas}{Measurer}
-    \newinst[2]{app}{Application}
+    \newinst[1.25]{app}{Application}
     
-    \begin{call}{appr}{Attestation Request}{attest}{Attestation}
-      \begin{callself}{attest}{Protocol Selection}{Attestation Preparation}
-      \begin{call}{attest}{Measurement Requests}{meas}{Measurement Values}
-        \begin{call}{meas}{Measurement Calls}{app}{Measurement Values}
+    \begin{call}{appr}{Request}{attest}{Attestation}
+      \begin{callself}{attest}{Protocol Selection}{}
+      \end{callself}
+      \begin{callself}{attest}{Protocol Compilation}{}
+      \end{callself}
+      \begin{sdblock}{Protocol Execution}{Execute
+          measurement requests from protocol}
+      \begin{call}{attest}{Request}{meas}{Value}
+        \begin{call}{meas}{Measurement}{app}{Value}
         \end{call}
       \end{call}
+      \end{sdblock}
+      \begin{callself}{attest}{Quote Assembly}{}
       \end{callself}
     \end{call}
     \begin{callself}{appr}{Appraisal}{Execute Decision}
@@ -298,13 +305,13 @@ as we become more aware of our needs.
 \label{fig:ap-1}
 \end{figure}
 
-\begin{figure}
-\centering 
-\includegraphics[width=0.750\textwidth]{figures/ap-2.pdf}
-\caption{Interaction between the Attestation and Measurement
-  subsystems when processing an evidence package.}
-\label{fig:ap-2}
-\end{figure}
+% \begin{figure}
+% \centering 
+% \includegraphics[width=0.750\textwidth]{figures/ap-2.pdf}
+% \caption{Interaction between the Attestation and Measurement
+%   subsystems when processing an evidence package.}
+% \label{fig:ap-2}
+% \end{figure}
 
 \appendix
 
