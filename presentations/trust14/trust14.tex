@@ -136,19 +136,34 @@
   base system report or quote
 
   \begin{itemize}
-  \item Typically a key used for signing reports
+  \item Typically a protected key used for authenticating reports
   \item In the Intel TXT processes this is the TPM's Endorsement Key
     (EK)
-  \item Created in the TPM factory and bound to its platform by a
-    certificate
-  \item $\private{EK}$ is stored in the TPM
-  \item $\private{EK}$ cannot be accessed directly and can only be
-    used by the TPM
-  \item $\private{EK}$ is not used for signing, but for decrypting
-    credentials
-  \item $\public{EK}$ is maintained by a Certificate Authority
+  \item Created and bound to its platform by the TPM foundry
+  \item $\private{EK}$ is stored in the TPM and cannot be accessed by
+    any entity other than the TPM
+  \item $\public{EK}$ is available for encrypting data for the TPM
+  \item $\private{EK}$ is used for decrypting data
+  \item Binding of $\public{EK}$ to its platform is maintained by a
+    trusted Certificate Authority (CA)
   \end{itemize}
 }
+
+\frame{\frametitle{Root of Trust for Storage}
+  A \emph{Root of Trust for Reporting} is trusted to protect the
+  base stored data
+
+  \begin{itemize}
+  \item Typically a key stored in a trusted location
+  \item In the Intel TXT boot process this is the TPM's Storage Root
+    Key (SRK)
+  \item Created by TPM\_TakeOwnership
+  \item $\private{SRK}$ is stored in the TPM
+  \item $\private{SRK}$ cannot be accessed directly and can only be
+    used by the TPM
+  \end{itemize}
+}
+
 
 \frame{\frametitle{Chaining Trust}
   \begin{itemize}
@@ -169,22 +184,6 @@
     \end{itemize}
   \end{itemize}
 }
-
-\frame{\frametitle{Root of Trust for Storage}
-  A \emph{Root of Trust for Reporting} is trusted to protect the
-  base stored data
-
-  \begin{itemize}
-  \item Typically a key stored in a trusted location
-  \item In the Intel TXT boot process this is the TPM's Storage Root
-    Key (SRK)
-  \item Created by TPM\_TakeOwnership
-  \item $\private{SRK}$ is stored in the TPM
-  \item $\private{SRK}$ cannot be accessed directly and can only be
-    used by the TPM
-  \end{itemize}
-}
-
 
 \frame{\frametitle{Building the Base}
   \begin{enumerate}
