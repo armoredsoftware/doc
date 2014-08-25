@@ -121,12 +121,13 @@
   \begin{itemize}
   \item Typically a hash function called on an initial code base from
     a protected execution environment
-  \item In the Intel TXT process the RTM is \textsf{SENTER} implemented on the processor
-  \item \textsf{SENTER} resets and measures \textsf{SINIT} into PCR 18
+  \item In the Intel TXT process the RTM is \texttt{SENTER} implemented on the processor
+  \item \texttt{SENTER} resets and measures \texttt{SINIT} into PCR 18
     in the TPM\footnote{`Measures X into PCR Y' informally means
       extending PCR Y with a hash of X.}
-  \item SENTER runs securely in the Intel processor~\footnote{AMD has
+  \item \texttt{SENTER} runs securely on the Intel processor~\footnote{AMD has
       a similar command.  ARM does not.}
+  \item Access control prevents access to PCR 18 by other instructions
   \end{itemize}
 }
 
