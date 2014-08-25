@@ -96,11 +96,14 @@
   \item Transitive - $\forall x,y,z\cdot\trusts{y}{x} \wedge \trusts{z}{y} \Rightarrow
   \trusts{z}{x}$
   \end{itemize}
+
+  The transitive property defines \emph{chains of trust}.
 }
 
-\frame{\frametitle{Roots of Trust}
-  As the name implies, a \emph{root of trust} forms a base for
-  transitively building trust.  Roots of trust are trusted implicitly.
+\frame{\frametitle{Roots of Trust} 
+
+  A \emph{root of trust} provides a basis for transitively building
+  trust.  Roots of trust are trusted implicitly.
 
   There are three important Roots of Trust:
   
@@ -116,10 +119,14 @@
   system measurement.
 
   \begin{itemize}
-  \item Typically a hash function called on an initial code base
-  \item In the Intel TXT process the RTM is SENTER
-  \item SENTER measures SINIT into PCR 18 in a TPM
-  \item SENTER runs securely in the Intel processor
+  \item Typically a hash function called on an initial code base from
+    a protected execution environment
+  \item In the Intel TXT process the RTM is \textsf{SENTER} implemented on the processor
+  \item \textsf{SENTER} resets and measures \textsf{SINIT} into PCR 18
+    in the TPM\footnote{`Measures X into PCR Y' informally means
+      extending PCR Y with a hash of X.}
+  \item SENTER runs securely in the Intel processor~\footnote{AMD has
+      a similar command.  ARM does not.}
   \end{itemize}
 }
 
