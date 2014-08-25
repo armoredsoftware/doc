@@ -3,7 +3,9 @@
 % theme definition
 \usetheme{KU}
 
+\usepackage{natbib}
 \usepackage{alltt}
+\usepackage{trust}
 
 \setbeamertemplate{blocks}[rounded][shadow=true]
 
@@ -28,8 +30,10 @@
 \newcommand{\mean}[1]{\langle#1\rangle}
 \newcommand{\rtime}{\ensuremath{\mathbb{R}^{0\leq}}}
 
-\title{Sample Beamer Theme}
-\subtitle{With KU Colors and ITTC}
+\bibliographystyle{abbrv}
+
+\title{Trust}
+\subtitle{What it is and how to get it}
 
 \author{Dr. Perry Alexander}
 
@@ -52,6 +56,140 @@
 
 {\footnotesize\color{kugray} Formatted with the Beamer Class for \LaTeXe}
 \end{frame}
+
+\frame{\frametitle{Defining Trust}
+  \begin{block}{Trust}
+    ``An entity can be trusted if it always behaves in the exptected
+    manner for the intended purpose~\cite{Martin:08:The-ten-page-in}''
+  \end{block}
+}
+
+\frame{\frametitle{Defining Trust}
+  \begin{block}{Properties}
+    \begin{itemize}
+    \item Unambiguous identification
+    \item Unimpeded operation
+    \item First-hand observation of good behavior \emph{or} indirect
+      experience of good behavior by a trusted third party
+    \end{itemize}
+  \end{block}
+}
+
+\frame{\frametitle{Capabilities for Trust}
+  \begin{itemize}
+  \item \emph{Strong Identification} --- strongly associating an
+    identifier---a public key---with the platform
+  \item \emph{Reporting Configuration} --- strongly identifying software and
+    hardware---hashing and other measurement---running on the platform.
+  \end{itemize}
+}
+
+\frame{\frametitle{Trust is a Preorder}
+
+  $\trusts{x}{y}$ is an homogeneous relation over actors that is true
+  when \emph{x trusts y}.  $\trusts{x}{y}$ is a preorer:
+
+  \begin{itemize}
+  \item Reflexive - $\forall x \cdot \trusts{x}{x}$
+  \item Transitive - $\forall x,y,z\cdot\trusts{y}{x} \wedge \trusts{z}{y} \Rightarrow
+  \trusts{z}{x}$
+  \end{itemize}
+}
+
+\frame{\frametitle{Roots of Trust}
+  As the name implies, a \emph{root of trust} forms a base for
+  transitively building trust.  Roots of trust are trusted implicitly.
+
+  There are three important Roots of Trust:
+  
+  \begin{itemize}
+  \item Root of Trust for Measurement (RTM)
+  \item Root of Trust for Reporting (RTR)
+  \item Root of Trust for Storage (RTS)
+  \end{itemize}
+}
+
+\frame{\frametitle{Root of Trust for Measurement}
+  A \emph{Root of Trust for Measurement} is trusted to take the base
+  system measurement.
+
+  \begin{itemize}
+  \item Typically a hash function called on an initial code base
+  \item In the Intel TXT process the RTM is SENTER
+  \item SENTER measures SINIT into PCR 18 in a TPM
+  \item SENTER runs securely in the Intel processor
+  \end{itemize}
+}
+
+\frame{\frametitle{Root of Trust for Reporting}
+  A \emph{Root of Trust for Reporting} is trusted to authenticate the
+  base system report or quote
+
+  \begin{itemize}
+  \item Typically a key used for signing reports
+  \item In the Intel TXT processes this is the TPM's Endorsement Key
+    (EK)
+  \item Created in the TPM factory and bound to its platform by a
+    certificate
+  \item $\private{EK}$ is stored in the TPM
+  \item $\private{EK}$ cannot be accessed directly and can only be
+    used by the TPM
+  \item $\private{EK}$ is not used for signing, but for decrypting
+    credentials
+  \item $\public{EK}$ is maintained by a Certificate Authority
+  \end{itemize}
+}
+
+\frame{\frametitle{Chaining Trust}
+  \begin{itemize}
+  \item Trust is transitive
+    \begin{itemize}
+    \item $\trusts{x}{y} \wedge \trusts{y}{z} \Rightarrow
+      \trusts{x}{z}$
+    \item Construct chains of trust
+    \item Remember ``directly observed or indirectly observed by a
+      trusted third party''
+    \end{itemize}
+  \item Roots of Trust define the basis for trust
+    \begin{itemize}
+    \item Use Roots of Trust to establish base for chain
+    \item RTM generates a trusted first measurement
+    \item RTS protects first measurement
+    \item rtr signs base quote for appraiser
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame{\frametitle{Root of Trust for Storage}
+  A \emph{Root of Trust for Reporting} is trusted to protect the
+  base stored data
+
+  \begin{itemize}
+  \item Typically a key stored in a trusted location
+  \item In the Intel TXT boot process this is the TPM's Storage Root
+    Key (SRK)
+  \item Created by TPM\_TakeOwnership
+  \item $\private{SRK}$ is stored in the TPM
+  \item $\private{SRK}$ cannot be accessed directly and can only be
+    used by the TPM
+  \end{itemize}
+}
+
+
+\frame{\frametitle{Building the Base}
+  \begin{enumerate}
+  \item Power On
+    \begin{itemize}
+    \item PCRs reset to -1
+    \end{itemize}
+  \item SENTER is called (RTM)
+    \begin{itemize}
+    \item SENTER resets PCRs to 0
+    \item SENTER hashes SINIT into PCR 18 (RTS)
+    \end{itemize}
+  \item SINIT is called (Trusted)
+  \end{enumerate}
+}
 
 \frame{\frametitle{Presentation Outline}
   \begin{itemize}
@@ -310,6 +448,7 @@ Please direct your attention to the whiteboard.
 \end{fnverbatim}
 }
 
+\bibliography{sldg}
 
 \end{document}
 
