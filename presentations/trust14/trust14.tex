@@ -75,7 +75,7 @@
   \end{block}
 }
 
-\frame{\frametitle{Capabilities for Trust}
+\frame{\frametitle{Necessary Capabilities for Trust}
   \begin{itemize}
   \item \emph{Strong Identification} --- An unambiguous, immutable
     identifier associated with the platform.  The identifier is a
@@ -100,11 +100,53 @@
   The transitive property defines \emph{chains of trust}.
 }
 
+
+\frame{\frametitle{Trusted Platform Module}
+  The \emph{Trusted Platform Module (TPM)} is a cryptographic
+  coprocessor for trust.
+
+  \begin{itemize}
+  \item Endorsement Key (EK) --- factory generated asymmetric key
+    that uniquely identifies the TPM
+  \item Attestation Instance Key (AIK) --- an alias for the EK
+  \item Storage Root Key (SRK) --- user generated asymmetric key that
+    encrypts data associated with the TPM
+  \item Platform Configuration Registers (PCRs) --- registers for
+    storing hashes
+  \item NVRAM --- Non-volatile storage associated with the TPM
+  \end{itemize}
+}
+
+\frame{\frametitle{Platform Configuration Registers}
+  \begin{itemize}
+  \item Operations on PCRs
+    \begin{itemize}
+    \item Extension --- Hash a new value juxtaposed with the existing
+      PCR value
+    \item Reset --- Set to 0
+    \item Set --- Set to a known value
+    \end{itemize}
+  \item Operations using PCRs
+    \begin{itemize}
+    \item Sealing data --- PCR state dependent encryption
+    \item Wrapping keys --- PCR state dependent encryption of a
+      private key
+    \item Quote --- Reporting PCR values to a third party
+    \end{itemize}
+  \item Properties
+    \begin{itemize}
+    \item Locality --- Access control
+    \item Resettable --- Can a PCR be reset
+    \item Many others that we don't need yet
+    \end{itemize}
+  \end{itemize}
+}
+
 \frame{\frametitle{Roots of Trust} 
 
   A \emph{root of trust} provides a basis for transitively building
-  trust.  Roots of trust are trusted implicitly.
-
+  trust.  Roots of trust are trusted implicitly. 
+  \\
   There are three important Roots of Trust:
   
   \begin{itemize}
@@ -119,15 +161,11 @@
   system measurement.
 
   \begin{itemize}
-  \item Typically a hash function called on an initial code base from
+  \item A hash function called on an initial code base from
     a protected execution environment
-  \item In the Intel TXT process the RTM is \texttt{SENTER} implemented on the processor
-  \item \texttt{SENTER} resets and measures \texttt{SINIT} into PCR 18
-    in the TPM\footnote{`Measures X into PCR Y' informally means
-      extending PCR Y with a hash of X.}
-  \item \texttt{SENTER} runs securely on the Intel processor~\footnote{AMD has
-      a similar command.  ARM does not.}
-  \item Access control prevents access to PCR 18 by other instructions
+  \item Starts the measurement process during boot
+  \item In the Intel TXT process the RTM is \texttt{SENTER}
+    implemented on the processor
   \end{itemize}
 }
 
@@ -136,7 +174,7 @@
   base system report or quote
 
   \begin{itemize}
-  \item Typically a protected key used for authenticating reports
+  \item A protected key used for authenticating reports
   \item In the Intel TXT processes this is the TPM's Endorsement Key
     (EK)
   \item Created and bound to its platform by the TPM foundry
@@ -150,11 +188,11 @@
 }
 
 \frame{\frametitle{Root of Trust for Storage}
-  A \emph{Root of Trust for Reporting} is trusted to protect the
+  A \emph{Root of Trust for Storage} is trusted to protect the
   base stored data
 
   \begin{itemize}
-  \item Typically a key stored in a trusted location
+  \item Typically a key stored in a protected location
   \item In the Intel TXT boot process this is the TPM's Storage Root
     Key (SRK)
   \item Created by TPM\_TakeOwnership
@@ -164,6 +202,44 @@
   \end{itemize}
 }
 
+
+\frame{\frametitle{One Step from Roots of Trust}
+  
+  Roots of trust are used to build a trusted system from boot.
+
+  \begin{itemize}
+  \item Power On Reset
+  \item Resettable PCRs are reset to -1
+  \item \texttt{SENTER} resets selected PCRs to 0
+    \begin{itemize}
+    \item Specified as resettable
+    \item PCRs in locality 4 or lower
+    \item \emph{Only} \texttt{SENTER} can reset locality 4 PCRs
+    \end{itemize}
+  \item \texttt{SENTER} hashes \texttt{SINIT} into PCR 18
+    \begin{itemize}
+    \item RTM generates the first measurement
+    \item RTS stores the first measurement in PCR 18
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame{\frametitle{Two Steps from Roots of Trust}
+
+  \begin{itemize}
+  \item \texttt{SINIT} measures the Secure Launch Environment (SLE)
+    \begin{itemize}
+    \item \texttt{SINIT} uses measurement policy stored in the TPM NVRAM
+    \item \texttt{SINIT} measured by RTM stored in RTS, thus trusted
+    \end{itemize}
+  \item \texttt{SINIT} returns control to \texttt{SENTER}
+  \item \texttt{SENTER} invokes the SLE
+    \begin{itemize}
+    \item SLE elements are hashed into PCRs
+    \item SLE core measures and starts the operational environment
+    \end{itemize}
+  \end{itemize}
+}
 
 \frame{\frametitle{Chaining Trust}
   \begin{itemize}
@@ -175,29 +251,15 @@
     \item Remember ``directly observed or indirectly observed by a
       trusted third party''
     \end{itemize}
-  \item Roots of Trust define the basis for trust
+  \item Roots of Trust define the ``root'' for trust
     \begin{itemize}
     \item Use Roots of Trust to establish base for chain
     \item RTM generates a trusted first measurement
     \item RTS protects first measurement
-    \item rtr signs base quote for appraiser
+    \item RTR signs base quote for appraiser (eventually)
     \end{itemize}
+  \item Extend chains of trust by measuring before executing
   \end{itemize}
-}
-
-\frame{\frametitle{Building the Base}
-  \begin{enumerate}
-  \item Power On
-    \begin{itemize}
-    \item PCRs reset to -1
-    \end{itemize}
-  \item SENTER is called (RTM)
-    \begin{itemize}
-    \item SENTER resets PCRs to 0
-    \item SENTER hashes SINIT into PCR 18 (RTS)
-    \end{itemize}
-  \item SINIT is called (Trusted)
-  \end{enumerate}
 }
 
 \frame{\frametitle{Presentation Outline}
