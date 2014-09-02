@@ -219,9 +219,9 @@
   \item $\private{EK}$ is stored in the TPM and cannot be accessed by
     any entity other than the TPM
   \item $\public{EK}$ is available for encrypting data for the TPM
-  \item $\private{EK}$ is used for decrypting data
-  \item Binding of $\public{EK}$ to its platform is maintained by a
-    trusted Certificate Authority (CA)
+  \item $\private{EK}$ is used for decrypting data inside the TPM
+  \item Linking $\public{EK}$ to its platform is done by a trusted
+    Certificate Authority (CA)
   \end{itemize}
 }
 
@@ -233,13 +233,13 @@
   \item Typically a key stored in a protected location
   \item In the Intel TXT boot process this is the TPM's Storage Root
     Key (SRK)
-  \item Created by TPM\_TakeOwnership
-  \item $\private{SRK}$ is stored in the TPM
-  \item $\private{SRK}$ cannot be accessed directly and can only be
-    used by the TPM
+  \item Created by \texttt{TPM\_TakeOwnership}
+  \item $\private{SRK}$ is stored in the TPM and cannot be accessed by
+    any entity other than the TPM
+  \item $\public{SRK}$ is available for encrypting data for the TPM
+  \item SRK is used for protecting other keys
   \end{itemize}
 }
-
 
 \frame{\frametitle{One Step from Roots of Trust}
   
@@ -248,18 +248,37 @@
   \begin{itemize}
   \item Power On Reset
   \item Resettable PCRs are reset to -1
-  \item \texttt{SENTER} resets selected PCRs to 0
+  \item \texttt{SENTER} resets specified PCRs to 0
     \begin{itemize}
-    \item Specified as resettable
+    \item PCRs specified as resettable
     \item PCRs in locality 4 or lower
     \item \emph{Only} \texttt{SENTER} can reset locality 4 PCRs
     \end{itemize}
-  \item \texttt{SENTER} hashes \texttt{SINIT} into PCR 18
+  \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
     \begin{itemize}
     \item RTM generates the first measurement
     \item RTS stores the first measurement in PCR 18
     \end{itemize}
   \end{itemize}
+}
+
+\frame{\frametitle{What We Know From Good PCR 18}
+  A good value in PCR 18 tells us:
+
+  \begin{itemize}
+  \item \texttt{SENTER} was called --- Resetting PCR 18 starts
+    measurements at 0 rather than -1
+  \item \texttt{SINIT} was measured by \texttt{SENTER} --- Only
+    \texttt{SENTER} can extend PCR 18
+  \item \texttt{SINIT} uses the correct policy --- PCR 18 is extended
+    with \texttt{SINIT} measurement policy
+  \item \texttt{SENTER} ran before \texttt{SINIT} --- Extension is
+    antisymmetric (?)
+  \end{itemize}
+
+  \begin{block}{Measurement $\neq$ Trust}
+    Measurements must be appraised to determine trust.
+  \end{block}
 }
 
 \frame{\frametitle{Two Steps from Roots of Trust}
@@ -268,14 +287,33 @@
   \item \texttt{SINIT} measures the Secure Launch Environment (SLE)
     \begin{itemize}
     \item \texttt{SINIT} uses measurement policy stored in the TPM NVRAM
-    \item \texttt{SINIT} measured by RTM stored in RTS, thus trusted
+    \item \texttt{SINIT} policy measured by RTM stored in RTS
+    \item \texttt{TBOOT} is a common SLE that we will reference
     \end{itemize}
   \item \texttt{SINIT} returns control to \texttt{SENTER}
-  \item \texttt{SENTER} invokes the SLE
+  \item \texttt{SENTER} invokes the SLE (\texttt{TBOOT})
     \begin{itemize}
-    \item SLE elements are hashed into PCRs
-    \item SLE core measures and starts the operational environment
+    \item SLE measures the initial operating environment
+    \item SLE starts the initial operating environment
+    \item In Xen \texttt{TBOOT} hashes a ramdisk with OS elements
+    \item In Xen the operating environment is the hypervisor
     \end{itemize}
+  \end{itemize}
+}
+
+\frame{\frametitle{What We Know From Good PCRs}
+  \begin{itemize}
+  \item \texttt{SENTER} was called --- Resetting PCR 18 starts
+    measurements at 0 rather than -1
+  \item \texttt{SINIT} was measured by \texttt{SENTER} --- Only
+    \texttt{SENTER} can extend PCR 18
+  \item \texttt{SINIT} uses the correct policy --- PCR 18 is extended
+    with \texttt{SINIT} measurement policy
+  \item \texttt{SENTER} ran before \texttt{SINIT} --- Extension is
+    antisymmetric (?)
+  \item \texttt{SLE} is good --- Measured by good \texttt{SINIT} into
+    PCR
+  \item Initial OS is good --- Measured by good \texttt{SLE} into PCR
   \end{itemize}
 }
 
