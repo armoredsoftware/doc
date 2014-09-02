@@ -208,8 +208,8 @@
 }
 
 \frame{\frametitle{Root of Trust for Reporting}
-  A \emph{Root of Trust for Reporting} is trusted to authenticate the
-  base system report or quote
+  A \emph{Root of Trust for Reporting} is trusted to guarantee the
+  integrity of the base system report or quote
 
   \begin{itemize}
   \item A protected key used for authenticating reports
@@ -226,11 +226,10 @@
 }
 
 \frame{\frametitle{Root of Trust for Storage}
-  A \emph{Root of Trust for Storage} is trusted to protect the
-  base stored data
+  A \emph{Root of Trust for Storage} is trusted to protect stored data
 
   \begin{itemize}
-  \item Typically a key stored in a protected location
+  \item A key stored in a protected location
   \item In the Intel TXT boot process this is the TPM's Storage Root
     Key (SRK)
   \item Created by \texttt{TPM\_TakeOwnership}
@@ -245,21 +244,29 @@
   
   Roots of trust are used to build a trusted system from boot.
 
-  \begin{itemize}
-  \item Power On Reset
-  \item Resettable PCRs are reset to -1
-  \item \texttt{SENTER} resets specified PCRs to 0
+  \begin{columns}[c]
+    \column{.53\textwidth}
     \begin{itemize}
-    \item PCRs specified as resettable
-    \item PCRs in locality 4 or lower
-    \item \emph{Only} \texttt{SENTER} can reset locality 4 PCRs
+    \item Power On Reset
+    \item Resettable PCRs are set to -1
+      \item \texttt{SENTER} called
+    \item \texttt{SENTER} resets PCRs to 0
+      \begin{itemize}
+      \item Specified as resettable
+      \item Locality 4 or lower
+      \item Only \texttt{SENTER} can reset locality 4 PCRs
+      \end{itemize}
+    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
+      \begin{itemize}
+      \item RTM generates first measurement
+      \item RTS stores first measurement in PCR 18
+      \end{itemize}
     \end{itemize}
-  \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
-    \begin{itemize}
-    \item RTM generates the first measurement
-    \item RTS stores the first measurement in PCR 18
-    \end{itemize}
-  \end{itemize}
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/basic-architecture.pdf}
+    \end{figure}
+  \end{columns}
 }
 
 \frame{\frametitle{What We Know From Good PCR 18}
@@ -405,7 +412,7 @@ These protocols are used in data transmission for CDs, Ethernet, and Tokenring,
 %    \end{block}
     \column{.45\textwidth}
     \begin{figure}
-%%      \includegraphics[width=0.95\textwidth]{architecture.pdf}
+      \includegraphics[width=1.0\textwidth]{figures/basic-architecture.pdf}
     \end{figure}
   \end{columns}
 }
