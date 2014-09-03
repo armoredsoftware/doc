@@ -247,27 +247,75 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item Power On Reset
-    \item Resettable PCRs are set to -1
-      \item \texttt{SENTER} called
-    \item \texttt{SENTER} resets PCRs to 0
-      \begin{itemize}
-      \item Specified as resettable
-      \item Locality 4 or lower
-      \item Only \texttt{SENTER} can reset locality 4 PCRs
-      \end{itemize}
+    \item Power-on reset, resettable PCRs set to -1
+    \item \texttt{SENTER} called
+    \item \texttt{SENTER} resets resettable PCRs to 0
     \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
-      \begin{itemize}
-      \item RTM generates first measurement
-      \item RTS stores first measurement in PCR 18
-      \end{itemize}
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/basic-architecture.pdf}
+      \includegraphics[width=1.0\textwidth]{figures/boot-pre-reset.pdf}
     \end{figure}
   \end{columns}
 }
+
+\frame{\frametitle{One Step from Roots of Trust}
+  
+  Roots of trust are used to build a trusted system from boot.
+
+  \begin{columns}[c]
+    \column{.53\textwidth}
+    \begin{itemize}
+    \item Power-on reset, resettable PCRs set to -1
+    \item \texttt{SENTER} called
+    \item \texttt{SENTER} resets resettable PCRs to 0
+    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
+    \end{itemize}
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/boot-reset.pdf}
+    \end{figure}
+  \end{columns}
+}
+
+\frame{\frametitle{One Step from Roots of Trust}
+  
+  Roots of trust are used to build a trusted system from boot.
+
+  \begin{columns}[c]
+    \column{.53\textwidth}
+    \begin{itemize}
+    \item Power-on reset, resettable PCRs set to -1
+    \item \texttt{SENTER} called
+    \item \texttt{SENTER} resets resettable PCRs to 0
+    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
+    \end{itemize}
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/boot-senter.pdf}
+    \end{figure}
+  \end{columns}
+}
+
+\frame{\frametitle{One Step from Roots of Trust}
+  
+  Roots of trust are used to build a trusted system from boot.
+
+  \begin{columns}[c]
+    \column{.53\textwidth}
+    \begin{itemize}
+    \item Power-on reset, resettable PCRs set to -1
+    \item \texttt{SENTER} called
+    \item \texttt{SENTER} resets resettable PCRs to 0
+    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
+    \end{itemize}
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/boot-senter-post.pdf}
+    \end{figure}
+  \end{columns}
+}
+
 
 \frame{\frametitle{What We Know From Good PCR 18}
   A good value in PCR 18 tells us:
@@ -279,8 +327,8 @@
     \texttt{SENTER} can extend PCR 18
   \item \texttt{SINIT} uses the correct policy --- PCR 18 is extended
     with \texttt{SINIT} measurement policy
-  \item \texttt{SENTER} ran before \texttt{SINIT} --- Extension is
-    antisymmetric (?)
+  \item \texttt{SENTER} ran before \texttt{SINIT} was measured ---
+    $\extend{A}{B} \neq \extend{B}{A}$
   \end{itemize}
 
   \begin{block}{Measurement $\neq$ Trust}
@@ -290,34 +338,48 @@
 
 \frame{\frametitle{Two Steps from Roots of Trust}
 
-  \begin{itemize}
-  \item \texttt{SINIT} measures the Secure Launch Environment (SLE)
+  \begin{columns}[c]
+    \column{.53\textwidth}
     \begin{itemize}
-    \item \texttt{SINIT} uses measurement policy stored in the TPM NVRAM
-    \item \texttt{SINIT} policy measured by RTM stored in RTS
-    \item \texttt{TBOOT} is a common SLE that we will reference
+    \item \texttt{SINIT} measures the Secure Launch Environment (SLE)
+      using measured policy
+    \item \texttt{SINIT} returns control to \texttt{SENTER}
+    \item \texttt{SENTER} invokes the SLE
     \end{itemize}
-  \item \texttt{SINIT} returns control to \texttt{SENTER}
-  \item \texttt{SENTER} invokes the SLE (\texttt{TBOOT})
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/boot-pre-sinit.pdf}
+    \end{figure}
+  \end{columns}
+}
+
+\frame{\frametitle{Two Steps from Roots of Trust}
+
+  \begin{columns}[c]
+    \column{.53\textwidth}
     \begin{itemize}
-    \item SLE measures the initial operating environment
-    \item SLE starts the initial operating environment
-    \item In Xen \texttt{TBOOT} hashes a ramdisk with OS elements
-    \item In Xen the operating environment is the hypervisor
+    \item \texttt{SINIT} measures the Secure Launch Environment (SLE)
+      using measured policy
+    \item \texttt{SINIT} returns control to \texttt{SENTER}
+    \item \texttt{SENTER} invokes the SLE
     \end{itemize}
-  \end{itemize}
+    \column{.45\textwidth}
+    \begin{figure}
+      \includegraphics[width=1.0\textwidth]{figures/boot-sinit-post.pdf}
+    \end{figure}
+  \end{columns}
 }
 
 \frame{\frametitle{What We Know From Good PCRs}
   \begin{itemize}
   \item \texttt{SENTER} was called --- Resetting PCR 18 starts
-    measurements at 0 rather than -1
-  \item \texttt{SINIT} was measured by \texttt{SENTER} --- Only
+    measurement sequence at 0 rather than -1
+  \item \texttt{SINIT} policy was measured by \texttt{SENTER} --- Only
     \texttt{SENTER} can extend PCR 18
   \item \texttt{SINIT} uses the correct policy --- PCR 18 is extended
     with \texttt{SINIT} measurement policy
-  \item \texttt{SENTER} ran before \texttt{SINIT} --- Extension is
-    antisymmetric (?)
+  \item \texttt{SENTER} ran before \texttt{SINIT} ---
+    $\extend{0}{SINIT}\neq\extend{-1}{SINIT}$
   \item \texttt{SLE} is good --- Measured by good \texttt{SINIT} into
     PCR
   \item Initial OS is good --- Measured by good \texttt{SLE} into PCR
