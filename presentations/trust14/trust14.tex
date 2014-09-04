@@ -390,9 +390,21 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-      \item Boot the MLE
-      \item Boot the vTPM
-      \item Boot the Armored Virtual Platform
+      \item \texttt{SENTER} starts the MLE 
+        \begin{itemize}
+        \item \texttt{SENTER} starts the hypervisor
+        \item \texttt{SENTER} passes dom0 to hypervisor
+        \item hypervisor starts dom0
+        \end{itemize}
+      \item dom0 constructs the Armored VP
+        \begin{itemize}
+        \item Measures the vTPM into the TPM
+        \item Starts the vTPM
+        \item Measures remaining Armored VMs into the vTPM
+        \item Starts remaining Armored VMs
+        \item Measures Armored application into the vTPM
+        \item Starts the Armored application
+        \end{itemize}
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
@@ -405,9 +417,21 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-      \item Boot the MLE
-      \item Boot the vTPM
-      \item Boot the Armored Virtual Platform
+      \item \texttt{SENTER} starts the MLE 
+        \begin{itemize}
+        \item \texttt{SENTER} starts the hypervisor
+        \item \texttt{SENTER} passes dom0 to hypervisor
+        \item hypervisor starts dom0
+        \end{itemize}
+      \item dom0 constructs the Armored VP
+        \begin{itemize}
+        \item Measures the vTPM into the TPM
+        \item Starts the vTPM
+        \item Measures remaining Armored VMs into the vTPM
+        \item Starts remaining Armored VMs
+        \item Measures Armored application into the vTPM
+        \item Starts the Armored application
+        \end{itemize}
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
@@ -420,9 +444,21 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-      \item Boot the MLE
-      \item Boot the vTPM
-      \item Boot the Armored Virtual Platform
+    \item \texttt{SENTER} starts the MLE 
+      \begin{itemize}
+      \item \texttt{SENTER} starts the hypervisor
+      \item \texttt{SENTER} passes dom0 to hypervisor
+      \item hypervisor starts dom0
+      \end{itemize}
+    \item dom0 constructs the Armored VP
+      \begin{itemize}
+      \item Measures the vTPM into the TPM
+      \item Starts the vTPM
+      \item Measures remaining Armored VMs into the vTPM
+      \item Starts remaining Armored VMs
+      \item Measures Armored application into the vTPM
+      \item Starts the Armored application
+      \end{itemize}
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
@@ -436,9 +472,21 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-      \item Boot the MLE
-      \item Boot the vTPM
-      \item Boot the Armored Virtual Platform
+    \item \texttt{SENTER} starts the MLE 
+      \begin{itemize}
+      \item \texttt{SENTER} starts the hypervisor
+      \item \texttt{SENTER} passes dom0 to hypervisor
+      \item hypervisor starts dom0
+      \end{itemize}
+    \item dom0 constructs the Armored VP
+      \begin{itemize}
+      \item Measures the vTPM into the TPM
+      \item Starts the vTPM
+      \item Measures remaining Armored VMs into the vTPM
+      \item Starts remaining Armored VMs
+      \item Measures Armored application into the vTPM
+      \item Starts the Armored application
+      \end{itemize}
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
