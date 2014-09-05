@@ -191,7 +191,7 @@
   \end{columns}
 }
 
-\frame{\frametitle{What Can We Learn?}
+\frame{\frametitle{What Do We Know?}
 
   Assume we know $0|\hash{A}|\hash{B}$ is correct
 
@@ -207,10 +207,30 @@
     \item Trusted store started with 0
     \end{itemize}
   \end{itemize}
+}
 
-  \begin{block}{Chains of Trust}
-    Trust chain starts with Trusted Measurer and Trusted Store.
-  \end{block}
+\frame{\frametitle{But Why Trust B?}
+  
+  A chain exists from Trusted Measurer and Trusted Store to B
+
+  \begin{itemize}
+  \item Trusted Measurer and Trusted Store are trusted \emph{a priori}
+  \item A is trusted to be A because its measurement is:
+    \begin{itemize}
+    \item Correct
+    \item Taken by a trusted party (Trusted Measurer)
+    \item Stored by a trusted party (Trusted Store)
+    \end{itemize}
+  \item B is trusted to be B because its measurement is:
+    \begin{itemize}
+    \item Correct
+    \item Taken by a trusted party (A)
+    \item Stored by a trusted party (Trusted Store)
+    \item If A's ability to measure B were compromised, $\hash{A}$
+      would be wrong
+    \end{itemize}
+  \item and so on and so on...
+  \end{itemize}
 }
 
 \frame{\frametitle{Trust is a Preorder}
@@ -220,11 +240,11 @@
 
   \begin{itemize}
   \item Reflexive - $\forall x \cdot \trusts{x}{x}$
-  \item Transitive - $\forall x,y,z\cdot\trusts{y}{x} \wedge \trusts{z}{y} \Rightarrow
+  \item Transitive - $\forall x,y,z\cdot\trusts{x}{y}\wedge\trusts{y}{z}  \Rightarrow
   \trusts{z}{x}$
   \end{itemize}
 
-  The transitive property defines \emph{chains of trust}.
+  \alert{Trusted Boot builds evidence supporting these chains}
 }
 
 
@@ -623,22 +643,22 @@
 }
 
 
-\frame{\frametitle{Chaining Trust}
+\frame{\frametitle{Chaining Trust (Reprise)}
   \begin{itemize}
   \item Trust is transitive
     \begin{itemize}
     \item $\trusts{x}{y} \wedge \trusts{y}{z} \Rightarrow
       \trusts{x}{z}$
-    \item Construct chains of trust
+    \item Construct evidence trust chains
     \item Remember ``directly observed or indirectly observed by a
       trusted third party''
     \end{itemize}
   \item Roots of Trust define the ``root'' for trust
     \begin{itemize}
     \item Use Roots of Trust to establish base for chain
-    \item RTM generates a trusted first measurement
-    \item RTS protects first measurement
-    \item RTR signs base quote for appraiser (eventually)
+    \item RTM is the Trusted Measurer
+    \item RTS is the Trusted Store
+    \item RTR is the Trusted Reporter (coming soon...)
     \end{itemize}
   \item Extend chains of trust by measuring before executing
   \end{itemize}
