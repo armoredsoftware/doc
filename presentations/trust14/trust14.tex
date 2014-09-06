@@ -311,10 +311,10 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item Power-on reset, resettable PCRs set to -1
-    \item \texttt{SENTER} called
-    \item \texttt{SENTER} resets resettable PCRs to 0
-    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
+    \item<1-> Power-on reset
+    \item<2-> Resettable PCRs set to -1
+    \item<3-> \texttt{SENTER} called, resets resettable PCRs to 0
+    \item<4-> \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
@@ -350,10 +350,10 @@
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item \texttt{SINIT} measures the Measured Launch Environment (MLE)
+    \item<1-> \texttt{SINIT} measures the Measured Launch Environment (MLE)
       using measured policy
-    \item \texttt{SINIT} returns control to \texttt{SENTER}
-    \item \texttt{SENTER} invokes the MLE
+    \item<1-> \texttt{SINIT} returns control to \texttt{SENTER}
+    \item<2-> \texttt{SENTER} invokes the MLE
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
