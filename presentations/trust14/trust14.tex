@@ -98,95 +98,12 @@
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-root.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{Chaining Measurements}
-    \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Start with a measurer and store that is trusted
-    \item Measure software to be launched
-    \item Store the measurement
-    \item Launch the new software
-    \item Repeat until system boot
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-measure.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-
-\frame{\frametitle{Chaining Measurements}
-    \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Start with a measurer and store that is trusted
-    \item Measure software to be launched
-    \item Store the measurement
-    \item Launch the new software
-    \item Repeat until system boot
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-store.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-
-\frame{\frametitle{Chaining Measurements}
-    \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Start with a measurer and store that is trusted
-    \item Measure software to be launched
-    \item Store the measurement
-    \item Launch the new software
-    \item Repeat until system boot
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-start.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-
-\frame{\frametitle{Chaining Measurements}
-    \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Start with a measurer and store that is trusted
-    \item Measure software to be launched
-    \item Store the measurement
-    \item Launch the new software
-    \item Repeat until system boot
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-next.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{Chaining Measurements}
-    \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Start with a measurer and store that is trusted
-    \item Measure software to be launched
-    \item Store the measurement
-    \item Launch the new software
-    \item Repeat until system boot
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/chain-final.pdf}
+      \only<1>{\includegraphics[width=1.0\textwidth]{figures/chain-root.pdf}}
+      \only<2>{\includegraphics[width=1.0\textwidth]{figures/chain-measure.pdf}}
+      \only<3>{\includegraphics[width=1.0\textwidth]{figures/chain-store.pdf}}
+      \only<4>{\includegraphics[width=1.0\textwidth]{figures/chain-start.pdf}}
+      \only<5>{\includegraphics[width=1.0\textwidth]{figures/chain-next.pdf}}
+      \only<6>{\includegraphics[width=1.0\textwidth]{figures/chain-final.pdf}}
     \end{figure}
   \end{columns}
 }
@@ -401,68 +318,13 @@
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-pre-reset.pdf}
+      \only<1>{\includegraphics[width=1.0\textwidth]{figures/boot-pre-reset.pdf}}
+      \only<2>{\includegraphics[width=1.0\textwidth]{figures/boot-reset.pdf}}
+      \only<3>{\includegraphics[width=1.0\textwidth]{figures/boot-senter.pdf}}
+      \only<4>{\includegraphics[width=1.0\textwidth]{figures/boot-senter-post.pdf}}
     \end{figure}
   \end{columns}
 }
-
-\frame{\frametitle{One Step from Roots of Trust}
-  
-  Roots of trust are used to build a trusted system from boot.
-
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Power-on reset, resettable PCRs set to -1
-    \item \texttt{SENTER} called
-    \item \texttt{SENTER} resets resettable PCRs to 0
-    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-reset.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{One Step from Roots of Trust}
-  
-  Roots of trust are used to build a trusted system from boot.
-
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Power-on reset, resettable PCRs set to -1
-    \item \texttt{SENTER} called
-    \item \texttt{SENTER} resets resettable PCRs to 0
-    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-senter.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{One Step from Roots of Trust}
-  
-  Roots of trust are used to build a trusted system from boot.
-
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item Power-on reset, resettable PCRs set to -1
-    \item \texttt{SENTER} called
-    \item \texttt{SENTER} resets resettable PCRs to 0
-    \item \texttt{SENTER} measures \texttt{SINIT} policy into PCR 18
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-senter-post.pdf}
-    \end{figure}
-  \end{columns}
-}
-
 
 \frame{\frametitle{What We Know From Good PCR 18}
   A good value in PCR 18 tells us:
@@ -495,24 +357,8 @@
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-pre-sinit.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{Two Steps from Roots of Trust}
-
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item \texttt{SINIT} measures the Measured Launch Environment (MLE)
-      using measured policy
-    \item \texttt{SINIT} returns control to \texttt{SENTER}
-    \item \texttt{SENTER} invokes the MLE
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-sinit-post.pdf}
+      \only<1>{\includegraphics[width=1.0\textwidth]{figures/boot-pre-sinit.pdf}}
+      \only<2>{\includegraphics[width=1.0\textwidth]{figures/boot-sinit-post.pdf}}
     \end{figure}
   \end{columns}
 }
@@ -555,93 +401,13 @@
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-pre-hypervisor.pdf}
+      \only<1>{\includegraphics[width=1.0\textwidth]{figures/boot-pre-hypervisor.pdf}}
+      \only<2>{\includegraphics[width=1.0\textwidth]{figures/boot-vtpm.pdf}}
+      \only<3>{\includegraphics[width=1.0\textwidth]{figures/boot-platform.pdf}}
+      \only<4>{\includegraphics[width=1.0\textwidth]{figures/boot-platform-post.pdf}}
     \end{figure}
   \end{columns}
 }
-
-\frame{\frametitle{Boot the vTPM}
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-      \item \texttt{SENTER} starts the MLE 
-        \begin{itemize}
-        \item \texttt{SENTER} starts the hypervisor
-        \item \texttt{SENTER} passes dom0 to hypervisor
-        \item hypervisor starts dom0
-        \end{itemize}
-      \item dom0 constructs the Armored VP
-        \begin{itemize}
-        \item Measures the vTPM into the TPM
-        \item Starts the vTPM
-        \item Measures remaining Armored VMs into the vTPM
-        \item Starts remaining Armored VMs
-        \item Measures Armored application into the vTPM
-        \item Starts the Armored application
-        \end{itemize}
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-vtpm.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-\frame{\frametitle{Boot the Armor Virtual Platform}
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item \texttt{SENTER} starts the MLE 
-      \begin{itemize}
-      \item \texttt{SENTER} starts the hypervisor
-      \item \texttt{SENTER} passes dom0 to hypervisor
-      \item hypervisor starts dom0
-      \end{itemize}
-    \item dom0 constructs the Armored VP
-      \begin{itemize}
-      \item Measures the vTPM into the TPM
-      \item Starts the vTPM
-      \item Measures remaining Armored VMs into the vTPM
-      \item Starts remaining Armored VMs
-      \item Measures Armored application into the vTPM
-      \item Starts the Armored application
-      \end{itemize}
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-platform.pdf}
-    \end{figure}
-  \end{columns}
-}
-
-
-\frame{\frametitle{Boot Result}
-  \begin{columns}[c]
-    \column{.53\textwidth}
-    \begin{itemize}
-    \item \texttt{SENTER} starts the MLE 
-      \begin{itemize}
-      \item \texttt{SENTER} starts the hypervisor
-      \item \texttt{SENTER} passes dom0 to hypervisor
-      \item hypervisor starts dom0
-      \end{itemize}
-    \item dom0 constructs the Armored VP
-      \begin{itemize}
-      \item Measures the vTPM into the TPM
-      \item Starts the vTPM
-      \item Measures remaining Armored VMs into the vTPM
-      \item Starts remaining Armored VMs
-      \item Measures Armored application into the vTPM
-      \item Starts the Armored application
-      \end{itemize}
-    \end{itemize}
-    \column{.45\textwidth}
-    \begin{figure}
-      \includegraphics[width=1.0\textwidth]{figures/boot-platform-post.pdf}
-    \end{figure}
-  \end{columns}
-}
-
 
 \frame{\frametitle{Chaining Trust (Reprise)}
   \begin{itemize}
