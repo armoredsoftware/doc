@@ -373,9 +373,9 @@
     with \texttt{SINIT} measurement policy
   \item \texttt{SENTER} ran before \texttt{SINIT} ---
     $\extend{0}{SINIT}\neq\extend{-1}{SINIT}$
-  \item \texttt{SLE} is good --- Measured by good \texttt{SINIT} into
+  \item \texttt{MLE} is good --- Measured by good \texttt{SINIT} into
     PCR
-  \item Initial OS is good --- Measured by good \texttt{SLE} into PCR
+  \item Initial OS is good --- Measured by good \texttt{MLE} into PCR
   \end{itemize}
 }
 
@@ -407,6 +407,20 @@
       \only<4>{\includegraphics[width=1.0\textwidth]{figures/boot-platform-post.pdf}}
     \end{figure}
   \end{columns}
+}
+
+\frame{\frametitle{What we know from good PCRs}
+  \begin{itemize}
+  \item The right hypervisor and dom0 started - PCR 17 measurement and
+    we trust \texttt{SENTER}, \texttt{SINIT} and \texttt{SINIT} Policy
+  \item The right vTPM started - PCR 19 measurement and we trust
+    \texttt{SENTER}, \texttt{SINIT}, and dom0\footnote{More work for
+      vTPM startup remains}
+  \item The right ArmoredSoftware components started - vTPM PCRs and
+    we trust dom0 and the vTPM
+  \item The right application started - vTPM PCRs and we trust dom0
+    and the vTPM
+  \end{itemize}
 }
 
 \frame{\frametitle{Chaining Trust (Reprise)}
