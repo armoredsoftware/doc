@@ -101,16 +101,19 @@
   \end{itemize}
 }
 
-\frame{\frametitle{Chaining Measurements}
+\frame{\frametitle{Measurement --- Chaining Evidence}
+  
+  We would like to start $A$ and $B$ while gathering evidence of trust
+
     \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item<1-> Start with a measurer and store that are trusted
+    \item<1-> Start with a root measurer and store that are trusted
       \emph{a priori}
-    \item<2-> Measure software to be launched
-    \item<3-> Store the measurement
+    \item<2-> Measure the new software to be launched
+    \item<3-> Store the measurement of the new software
     \item<4-> Launch the new software
-    \item<5-> Repeat until system boot
+    \item<5-> Repeat for each system software component
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
@@ -124,17 +127,26 @@
   \end{columns}
 }
 
-\frame{\frametitle{What Do We Know?}
+\frame{\frametitle{Appraisal --- What Do We Know?}
 
-  Assume we know $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ is correct
+  Measurement $\neq$ trust --- Measurements must be appraised
 
   \begin{itemize}
-  \item $\hash{A}$ and $\hash{B}$ must be correct
+  \item Determine if $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ is correct
     \begin{itemize}
-    \item $A$ and $B$ are the correct binaries
+    \item Calculate a \emph{golden hash} from $A$ and $B$
+    \item Compare golden hash with
+      $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ from trusted store
+    \item Correct $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ implies
+      trusted boot
+    \end{itemize}
+  \item Correct $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ implies $A$ and $B$ must be correct
+    \begin{itemize}
+    \item Correct $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ implies $\hash{A}$ and $\hash{B}$ are the correct hashes
+    \item Correct $\hash{A}$ and $\hash{B}$ implies $A$ and $B$ are the correct binaries
     \item $A$ includes hash and launch functions
     \end{itemize}
-  \item Measurement occurred in the right order
+  \item Correct $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ implies measurement occurred in the right order
     \begin{itemize}
     \item $\hash{(XY)}\neq\hash{(YX)}$
     \item Trusted store started with 0
@@ -142,13 +154,13 @@
   \end{itemize}
 }
 
-\frame{\frametitle{But Why Trust B?}
+\frame{\frametitle{Appraisal --- But Why Trust B?}
   
-  A chain exists from Trusted Measurer and Trusted Store to B
+  A chain exists from the Trusted Measurer and Trusted Store to B
 
   \begin{itemize}
   \item Trusted Measurer and Trusted Store are trusted \emph{a priori}
-  \item A is trusted to be A because its measurement is:
+  \item $A$ is trusted to be $A$ because its measurement is:
     \begin{itemize}
     \item Correct
     \item Taken by a trusted party (Trusted Measurer)
@@ -177,7 +189,7 @@
   \trusts{x}{z}$
   \end{itemize}
 
-  \alert{Measured Boot gathers evidence supporting these chains}
+  \alert{Measured Boot gathers evidence of these chains}
 }
 
 
