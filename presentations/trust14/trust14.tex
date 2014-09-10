@@ -86,11 +86,27 @@
   \end{itemize}
 }
 
+\frame{\frametitle{Tools for Trust}
+  \begin{itemize}
+  \item $\hash{X}$ --- Hash function such as MD-5
+    \begin{itemize}
+    \item $\hash{X}$ is unique for each $X$
+    \item Guessing $X$ from $\hash{X}$ is impossible
+    \end{itemize}
+  \item $\encrypt{X}{Y}$ --- Encrypting $X$ with $Y$
+    \begin{itemize}
+    \item $X$ cannot be obtained from $\encrypt{X}{Y}$ without $Y$
+    \item $Y$ cannot be guessed
+    \end{itemize}
+  \end{itemize}
+}
+
 \frame{\frametitle{Chaining Measurements}
     \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item<1-> Start with a measurer and store that is trusted
+    \item<1-> Start with a measurer and store that are trusted
+      \emph{a priori}
     \item<2-> Measure software to be launched
     \item<3-> Store the measurement
     \item<4-> Launch the new software
@@ -110,13 +126,13 @@
 
 \frame{\frametitle{What Do We Know?}
 
-  Assume we know $0|\hash{A}|\hash{B}$ is correct
+  Assume we know $\extend{\extend{0}{\hash{A}}}{\hash{B}}$ is correct
 
   \begin{itemize}
   \item $\hash{A}$ and $\hash{B}$ must be correct
     \begin{itemize}
     \item $A$ and $B$ are the correct binaries
-    \item $A$ and $B$ include hash and launch functions
+    \item $A$ includes hash and launch functions
     \end{itemize}
   \item Measurement occurred in the right order
     \begin{itemize}
@@ -158,10 +174,10 @@
   \begin{itemize}
   \item Reflexive - $\forall x \cdot \trusts{x}{x}$
   \item Transitive - $\forall x,y,z\cdot\trusts{x}{y}\wedge\trusts{y}{z}  \Rightarrow
-  \trusts{z}{x}$
+  \trusts{x}{z}$
   \end{itemize}
 
-  \alert{Measured Boot builds evidence supporting these chains}
+  \alert{Measured Boot gathers evidence supporting these chains}
 }
 
 
