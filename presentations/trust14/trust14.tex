@@ -515,14 +515,16 @@
 }
 
 \frame{\frametitle{Certifying AIK}
-    We would like to start $A$ and $B$ while gathering evidence of trust
+  
+  Assume a trusted Certificate Authority (CA) that maintains links from ID
+  to $\public{EK}$
 
-    \begin{columns}[c]
+  \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item<1-> Request AIK certification from a Certificate Authority
-    \item<2-> CA signs the AIK
-    \item<3-> CA encrypts the signed AIK with the requester's EK
+    \item<1-> Target $ID_n$ requests AIK certification from CA
+    \item<2-> CA signs AIK
+    \item<3-> CA encrypts signed AIK with requester's EK
     \item<4-> CA sends encrypted AIK to requester
     \item<5-> Requester decrypts encrypted AIK
     \item<6-> Requester sends signed AIK to appraiser
@@ -535,9 +537,27 @@
       \only<5-6>{\includegraphics[width=0.70\textwidth]{figures/cert-decrypt.pdf}}
     \end{figure}
   \end{columns}
-
 }
 
+\frame{\frametitle{Why Believe AIK Belongs to $ID_n$?}
+
+  Cryptographic evidence ensures $\public{AIK}$ is an alias for the
+  right $\public{EK}$
+
+  \begin{itemize}
+  \item Only the CA can generate $\sign{\public{AIK}}{CA}$
+  \item CA is trusted to know $ID_n->EK_n$
+  \item CA is trusted to generate
+    $\encrypt{\sign{\public{AIK}}{CA}}{EK_n}$
+  \item Only $ID_n$ can decrypt $\encrypt{\sign{\public{AIK}}{CA}}{EK_n}$
+  \item Appraiser can check $\sign{\public{AIK}}{CA}$ to ensure use of
+    trusted CA
+  \item If Appraiser can use $\public{AIK}$ then it was decrypted by
+    $ID_n$
+  \end{itemize}
+
+  \alert{AIK is an alias for EK used for signing}
+}
 % \frame{\frametitle{Presentation Outline}
 %   \begin{itemize}
 %     \item Review access control modeling objectives
