@@ -517,26 +517,43 @@
 \frame{\frametitle{Certifying AIK}
   
   Assume a trusted Certificate Authority (CA) that maintains links from ID
-  to $\public{EK}$
+  to $\public{EK}$ with well-known public key $\public{CA}$
 
   \begin{columns}[c]
     \column{.53\textwidth}
     \begin{itemize}
-    \item<1-> Target $ID_n$ requests AIK certification from CA
-    \item<2-> CA signs AIK
-    \item<3-> CA encrypts signed AIK with requester's EK
-    \item<4-> CA sends encrypted AIK to requester
-    \item<5-> Requester decrypts encrypted AIK
-    \item<6-> Requester sends signed AIK to appraiser
+    \item<1-> $ID_n$ requests $\public{AIK}$ certification from CA
+    \item<2-> CA signs $\public{AIK}$ with $\private{CA}$
+    \item<3-> CA encrypts $\sign{\public{AIK}}{CA}$ with $ID_n$'s $\public{EK_n}$
+    \item<4-> CA sends $\encrypt{\sign{\public{AIK}}{CA}}{EK_n}$ to $ID_n$
+    \item<5-> $ID_n$ decrypts encrypted AIK with $\private{EK_n}$
+    \item<6-> $ID_n$ sends $\sign{\public{AIK}}{CA}$ to appraiser
     \end{itemize}
     \column{.45\textwidth}
     \begin{figure}
-      \only<1>{\includegraphics[width=0.70\textwidth]{figures/cert-pre.pdf}}
-      \only<2>{\includegraphics[width=0.70\textwidth]{figures/cert-gen.pdf}}
-      \only<3-4>{\includegraphics[width=0.70\textwidth]{figures/cert-crypt.pdf}}
-      \only<5-6>{\includegraphics[width=0.70\textwidth]{figures/cert-decrypt.pdf}}
+      \only<1>{\includegraphics[width=0.70\columnwidth]{figures/cert-pre.pdf}}
+      \only<2>{\includegraphics[width=0.70\columnwidth]{figures/cert-gen.pdf}}
+      \only<3-4>{\includegraphics[width=0.70\columnwidth]{figures/cert-crypt.pdf}}
+      \only<5-6>{\includegraphics[width=0.70\columnwidth]{figures/cert-decrypt.pdf}}
     \end{figure}
   \end{columns}
+}
+
+\frame{\frametitle{Using Protocol Notation}
+
+  Protocol notation specifies communication:
+
+  \[\msg{Sender}{Receiver}{Messsage}\]
+
+  \begin{block}{Key Certification Protocol}
+  \begin{eqnarray}
+    \begin{aligned}
+    & \msg{ID_n}{CA}{AIK} \\
+    & \msg{CA}{ID_n}{\encrypt{\sign{\public{AIK}}{CA}}{EK_n}} \\
+    & \msg{ID_n}{App}{\sign{\public{AIK}}{CA},\sign{\langle n,pcr\rangle}{\public{AIK}}}
+    \end{aligned}
+  \end{eqnarray}
+  \end{block}
 }
 
 \frame{\frametitle{Why Believe AIK Belongs to $ID_n$?}
@@ -546,7 +563,7 @@
 
   \begin{itemize}
   \item Only the CA can generate $\sign{\public{AIK}}{CA}$
-  \item CA is trusted to know $ID_n->EK_n$
+  \item CA is trusted to know $ID_n\rightarrow EK_n$
   \item CA is trusted to generate
     $\encrypt{\sign{\public{AIK}}{CA}}{EK_n}$
   \item Only $ID_n$ can decrypt $\encrypt{\sign{\public{AIK}}{CA}}{EK_n}$
@@ -556,7 +573,7 @@
     $ID_n$
   \end{itemize}
 
-  \alert{AIK is an alias for EK used for signing}
+  \alert{AIK is now a certified alias for EK used for signing}
 }
 % \frame{\frametitle{Presentation Outline}
 %   \begin{itemize}
