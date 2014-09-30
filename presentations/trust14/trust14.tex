@@ -57,32 +57,28 @@
 {\footnotesize\color{kugray} Formatted with the Beamer Class for \LaTeXe}
 \end{frame}
 
-\frame{\frametitle{Defining Trust}
-  \begin{block}{Trust}
-    ``An entity can be trusted if it always behaves in the expected
-    manner for the intended purpose~\cite{Martin:08:The-ten-page-in}''
-  \end{block}
+\frame{\frametitle{What is Trust?}
+  ``An entity can be trusted if it always behaves in the expected
+  manner for the intended purpose''\footnote{\emph{The Ten Page Introduction
+      to Trusted Computing} by Andrew Martin}
 }
 
-\frame{\frametitle{Defining Trust}
-  \begin{block}{Properties}
+\frame{\frametitle{Properties of Trust}
     \begin{itemize}
     \item Unambiguous identification
     \item Unimpeded operation
     \item First-hand observation of good behavior \emph{or} indirect
       experience of good behavior by a trusted third party
     \end{itemize}
-  \end{block}
 }
 
-\frame{\frametitle{Necessary Capabilities for Trust}
+\frame{\frametitle{Capabilities for Establishing Trust}
   \begin{itemize}
   \item \emph{Strong Identification} --- An unambiguous, immutable
-    identifier associated with the platform.  The identifier is a
-    protected encryption key in the TXT implementation.
+    identifier associated with the platform.
   \item \emph{Reporting Configuration} --- An unambiguous
     identification mechanism for software and hardware running on the
-    platform.  The mechanism is hashing in the TXT implementation
+    platform.
   \end{itemize}
 }
 
@@ -93,10 +89,16 @@
     \item $\hash{X}$ is unique for each $X$
     \item Guessing $X$ from $\hash{X}$ is impossible
     \end{itemize}
-  \item $\encrypt{X}{Y}$ --- Encrypting $X$ with $Y$
+  \item $\encrypt{X}{Y}$ --- Encrypt $X$ with $Y$
     \begin{itemize}
     \item $X$ cannot be obtained from $\encrypt{X}{Y}$ without $Y$
-    \item $Y$ cannot be guessed
+    \item Guessing $X$ from $\encrypt{X}{Y}$ is impossible
+    \item Guessing $Y$ is impossible
+    \end{itemize}
+  \item $\sign{X}{Y}$ --- Sign $X$ with $Y$
+    \begin{itemize}
+    \item $\sign{X}{Y}$ is unique for every $X$ and $Y$ pair
+    \item Guessing $\sign{X}{Y}$ from $X$ is impossible
     \end{itemize}
   \end{itemize}
 }
