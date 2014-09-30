@@ -84,18 +84,18 @@
 
 \frame{\frametitle{Tools for Trust}
   \begin{itemize}
-  \item $\hash{X}$ --- Hash function such as MD-5
+  \item $\hash{X}$ --- Hash of $X$
     \begin{itemize}
     \item $\hash{X}$ is unique for each $X$
     \item Guessing $X$ from $\hash{X}$ is impossible
     \end{itemize}
-  \item $\encrypt{X}{Y}$ --- Encrypt $X$ with $Y$
+  \item $\encrypt{X}{Y}$ --- Encrypt $X$ with $\public{Y}$
     \begin{itemize}
     \item $X$ cannot be obtained from $\encrypt{X}{Y}$ without $Y$
     \item Guessing $X$ from $\encrypt{X}{Y}$ is impossible
     \item Guessing $Y$ is impossible
     \end{itemize}
-  \item $\sign{X}{Y}$ --- Sign $X$ with $Y$
+  \item $\sign{X}{Y}$ --- Sign $X$ with $\private{Y}$
     \begin{itemize}
     \item $\sign{X}{Y}$ is unique for every $X$ and $Y$ pair
     \item Guessing $\sign{X}{Y}$ from $X$ is impossible
