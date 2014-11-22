@@ -19,6 +19,8 @@
 \newcommand{\seal}[2]{\ensuremath{seal(#1,\{#2\})}}
 \newcommand{\wrap}[2]{\ensuremath{wrap(#1,\{#2\})}}
 
+%%% Trust notations (deprecated)
+
 \newcommand{\trustworthy}[1]{\ensuremath{W(#1)}}
 \newcommand{\trusts}[2]{\ensuremath{T^{\mathsf{#1}}[\mathsf{#2}]}}
 \newcommand{\conf}[3]{\ensuremath{\mathit{C(\mathsf{#1},\mathsf{#2},\{#3\})}}}
@@ -29,6 +31,8 @@
 \newcommand{\availrest}[2]{\ensuremath{\mathit{A_r(\mathsf{#1},\mathsf{#2})}}}
 \newcommand{\account}[2]{\ensuremath{\mathit{N(\mathsf{#1},\mathsf{#2})}}}
 \newcommand{\provides}[1]{\ensuremath{\mathsf{provides}(#1)}}
+
+%%% Spi notations
 
 \newcommand{\nil}{\ensuremath{\mathbf{0}}}
 \newcommand{\bind}[1]{\ensuremath{\nu #1}}
@@ -42,3 +46,8 @@
 \newcommand{\llet}[3]{\ensuremath{\mathsf{let}\; #1=#2\; \mathsf{in}\;
     #3}}
 \newcommand{\defs}{\ensuremath{\stackrel{\Delta}{=}}}
+
+%%% Message notation
+
+\newcommand{\sndmsg}[4]{\ensuremath{#1\rightarrow #2:#3}\;
+  \mathsf{on}\; #4}
