@@ -7,7 +7,7 @@
 \usepackage{url}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\usepackage{trust}
+\usepackage{trust-spi}
 \usepackage{subfigure}
 \usepackage{ifthen}
 
@@ -316,6 +316,42 @@ as we become more aware of our needs.
 \appendix
 
 \section{Glossary}
+
+\begin{itemize}
+  \squash
+\item $\nil$ - null process
+\item $\hash{M}$ - hash of $M$
+\item $\public{K}$ - public half of asymmetric key $K$
+\item $\private{K}$ - private half of asymmetric key $K$
+\item $\crypt{M}{K}$ - encrypt $M$ with symmetric key $K$
+\item $\encrypt{M}{K}$ - encrypt $M$ with the public key from $K$
+\item $\decrypt{M}{K}$ - decrypt $M$ with the public key from $K$
+\item $\sign{M}{K}$ - sign $M$ with the private key from $K$
+\item $\design{M}{K}$ - check signature on $M$ with the public key from $K$
+\item $(\bind{x})P$ - new variable $x$ defined in scope of $P$
+\item $\snd{c}{M}$ - send $M$ on channel $c$
+\item $\rcv{c}{M}$ - receive $M$ on channel $c$
+\item $\rep{P}$ - infinite replication of $P$
+\item $P\alt Q$ - $P$ or $Q$
+\item $P\comp Q$ - $P$ in parallel with $Q$
+\item $\ccase{\crypt{M}{k}}{x}{P}$ - attempt to decrypt $\crypt{M}{k}$ and
+  bind to $x$ in $P$ if successful.  Stuck if unsuccessful
+\item $\ccase{\decrypt{M}{k}}{x}{P}$ - attempt to decrypt $\encrypt{M}{k}$ and
+  bind to $x$ in $P$ if successful.  Stuck if unsuccessful
+\item $\ccase{\design{M}{k}}{x}{P}$ - attempt to check signature $\sign{M}{k}$ and
+  bind to $x$ in $P$ if successful.  Stuck if unsuccessful
+\item $\icase{x}{y} 0: P suc(x): Q$ - case splitting over integers.
+  $x$ is bound in $Q$.
+\item $\llet{(x,y)}{M}{y} $ - match $M$ to $(x,y)$ binding $x$ and $y$
+  to pair elements in $M$
+\item $A\defs B$ - define an equivalence
+\end{itemize}
+
+\begin{eqnarray*}
+  \label{eq:1}
+  A & \defs & (\bind{c})\;\snd{c}{M}.\nil \comp \\
+    & & \rcv{c}{M}.A
+\end{eqnarray*}
 
 %%\nocite{}
 
