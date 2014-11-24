@@ -67,27 +67,25 @@ Examples motivated by \citet{Abadi:99:A-Calculus-for-}.
 
 \subsection{Needham Schroeder}
 
-\begin{eqnarray*}
-  \label{eq:2}
+\begin{align*}
   & \sndmsg{A}{B}{\encrypt{\public{A},N_A}{B}}{c} & \\
   & \sndmsg{B}{A}{\encrypt{N_A,N_B}{A}}{c} & \\
   & \sndmsg{A}{B}{\encrypt{N_B}{B}}{c} &
-\end{eqnarray*}
+\end{align*}
 
-\begin{eqnarray*}
-  \label{eq:3}
-  A & \defs & \snd{c}{\encrypt{(A,N_A)}{B}}. \\
-  & & \rcv{c}{M}. \\
-  & & \CASE \decrypt{M}{A} \OF (N_A,nb) \IN \\
-  & & \snd{c}{\encrypt{nb}{B}}. \\
-  & & A \\
-  B & \defs & \rcv{c}{M}. \\
-  & & \CASE \decrypt{M}{B} \OF (x,n) \IN \\
-  & & \snd{c}{\encrypt{(n,N_B)}{x}}. \\
-  & & \rcv{c}{M}. \\
-  & & \CASE \decrypt{M}{B} \OF N_B \IN B \\
-  sys & \defs & (\bind{c}) A \cmp B
-\end{eqnarray*}
+\begin{align*}
+  A \defs & \snd{c}{\encrypt{(A,N_A)}{B}}. \\
+    & \rcv{c}{M}. \\
+    & \CASE \decrypt{M}{A} \OF (N_A,nb) \IN \\
+    & \snd{c}{\encrypt{nb}{B}}. \\
+    & A \\
+  B \defs & \rcv{c}{M}. \\
+    & \CASE \decrypt{M}{B} \OF (x,n) \IN \\
+    & \snd{c}{\encrypt{(n,N_B)}{x}}. \\
+    & \rcv{c}{M}. \\
+    & \CASE \decrypt{M}{B} \OF N_B \IN B \\
+  sys \defs & (\bind{c}) A \cmp B
+\end{align*}
 
 \inference[React Inter]{}{\snd{m}{N}.p\cmp\rcv{m}{x}.Q -> P\cmp
   [x->N]Q}
@@ -173,8 +171,6 @@ Do we really want a signature check that fails to get stuck?  I think
 so.  $M$ is available, but the signature check is stuck.  A signed
 message is best represented as a pair $(M,\sign{M}{k})$ allowing the
 message to be explicitly available.
-
-I think this is pretty much what we want.
 
 \medskip
 
@@ -279,11 +275,11 @@ I think this is pretty much what we want.
 \item $\sndmsg{A}{B}{M}{c}$ - $A$ sends $B$ message $M$ on channel $c$
 \end{itemize}
 
-\begin{eqnarray*}
+\begin{align*}
   \label{eq:1}
-  A & \defs & (\bind{c})\;\snd{c}{M}.\nil \cmp \\
-    & & \rcv{c}{M}.A
-\end{eqnarray*}
+  A \defs & (\bind{c})\;\snd{c}{M}.\nil \cmp \\
+    & \rcv{c}{M}.A
+\end{align*}
 
 %%\nocite{}
 
