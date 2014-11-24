@@ -11,6 +11,7 @@
 \usepackage{subfigure}
 \usepackage{ifthen}
 \usepackage{amsmath}
+\usepackage{stmaryrd}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows}
@@ -87,7 +88,7 @@ Examples motivated by \citet{Abadi:99:A-Calculus-for-}.
   sys \defs & (\bind{c}) A \cmp B
 \end{align*}
 
-\inference[React Inter]{}{\snd{m}{N}.p\cmp\rcv{m}{x}.Q -> P\cmp
+\inference[React Inter]{}{\snd{m}{N}.P\cmp\rcv{m}{x}.Q -> P\cmp
   [x->N]Q}
 
 \medskip
@@ -96,7 +97,7 @@ Examples motivated by \citet{Abadi:99:A-Calculus-for-}.
 
 \medskip
 
-\inference[Red Match]{}{[M \IS M]P > P}
+\inference[Red Match]{}{\llbracket M \IS M\rrbracket P > P}
 
 \medskip
 
@@ -115,6 +116,7 @@ pairs here.  We'll see what the other inference rules give us.
 
 I find the $\CASE$ rules over naturals quite crude.
 
+\medskip
 
 \inference[Red Sym Decrypt]{}{\CASE \crypt{M}{k} \OF \crypt{x}{k} \IN
   P > [x->M]P}
@@ -124,20 +126,18 @@ I find the $\CASE$ rules over naturals quite crude.
 Additional proposed semantic rules for public/private key encryption
 and signature checking
 
-\inference[Red Asym Decrypt]{}{\CASE \encrypt{M}{k} \OF \decrypt{x}{k} \IN P
+\inference[Red Asym Decrypt 1]{}{\CASE \encrypt{M}{k} \OF \decrypt{x}{k} \IN P
 > [x->M]P}
 
 \medskip
 
-\inference[Red Sig Check Broken]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
+\inference[Red Asym Decrypt 2]{}{\CASE \decrypt{M}{k} \OF \encrypt{x}{k} \IN P
 > [x->M]P}
 
 \medskip
 
-This rule has a more serious problem as it allows us to reproduce a
-message from it's signature.  Specifically, if we have $\sign{M}{k}$
-and signature match is successful, then $x$ is bound to $M$.  That
-can't happen.  Possibly the rule should look like this:
+The previous two rules capture the essence of asymmetric key pairs.
+Specifically, encrypt with one and decrypt with the other.
 
 \medskip
 
@@ -148,10 +148,15 @@ where $\hash{M}$ is the hash and not the message itself.  A signature
 check should look something like this:
 
 \begin{align*}
-  & \LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \design{M}{k} \IN P \\
-  & > [m->M][s->\sign{M}{k}]\CASE s \OF \design{M}{k} \IN P \\
-  & > \CASE \sign{M}{k} \OF \design{M}{k} \IN [m->M][s->\hash{M}]P \\
-  & > [m->M][s->\hash{M}]P
+  & \LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \encrypt{x}{k} \IN
+  \llbracket x\IS \hash{m}\rrbracket P \\
+  & > [m->M][s->\sign{M}{k}]\CASE s \OF \encrypt{x}{k} \IN \llbracket
+  x\IS \hash{m}\rrbracket P \\
+  & > \CASE \sign{M}{k} \OF \encrypt{x}{k} \IN
+  [m->M][s->\sign{M}{k}]\llbracket x\IS \hash{m}\rrbracket P \\
+  & > [x->\hash{M}][m->M][s->\sign{M}{k}][x\IS \hash{m}]P \\
+  & > \llbracket\hash{M} \IS \hash{M}\rrbracket[x->\hash{M}][m->M][s->\sign{M}{k}]P \\
+  & > [x->\hash{M}][m->M][s->\sign{M}{k}]P
 \end{align*}
 
 This is precisely what we want.  Specifically, $P$ with $m$ replaced
