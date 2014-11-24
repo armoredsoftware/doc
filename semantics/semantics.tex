@@ -60,7 +60,194 @@ The University of Kansas \\
 
 \section{SPI Calculus}
 
-\citet{Abadi:99:A-Calculus-for-}
+Examples motivated by \citet{Abadi:99:A-Calculus-for-}.
+
+\subsection{Wide Mouth Frog}
+
+\subsection{Needham Schroeder}
+
+\begin{eqnarray*}
+  \label{eq:2}
+  & \sndmsg{A}{B}{\encrypt{\public{A},N_A}{B}}{c} & \\
+  & \sndmsg{B}{A}{\encrypt{N_A,N_B}{A}}{c} & \\
+  & \sndmsg{A}{B}{\encrypt{N_B}{B}}{c} &
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  \label{eq:3}
+  A & \defs & \snd{c}{\encrypt{(A,N_A)}{B}}. \\
+  & & \rcv{c}{M}. \\
+  & & \CASE \decrypt{M}{A} \OF (N_A,nb) \IN \\
+  & & \snd{c}{\encrypt{nb}{B}}. \\
+  & & A \\
+  B & \defs & \rcv{c}{M}. \\
+  & & \CASE \decrypt{M}{B} \OF (x,n) \IN \\
+  & & \snd{c}{\encrypt{(n,N_B)}{x}}. \\
+  & & \rcv{c}{M}. \\
+  & & \CASE \decrypt{M}{B} \OF N_B \IN B \\
+  sys & \defs & (\bind{c}) A \cmp B
+\end{eqnarray*}
+
+\inference[React Inter]{}{\snd{m}{N}.p\cmp\rcv{m}{x}.Q -> P\cmp
+  [x->N]Q}
+
+\medskip
+
+\inference[Red Replace]{}{\rep{P}>P\cmp\rep{P}}
+
+\medskip
+
+\inference[Red Match]{}{[M \IS M]P > P}
+
+\medskip
+
+\inference[Red Let]{}{\LET (x,y)=(M,N) \IN P>[x->M][y->N]P}
+
+Note that we may want a more general $\LET$ that matches more than
+pairs here.  We'll see what the other inference rules give us.
+
+\medskip
+
+\inference[Red Zero]{}{\CASE 0 \OF \arm{0}{P}\arm{suc(x)}{Q}>P}
+
+\medskip
+
+\inference[Red Suc]{}{\CASE suc(M) \OF \arm{0}{P}\arm{suc(x)}{Q}>[x->M]Q}
+
+I find the $\CASE$ rules over naturals quite crude.
+
+
+\inference[Red Sym Decrypt]{}{\CASE \crypt{M}{k} \OF \crypt{x}{k} \IN
+  P > [x->M]P}
+
+\medskip
+
+Additional proposed semantic rules for public/private key encryption
+and signature checking
+
+\inference[Red Asym Decrypt]{}{\CASE \encrypt{M}{k} \OF \decrypt{x}{k} \IN P
+> [x->M]P}
+
+\medskip
+
+\inference[Red Sig Check]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
+> [x->M]P}
+
+\medskip
+
+Do we really want a signature check that fails to get stuck?  The $M$
+is available, but the signature check does not pass.  This would work
+if we treat $\sign{M}{k}$ as only the signature block and not the
+message.  A signed message may be best represented as a pair
+$(M,\sign{M}{k})$ allowing the message to be explicitly available.
+What that construct looks like is up in the air at this point.
+
+This rule has a more serious problem as it allows us to reproduce a
+message from it's signature.  Specifically, if we have $\sign{M}{k}$
+and signature match is successful, then $x$ is bound to $M$.  That
+can't happen.  Possibly the rule should look like this:
+
+\medskip
+
+\inference[Red Sig Check]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
+> [x->\hash{M}]P}
+
+where $\hash{M}$ is the hash and not the message itself.  Maybe a
+signature check should look something like this:
+
+\[\LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \design{M}{k} \IN P\]
+
+A quick reduction gives:
+
+\[[m->M][s->\sign{M}{k}]\CASE s \OF \design{M}{k} \IN P\]
+
+Substitution gives:
+
+\[\CASE \sign{M}{k} \OF \design{M}{k} \IN [m->M][s->\sign{M}{k}]P\]
+
+Finally, using the signature reduction rule:
+
+\[[m->M][s->\sign{M}{k}]P\]
+
+If the signature does not match, the process hangs.  Assume M\neq N:
+
+\[\LET (m,s)=(M,\sign{N}{k}) \IN \CASE s \OF \design{M}{k} \IN P\]
+\[[m->M][s->\sign{N}{k}]\CASE s \OF \design{M}{k} \IN P\]
+\[\CASE \sign{N}{k} \OF \design{M}{k} \IN [m->M][s->\sign{M}{k}]P\]
+
+This is pretty much what we want I think other than the signature
+check hanging on failure.  I think that's what it should be, but
+signature check failure still results in a message that could be
+processed.  I suppose the way to do it would be put the signature
+check process in parallel with a process that does not check it.
+
+\medskip
+
+\inference[Struct Nil]{}{P\cmp\nil\equiv P}
+
+\medskip
+
+\inference[Struct Comm]{}{P\cmp Q \equiv Q\cmp P}
+
+\medskip
+
+\inference[Struct Assoc]{}{P\cmp (Q\cmp R) \equiv (P\cmp Q)\cmp R}
+
+\medskip
+
+\inference[Struct Switch]{}{(\bind{m})(\bind{n})P \equiv
+  (\bind{n})(\bind{m})P}
+
+\medskip
+
+\inference[Struct Drop]{}{(\bind{n})\nil \equiv \nil}
+
+\medskip
+
+\inference[Struct Extrusion]{n\notin fv(P)}{(\bind{n})(P\cmp Q)\equiv
+  P\cmp (\bind{n})Q}
+
+\medskip
+
+\inference[Struct Red]{P>Q}{P\equiv Q}
+
+\medskip
+
+\inference[Struct Refl]{}{P\equiv P}
+
+\medskip
+
+\inference[Struct Symm]{P\equiv Q}{Q\equiv P}
+
+\medskip
+
+\inference[Struct Trans]{P\equiv Q & Q\equiv R}{P\equiv R}
+
+\medskip
+
+\inference[Struct Par]{P\equiv P'}{P\cmp Q\equiv P'\cmp Q}
+
+\medskip
+
+\inference[Struct Res]{P\equiv P'}{(\bind{n})P \equiv (\bind{n})P'}
+
+\medskip
+
+\inference[React Struct]{P\equiv P' & P'->Q' & Q'\equiv Q}{P->Q}
+
+\medskip
+
+\inference[React Par]{P'->P'}{P\cmp Q -> P'\cmp Q}
+
+\medskip
+
+\inference[React Res]{P'->P'}{(\bind{n})P -> (\bind{n})P}
+
+\begin{alltt}
+  \(A \defs \snd{c}{\encrypt{(A,N_A)}{B}}.\)
+\end{alltt}
+
+\subsection{Privacy CA Protocol}
 
 \appendix
 

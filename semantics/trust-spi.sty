@@ -36,12 +36,13 @@
 %%% Spi notations
 
 \reservestyle{\command}{\textsf}
-\command{case,of,let,in}
+\command{case,of,let,in,is}
 
 \newcommand{\CASE}{\ensuremath{ \<case> \;}}
 \newcommand{\OF}{\ensuremath{\; \<of> \;}}
 \newcommand{\LET}{\ensuremath{ \<let> \;}}
 \newcommand{\IN}{\ensuremath{\; \<in> \;}}
+\newcommand{\IS}{\ensuremath{\; \<is> \;}}
 
 \newcommand{\nil}{\ensuremath{\mathbf{0}}}
 \newcommand{\bind}[1]{\ensuremath{\nu #1}}
@@ -49,7 +50,7 @@
 \newcommand{\rcv}[2]{\ensuremath{#1(#2)}}
 \newcommand{\rep}[1]{\ensuremath{!#1}}
 \newcommand{\alt}{\ensuremath{\; + \;}}
-\newcommand{\cmp}{\ensuremath{\; \mid \;}}
+\newcommand{\cmp}{\ensuremath{ \mid }}
 \newcommand{\ccase}[3]{\ensuremath{\CASE #1 \OF #2 \IN #3}}
 \newcommand{\icase}[2]{\ensuremath{\CASE #1 \OF #2}}
 \newcommand{\arm}[2]{\ensuremath{\; #1: #2}} 
