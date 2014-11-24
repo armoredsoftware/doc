@@ -10,6 +10,7 @@
 \usepackage{trust-spi}
 \usepackage{subfigure}
 \usepackage{ifthen}
+\usepackage{amsmath}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows}
@@ -130,17 +131,10 @@ and signature checking
 
 \medskip
 
-\inference[Red Sig Check]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
+\inference[Red Sig Check Broken]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
 > [x->M]P}
 
 \medskip
-
-Do we really want a signature check that fails to get stuck?  The $M$
-is available, but the signature check does not pass.  This would work
-if we treat $\sign{M}{k}$ as only the signature block and not the
-message.  A signed message may be best represented as a pair
-$(M,\sign{M}{k})$ allowing the message to be explicitly available.
-What that construct looks like is up in the air at this point.
 
 This rule has a more serious problem as it allows us to reproduce a
 message from it's signature.  Specifically, if we have $\sign{M}{k}$
@@ -152,34 +146,35 @@ can't happen.  Possibly the rule should look like this:
 \inference[Red Sig Check]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
 > [x->\hash{M}]P}
 
-where $\hash{M}$ is the hash and not the message itself.  Maybe a
-signature check should look something like this:
+where $\hash{M}$ is the hash and not the message itself.  A signature
+check should look something like this:
 
-\[\LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \design{M}{k} \IN P\]
+\begin{align*}
+  & \LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \design{M}{k} \IN P \\
+  & > [m->M][s->\sign{M}{k}]\CASE s \OF \design{M}{k} \IN P \\
+  & > \CASE \sign{M}{k} \OF \design{M}{k} \IN [m->M][s->\hash{M}]P \\
+  & > [m->M][s->\hash{M}]P
+\end{align*}
 
-A quick reduction gives:
+This is precisely what we want.  Specifically, $P$ with $m$ replaced
+by the message $M$ and $s$ replaced by the decrypted signature,
+$\hash{M}$, produced by the signature check.  It is unlikely that
+$\hash{M}$ will be used in $P$, but it is available.
 
-\[[m->M][s->\sign{M}{k}]\CASE s \OF \design{M}{k} \IN P\]
+If the signature does not match, the process hangs.  Assume $M\neq N$:
 
-Substitution gives:
+\begin{align*}
+  & \LET (m,s)=(M,\sign{N}{k}) \IN \CASE s \OF \design{M}{k} \IN P \\
+  & > [m->M][s->\sign{N}{k}]\CASE s \OF \design{M}{k} \IN P \\
+  & > \CASE \sign{N}{k} \OF \design{M}{k} \IN [m->M][s->\hash{M}]P
+\end{align*}
 
-\[\CASE \sign{M}{k} \OF \design{M}{k} \IN [m->M][s->\sign{M}{k}]P\]
+Do we really want a signature check that fails to get stuck?  I think
+so.  $M$ is available, but the signature check is stuck.  A signed
+message is best represented as a pair $(M,\sign{M}{k})$ allowing the
+message to be explicitly available.
 
-Finally, using the signature reduction rule:
-
-\[[m->M][s->\sign{M}{k}]P\]
-
-If the signature does not match, the process hangs.  Assume M\neq N:
-
-\[\LET (m,s)=(M,\sign{N}{k}) \IN \CASE s \OF \design{M}{k} \IN P\]
-\[[m->M][s->\sign{N}{k}]\CASE s \OF \design{M}{k} \IN P\]
-\[\CASE \sign{N}{k} \OF \design{M}{k} \IN [m->M][s->\sign{M}{k}]P\]
-
-This is pretty much what we want I think other than the signature
-check hanging on failure.  I think that's what it should be, but
-signature check failure still results in a message that could be
-processed.  I suppose the way to do it would be put the signature
-check process in parallel with a process that does not check it.
+I think this is pretty much what we want.
 
 \medskip
 
