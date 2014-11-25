@@ -97,7 +97,7 @@ Examples motivated by \citet{Abadi:99:A-Calculus-for-}.
 
 \medskip
 
-\inference[Red Match]{}{\llbracket M \IS M\rrbracket P > P}
+\inference[Red Match]{}{|[ M \IS M |] P > P}
 
 \medskip
 
@@ -139,24 +139,22 @@ and signature checking
 The previous two rules capture the essence of asymmetric key pairs.
 Specifically, encrypt with one and decrypt with the other.
 
-\medskip
-
-\inference[Red Sig Check]{}{\CASE \sign{M}{k} \OF \design{x}{k} \IN P
-> [x->\hash{M}]P}
-
-where $\hash{M}$ is the hash and not the message itself.  A signature
-check should look something like this:
+Assume $\hash{M}$ is the hash and not the message itself and
+$\sign{M}{k}$ is the hash encrypted with private key, $\private{k}$.
+Thus, a signed message is the pair $(M,\sign{M}{k})$ consisting of the
+message and the signed hash.  Given this, a successful signature check
+looks something like this:
 
 \begin{align*}
   & \LET (m,s)=(M,\sign{M}{k}) \IN \CASE s \OF \encrypt{x}{k} \IN
-  \llbracket x\IS \hash{m}\rrbracket P \\
-  & > [m->M][s->\sign{M}{k}]\CASE s \OF \encrypt{x}{k} \IN \llbracket
-  x\IS \hash{m}\rrbracket P \\
+  |[ x\IS \hash{m}|] P \\
+  & > [m->M][s->\sign{M}{k}]\CASE s \OF \encrypt{x}{k} \IN |[
+  x\IS \hash{m}|] P \\
   & > \CASE \sign{M}{k} \OF \encrypt{x}{k} \IN
-  [m->M][s->\sign{M}{k}]\llbracket x\IS \hash{m}\rrbracket P \\
+  [m->M][s->\sign{M}{k}]|[x \IS \hash{m} |] P \\
   & > [x->\hash{M}][m->M][s->\sign{M}{k}][x\IS \hash{m}]P \\
-  & > \llbracket\hash{M} \IS \hash{M}\rrbracket[x->\hash{M}][m->M][s->\sign{M}{k}]P \\
-  & > [x->\hash{M}][m->M][s->\sign{M}{k}]P
+  & > |[\hash{M} \IS \hash{M}|][x->\hash{M} ][m->M][s->\sign{M}{k}]P \\
+  & > [x->\hash{M} ][m->M][s->\sign{M}{k}]P
 \end{align*}
 
 This is precisely what we want.  Specifically, $P$ with $m$ replaced
@@ -164,13 +162,36 @@ by the message $M$ and $s$ replaced by the decrypted signature,
 $\hash{M}$, produced by the signature check.  It is unlikely that
 $\hash{M}$ will be used in $P$, but it is available.
 
-If the signature does not match, the process hangs.  Assume $M\neq N$:
+If the signature does not match, the process hangs.  Assume the hash
+is incorrect.  Specifically, $M\neq N$:
 
 \begin{align*}
-  & \LET (m,s)=(M,\sign{N}{k}) \IN \CASE s \OF \design{M}{k} \IN P \\
-  & > [m->M][s->\sign{N}{k}]\CASE s \OF \design{M}{k} \IN P \\
-  & > \CASE \sign{N}{k} \OF \design{M}{k} \IN [m->M][s->\hash{M}]P
+  & \LET (m,s)=(M,\sign{N}{k}) \IN \CASE s \OF \encrypt{x}{k} \IN
+  |[ x\IS \hash{m}|] P \\
+  & > [m->M][s->\sign{N}{k}]\CASE s \OF \encrypt{x}{k} \IN |[
+  x\IS \hash{m}|] P \\
+  & > \CASE \sign{N}{k} \OF \encrypt{x}{k} \IN
+  [m->M][s->\sign{N}{k}]|[x\IS \hash{m} |] P \\
+  & > [x->\hash{N} ][m->M][s->\sign{M}{k}] |[ x\IS \hash{m} |]P \\
+  & > |[ \hash{N}\IS \hash{M} |][x->\hash{N} ][m->M][s->\sign{M}{k}]P
 \end{align*}
+
+The process is stuck when $\hash{N}\IS\hash{M}$ fails because $N\neq
+M$.  
+
+Now assume the wrong private key was used to sign the message hash.
+Specifically, $j\neq k$:
+
+\begin{align*}
+  & \LET (m,s)=(M,\sign{M}{j}) \IN \CASE s \OF \encrypt{x}{k} \IN
+  |[ x\IS \hash{m}|] P \\
+  & > [m->M][s->\sign{M}{j}]\CASE s \OF \encrypt{x}{k} \IN |[
+  x\IS \hash{m}|] P \\
+  & > \CASE \sign{M}{j} \OF \encrypt{x}{k} \IN
+  [m->M][s->\sign{M}{k}]|[x \IS \hash{m} |] P \\
+\end{align*}
+
+The process is stuck when $\sign{M}{j}$ does not unify with $\encrypt{x}{k}$.
 
 Do we really want a signature check that fails to get stuck?  I think
 so.  $M$ is available, but the signature check is stuck.  A signed
