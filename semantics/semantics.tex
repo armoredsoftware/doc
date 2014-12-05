@@ -14,7 +14,7 @@
 \usepackage{stmaryrd}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows,shadows}
+\usetikzlibrary{arrows,shadows,matrix}
 \usepackage[underline=false]{pgf-umlsd}
 
 \lhead{ArmoredSoftware Architecture}
@@ -265,6 +265,36 @@ message to be explicitly available.
 \end{alltt}
 
 \subsection{Privacy CA Protocol}
+
+\section{Strand Spaces}
+
+\subsection{Needham Schroder}
+
+\begin{align*}
+  & \sndmsg{A}{B}{\encrypt{\public{A},N_A}{B}}{c} & \\
+  & \sndmsg{B}{A}{\encrypt{N_A,N_B}{A}}{c} & \\
+  & \sndmsg{A}{B}{\encrypt{N_B}{B}}{c} &
+\end{align*}
+
+\begin{tikzpicture}[
+  implies/.style={double,double equal sign distance,-implies},
+  dot/.style={shape=circle,fill=black,minimum size=4pt,
+    inner sep=0pt,outer sep=2pt}]
+
+\matrix[matrix of nodes] {
+  |[dot,label=above:$A$] (A1)| {} &[3cm] | [dot,label=above:$B$] (B1)| {} \\[1cm]
+  |[dot] (A2)| {} & |[dot] (B2)| {}\\[1cm]
+  |[dot] (A3)| {} & |[dot] (B3)| {}\\
+};
+\draw (A1) edge[->] node[above] {$\encrypt{\public{A},N_A}{B}$} (B1)
+           edge[implies] (A2);
+\draw (B2) edge[->] node[above] {$\encrypt{N_A,N_B}{A}$} (A2)
+           edge[implies,implies-] (B1)
+           edge[implies] (B3);
+\draw (A3) edge[->] node[above] {$\encrypt{N_B}{B}$} (B3)
+           edge[implies,implies-] (A2);
+
+\end{tikzpicture}
 
 \appendix
 
