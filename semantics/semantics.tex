@@ -324,7 +324,7 @@ message to be explicitly available.
            edge[implies] (A2);
 \draw (B2) edge[->] node[above] {$\crypt{K_{AC}}{K_{BC}}$} (C2)
            edge[implies,implies-] (B1);
-\draw (C3) edge[->] node[above] {$\encrypt{M}{K_{AC}}$} (A3)
+\draw (C3) edge[->] node[above] {$\crypt{M}{K_{AC}}$} (A3)
            edge[implies,implies-] (C2);
 \draw (A2) edge[implies] (A3);
 
