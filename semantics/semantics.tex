@@ -283,8 +283,8 @@ message to be explicitly available.
 
 \matrix[matrix of nodes] {
   |[dot,label=above:$A$] (A1)| {} &[3cm] | [dot,label=above:$B$] (B1)| {} \\[1cm]
-  |[dot] (A2)| {} & |[dot] (B2)| {}\\[1cm]
-  |[dot] (A3)| {} & |[dot] (B3)| {}\\
+  |[dot] (A2)| {} & |[dot] (B2)| {} \\[1cm]
+  |[dot] (A3)| {} & |[dot] (B3)| {} \\
 };
 \draw (A1) edge[->] node[above] {$\encrypt{\public{A},N_A}{B}$} (B1)
            edge[implies] (A2);
@@ -293,6 +293,40 @@ message to be explicitly available.
            edge[implies] (B3);
 \draw (A3) edge[->] node[above] {$\encrypt{N_B}{B}$} (B3)
            edge[implies,implies-] (A2);
+
+\end{tikzpicture}
+
+\subsection{Wide Mouth Frog}
+
+\begin{align*}
+  & \sndmsg{A}{B}{\crypt{K_{AC}}{K_{AB}}}{c} & \\
+  & \sndmsg{B}{C}{\crypt{K_{AC}}{K_{BC}}}{c} & \\
+  & \sndmsg{A}{C}{\crypt{M}{K_{AC}}}{c} &
+\end{align*}
+
+\begin{tikzpicture}[
+  implies/.style={double,double equal sign distance,-implies},
+  dot/.style={shape=circle,fill=black,minimum size=4pt,
+    inner sep=0pt,outer sep=4pt}]
+
+\matrix[matrix of nodes] {
+  |[dot,label=above:$A$] (A1)| {}
+  &[3cm] |[dot,label=above:$B$] (B1)| {}
+  &[3cm] |[dot,label=above:$C$] (C1)| {} \\[1cm]
+  |[dot] (A2)| {} 
+  & |[dot] (B2)| {}
+  & |[dot] (C2)| {}\\[1cm]
+  |[dot] (A3)| {}
+  & 
+  & |[dot] (C3)| {}\\
+};
+\draw (A1) edge[->] node[above] {$\crypt{K_{AC}}{K_{AB}}$} (B1)
+           edge[implies] (A2);
+\draw (B2) edge[->] node[above] {$\crypt{K_{AC}}{K_{BC}}$} (C2)
+           edge[implies,implies-] (B1);
+\draw (C3) edge[->] node[above] {$\encrypt{M}{K_{AC}}$} (A3)
+           edge[implies,implies-] (C2);
+\draw (A2) edge[implies] (A3);
 
 \end{tikzpicture}
 
