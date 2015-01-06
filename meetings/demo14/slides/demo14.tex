@@ -1,0 +1,65 @@
+\documentclass{beamer}
+
+% theme definition
+\usetheme{KU}
+
+\usepackage{natbib}
+\usepackage{alltt}
+\usepackage{trust}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+\setbeamercolor{title}{fg=kublue}
+\setbeamercolor{subtitle}{fg=kugray} 
+\setbeamercolor{institute}{fg=kugray}
+\setbeamercolor{frametitle}{fg=kublue}
+\setbeamercolor{frametitle}{bg=white}
+\setbeamercolor{framesubtitle}{fg=kugray}
+\setbeamercolor{framesubtitle}{bg=white}
+\setbeamercolor{item}{fg=black}
+\setbeamercolor{subitem}{fg=kugray}
+\setbeamercolor{itemize/enumerate subbody}{fg=kugray}
+\setbeamercolor{block title}{bg=kublue}
+\setbeamercolor{block title}{fg=white}
+\setbeamercolor{block body}{bg=sand}
+\setbeamercolor{block body}{fg=black}
+
+\usefonttheme{serif}
+
+\newenvironment{fnverbatim}{\begin{alltt}\scriptsize}{\normalsize\end{alltt}}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\rtime}{\ensuremath{\mathbb{R}^{0\leq}}}
+
+\bibliographystyle{abbrv}
+
+\title{ArmoredSoftware: Trust in the cloud}
+\subtitle{Annual Demonstration}
+
+\author{Dr. Perry Alexander, Dr. Andrew Gill, Dr. Prasad Kulkarni,
+  Adam Petz, Paul Kline, Justin Dawson, Jason Gevargizian, Edward
+  Komp, Leon Searl} 
+
+\date{{\color{kugray}January 15, 2015}}
+
+% turns off navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+\institute{
+    Information and Telecommunication Technology Center \\
+    Electrical Engineering and Computer Science \\
+    The University of Kansas \\
+    \texttt{palexand@ku.edu,andygill@ku.edu,prasadk@ku.edu}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+
+% {\footnotesize\color{kugray} Formatted with the Beamer Class for \LaTeXe}
+\end{frame}
+
+
+\bibliography{demo14}
+
+\end{document}
+
