@@ -3,9 +3,13 @@
 % theme definition
 \usetheme{KU}
 
-\usepackage{natbib}
+%\usepackage{natbib}
 \usepackage{alltt}
 \usepackage{trust}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shadows}
+\usepackage[underline=false]{pgf-umlsd}
 
 \setbeamertemplate{blocks}[rounded][shadow=true]
 
@@ -130,7 +134,7 @@
   \item Executable protocol representation
     \begin{itemize}
     \item protocol fragments as first-class structures
-    \item strand space~\cite{Fabrega:1999aa} formal semantics
+    \item strand space formal semantics
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -138,7 +142,30 @@
 \section{Prototype demonstration and discussion}
 
 \begin{frame}
-  \frametitle{Demonstration Protocol}
+  \frametitle{CA-Based Attestation Protocol}
+  
+  \begin{footnotesize}
+  \begin{sequencediagram}
+    \newthread[white]{appr}{Appraiser}
+    \newinst[1.0]{attest}{Attestation}
+    \newinst[1.5]{meas}{Measurer}
+    \newinst[1.0]{app}{Application}
+    
+    \begin{call}{appr}{Request}{attest}{Evidence}
+      \begin{callself}{attest}{Protocol Selection}{}
+      \end{callself}
+      \begin{call}{attest}{Request}{meas}{Value}
+        \begin{call}{meas}{Measurement}{app}{Value}
+        \end{call}
+      \end{call}
+      \begin{callself}{attest}{Quote Assembly}{}
+      \end{callself}
+    \end{call}
+    \begin{callself}{appr}{Appraisal}{Execute Decision}
+    \end{callself}
+  \end{sequencediagram}
+  \end{footnotesize}
+
 \end{frame}
 
 \subsection{Refine big picture to current demo}
@@ -205,7 +232,7 @@
   \end{itemize}
 \end{frame}
 
-\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote}
+\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa}
 
 \begin{frame}
   \frametitle{References}
