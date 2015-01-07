@@ -93,7 +93,7 @@
     \end{itemize}
   \item Lightweight integration with existing cloud
     \begin{itemize}
-    \item targeting Xen, OpenStack, and Linux
+    \item targeting TXT, Xen, Linux, and OpenStack infrastructure
     \item user-space measurement and attestation
     \end{itemize}
   \end{itemize}
@@ -104,10 +104,35 @@
   \includegraphics[width=\textwidth]{figures/system.pdf}
 \end{frame}
 
-\subsection{Design Refinements}
+\subsection{Implementation}
 
 \begin{frame}
-  \frametitle{Design Refinements}
+  \frametitle{Implementation Decisions}
+
+  \begin{itemize}
+  \item Standard delivery platform
+    \begin{itemize}
+    \item Xen+XSM VM infrastructure
+    \item OpenStack cloud infrastructure
+    \item Fedora, HotSpot JVM, GHC
+    \end{itemize}
+  \item Standard communication mechanisms
+    \begin{itemize}
+    \item JSON structures for all exchanged data
+    \item \textsl{vchan} for on-platform communication
+    \item TCP/IP for off-platform communication
+    \end{itemize}
+  \item Trusted Computing Group standards compliant
+    \begin{itemize}
+    \item Trusted Platform Module (TPM) 1.2
+    \item TCG vTPM in principle
+    \end{itemize}
+  \item Executable protocol representation
+    \begin{itemize}
+    \item protocol fragments as first-class structures
+    \item strand space~\cite{Fabrega:1999aa} formal semantics
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \section{Prototype demonstration and discussion}
