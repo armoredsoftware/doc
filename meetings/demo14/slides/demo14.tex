@@ -65,7 +65,42 @@
 \subsection{Big Picture}
 
 \begin{frame}
-  \frametitle{Big Picture}
+  \frametitle{Program Goal}
+  \begin{block}{Trust in the Cloud}
+    Provide new capabilities that help establish and maintain
+    trustworthy cloud-based application deployment
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{New Capabilities}
+  
+  \begin{itemize}
+  \item Establish trust among cloud components
+    \begin{itemize}
+    \item trust among cohorts of processes
+    \item trust among processes and environment
+    \end{itemize}
+  \item Promote informed decision making
+    \begin{itemize}
+    \item data confidentiality can be confirmed
+    \item execution and data integrity can be confirmed
+    \end{itemize}
+  \item Autonomous run-time response and reconfiguration
+    \begin{itemize}
+    \item responds to attack, failure, reconfiguration, and repair 
+    \item response varies based on measurement
+    \end{itemize}
+  \item Lightweight integration with existing cloud
+    \begin{itemize}
+    \item targeting Xen, OpenStack, and Linux
+    \item user-space measurement and attestation
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{High-Level Architecture}
 \end{frame}
 
 \subsection{Design Refinements}
@@ -144,7 +179,12 @@
   \end{itemize}
 \end{frame}
 
-\bibliography{demo14}
+\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote}
+
+\begin{frame}
+  \frametitle{References}
+  \bibliography{demo14}
+\end{frame}
 
 \end{document}
 
