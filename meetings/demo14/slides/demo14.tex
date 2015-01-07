@@ -6,9 +6,10 @@
 %\usepackage{natbib}
 \usepackage{alltt}
 \usepackage{trust}
+\usepackage{fixltx2e}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows,shadows}
+\usetikzlibrary{arrows,shadows, matrix}
 \usepackage[underline=false]{pgf-umlsd}
 
 \setbeamertemplate{blocks}[rounded][shadow=true]
@@ -178,6 +179,117 @@
 
 \begin{frame}
   \frametitle{3-4 Slides on Attestation Protocol Execution}
+\end{frame}
+
+%crypto extensions
+\newcommand{\nonce}[1]{N\textsubscript{#1}}
+
+%constants
+\def \pmask {PCR\textsubscript{m}}
+\def \pcomp {PCR\textsubscript{c}}
+\def \evd {d}
+\def \eve {e}
+\def \cacert {\sign {\public{AIK}}{CA}}
+\def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
+\def \aikh {AIK_h}
+
+\def \app {A}
+\def \att {B}
+\def \ca {C}
+\def \mea {M}
+\def \tp {T}
+
+\def \req {R}
+\def \resp {P}
+\def \k {K}
+
+\begin{frame}
+  \frametitle{Strand Space Diagram}
+  \begin{tikzpicture}[
+  implies/.style={double,double equal sign distance,-implies},
+  dot/.style={shape=circle,fill=black,minimum size=4pt,
+    inner sep=0pt,outer sep=4pt}]
+
+\matrix[matrix of nodes] {
+  |[dot,label=above:$\app$] (A1)| {}
+  &[4cm] |[dot,label=above:$\att$] (B1)| {}
+  &[3.5cm] |[label=above:$\mea$] (M1)| {} 
+  &[3.5cm] |[label=above:$\tp$] (T1)| {}
+  &[3cm] |[label=above:$\ca$] (C1)| {}\\[1cm]
+  & |[dot] (B2)| {}
+  &
+  & |[dot] (T2)| {}\\[1cm]
+  &
+  |[dot] (B3)| {}
+  &
+  & |[dot] (T3)| {}\\  [1cm]
+  &
+  |[dot] (B4)| {}
+  &
+  &
+  & |[dot] (C4)| {} \\ [1 cm]
+  &
+  |[dot] (B5)| {}
+  &
+  &
+  & |[dot] (C5)| {} \\ [1 cm]
+  &
+  |[dot] (B6)| {}
+  &
+  & |[dot] (T6)| {} \\ [1 cm]
+  &
+  |[dot] (B7)| {}
+  &
+  & |[dot] (T7)| {} \\ [1 cm]
+  &
+  |[dot] (B8)| {}
+  & |[dot] (M8)| {} \\ [1 cm]
+  &
+  |[dot] (B9)| {}
+  & |[dot] (M9)| {} \\ [1 cm]
+  &
+  |[dot] (B10)| {}
+  &
+  & |[dot] (T10)| {} \\ [1 cm]
+  &
+  |[dot] (B11)| {}
+  &
+  & |[dot] (T11)| {} \\ [1 cm]
+  |[dot] (A12)| {}
+  & |[dot] (B12)| {} \\ [1 cm]
+  |[dot] (A13)| {}
+  & |[dot] (B13)| {} \\ [1 cm]
+};
+\draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
+           edge[implies,implies-] (B1);
+\draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
+           edge[implies,implies-] (T2);
+\draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
+           edge[implies,implies-] (B3);
+\draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \encrypt{\cacert}{K}$} (B5)
+           edge[implies,implies-] (C4);
+\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}})}{EK})$} (T6)
+           edge[implies,implies-] (B5);
+\draw (T7) edge[->] node[above] {$K$} (B7)
+           edge[implies,implies-] (T6);
+\draw (B8) edge[->] node[above] {$\evd$} (M8)
+           edge[implies,implies-] (B7);
+\draw (M9) edge[->] node[above] {$\eve$} (B9)
+           edge[implies,implies-] (M8);
+\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10)
+% quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
+           edge[implies,implies-] (B9);
+\draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
+% \pcomp, sig(\hash{\pcomp}, ed) AIK
+           edge[implies,implies-] (T10);
+\draw (B12) edge[->] node[above] {$\eve, \nonce{\app}, \pcomp, \cacert$} (A12)
+% \eve, \nonce{\app}, \pcomp, \cacert
+           edge[implies,implies-] (B11);
+\draw (B13) edge[->] node[above] {$\sign{\hash{\pcomp}, \exdata}{AIK}$} (A13) 
+% sig(hash(\pcomp), ed) AIK
+           edge[implies,implies-] (B12);
+\end{tikzpicture}
 \end{frame}
 
 \subsection{Appraisal}
