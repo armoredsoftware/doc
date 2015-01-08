@@ -224,7 +224,7 @@
   \begin{align*}
   & \sndmsg {\app}{\att} {\evd, \nonce{\app}, \pmask} {\channel {\app \att}}  & \\
   & \sndmsg{\att}{\tp} {make\_and\_load\_identity} {\channel {\att \tp}} & \\
-  & \sndmsg{\tp}{\att} {\att, \aikh} {\channel {\tp \att}} & \\
+  & \sndmsg{\tp}{\att} {\public{AIK}, \aikh} {\channel {\tp \att}} & \\
   & \sndmsg{\att}{\ca} {\att, \public{AIK}} {\channel {\att \ca}} & \\
   & \sndmsg{\ca}{\att} {\encrypt{K, \hash{AIK}}{EK}, \encrypt{\cacert}{K}} {\channel {\ca \att}}& \\
   & \sndmsg{\att}{\tp} {activate\_identity({\aikh, \hash{AIK})}} {\channel {\att \tp}} & \\
@@ -305,7 +305,7 @@
            edge[implies,implies-] (B1);
 \draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
-\draw (B4) edge[->] node[above] {$\att, \public{AIK}$} (C4)
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
            edge[implies,implies-] (B3);
 \draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
@@ -400,7 +400,7 @@
            edge[implies,implies-] (B1);
 \draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
-\draw (B4) edge[->] node[above] {$\att, \public{AIK}$} (C4)
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
            edge[implies,implies-] (B3);
 \draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
@@ -565,7 +565,7 @@
 Shared notion of AIKCertRequest, AIKCert, and CAResponse JSON structures.
 $\linebreak$
 $\linebreak$
-Attester (after establishing $K$)
+Attester
 \begin{itemize}
 \item {creates an AIKCert request (containing attester ID, AIK) and converts to JSON}
 \item {JSON sent as POST request to CA running as web server}
@@ -576,8 +576,9 @@ Certificate Authority
 \item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ Cert request}
 \item {looks up TPM\_PUBKEY associated with ID in sql database}
 \item {AIKCert $\approx$ AIK signed with $CA_{-1}$}
+\item {generates key $K$ and encrypts with TPM\_PUBKEY}
 \item {AIKCert encrypted with $K$}
-\item {wrapped in a CAResponse, converted to JSON and sent as response. }
+\item {both wrapped in a CAResponse, converted to JSON and sent as response. }
 
 \end{itemize}
 
