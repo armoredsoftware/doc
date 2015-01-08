@@ -4,14 +4,13 @@
 \usepackage{amsmath}
 \usepackage{semantic}
 
-\newcommand{\nonce}[1]{N\textsubscript{#1}}
 \newcommand{\crypt}[2]{\ensuremath{\{#1\}_{#2}}}
-\newcommand{\hash}[1]{\ensuremath{\mid #1 \mid}}
+\newcommand{\hash}[1]{\ensuremath{\mid#1\mid}}
 \newcommand{\extend}[2]{\ensuremath{#1\mid#2}}
 \newcommand{\encrypt}[2]{\ensuremath{\{#1\}_{\public{#2}}}}
 \newcommand{\decrypt}[2]{\ensuremath{\{#1\}_{\private{#2}}}}
-\newcommand{\sign}[2]{\ensuremath{\{\mid #1\mid\}_{\private{#2}}}}
-\newcommand{\design}[2]{\ensuremath{\{\mid #1\mid\}_{\public{#2}}}}
+\newcommand{\sign}[2]{\ensuremath{\{\mid#1\mid\}_{\private{#2}}}}
+\newcommand{\design}[2]{\ensuremath{\{|#1|\}_{\public{#2}}}}
 \newcommand{\cert}[2]{\ensuremath{[[#1]]_{#2}}}
 \newcommand{\evidence}[2]{\ensuremath{\langle #1,\sign{#2}{AIK}\rangle}}
 \newcommand{\request}[3]{\ensuremath{\langle #1,#2,#3\rangle}}
@@ -20,10 +19,6 @@
 \newcommand{\private}[1]{\ensuremath{#1^{-}}}
 \newcommand{\seal}[2]{\ensuremath{seal(#1,\{#2\})}}
 \newcommand{\wrap}[2]{\ensuremath{wrap(#1,\{#2\})}}
-<<<<<<< HEAD
-=======
-\newcommand{\nonce}[1]{\ensuremath{N_{#1}}}
->>>>>>> acac4842a2ee25f8ca59e785c5cdbdd3c8c46c34
 
 %%% Trust notations (deprecated)
 
@@ -54,11 +49,7 @@
 \newcommand{\snd}[2]{\ensuremath{\overline{#1}\langle#2\rangle}}
 \newcommand{\rcv}[2]{\ensuremath{#1(#2)}}
 \newcommand{\rep}[1]{\ensuremath{!#1}}
-<<<<<<< HEAD
-\newcommand{\altern}{\ensuremath{\; + \;}}
-=======
-%\newcommand{\alt}{\ensuremath{\; + \;}}
->>>>>>> acac4842a2ee25f8ca59e785c5cdbdd3c8c46c34
+\newcommand{\alt}{\ensuremath{\; + \;}}
 \newcommand{\cmp}{\ensuremath{ \mid }}
 \newcommand{\ccase}[3]{\ensuremath{\CASE #1 \OF #2 \IN #3}}
 \newcommand{\icase}[2]{\ensuremath{\CASE #1 \OF #2}}
@@ -68,12 +59,5 @@
 
 %%% Message notation
 
-<<<<<<< HEAD
-\newcommand{\sndmsg}[4]{\ensuremath{#1\rightarrow #2:#3}\;
-  \mathsf{on}\; #4}
-=======
 \newcommand{\sndmsg}[4]{\ensuremath{#1\rightarrow #2:#3}\; &
   \mathsf{on}\; #4}
-
-\newcommand{\channel}[1]{\ensuremath{C_{#1}}}
->>>>>>> acac4842a2ee25f8ca59e785c5cdbdd3c8c46c34
