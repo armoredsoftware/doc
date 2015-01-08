@@ -373,16 +373,102 @@
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Measurement}
+
+  \begin{center}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\att$] (B8)| {}
+        &[7.5cm] |[dot,label=above:$\mea$] (M8)| {} \\ [1.0cm]
+        |[dot] (B9)| {}
+        &|[dot] (M9)| {} \\
+      };
+      \draw (B8) edge[->] node[above] {$\evd$} (M8);
+      \draw (M9) edge[->] node[above] {$\eve$} (B9)
+      edge[implies,implies-] (M8);
+    \end{tikzpicture}
+  \end{center}
+
+    \begin{itemize}
+    \item Request information from measurer
+    \item Receive evidence $e$ from measurer
+    \item $d$ is abstract allowing protocol reuse
+    \item Most protocols make many requests of the measurer
+    \end{itemize}
+
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Generating a Quote}
+
+  \begin{center}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\att$] (B10)| {}
+        &[7.5cm] |[dot,label=above:$\mea$] (T10)| {} \\ [1.0cm]
+        |[dot] (B11)| {}
+        &|[dot] (T11)| {} \\
+      };
+\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10);
+% quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
+\draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
+% \pcomp, sig(\hash{\pcomp}, ed) AIK
+           edge[implies,implies-] (T10);
+    \end{tikzpicture}
+  \end{center}
+
+    \begin{itemize}
+    \item Request a quote from the TPM
+      \begin{itemize}
+      \item $\hash{AIK}$ identifies the signing $AIK$
+      \item $PCR_m$ identifies desired PCRs
+      \item $\exdata$ guarantees integrity of returned evidence
+      \end{itemize}
+    \item Receive quote from TPM
+      \begin{itemize}
+      \item $\pcomp$ is PCR composite built from requested PCRs
+      \item $\sign{\hash{\pcomp}, \exdata}{AIK}$ is the signed quote
+      \end{itemize}
+    \end{itemize}
+
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Appraisal}
+
+  \begin{center}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\att$] (A12)| {}
+        &[7.5cm] |[dot,label=above:$\mea$] (B12)| {} \\ [1.0cm]
+        |[dot] (A13)| {}
+        &|[dot] (B13)| {} \\
+      };
+      \draw (B12) edge[->] node[above] {$\eve, \nonce{\app}, \pcomp, \cacert$} (A12);
+      % \eve, \nonce{\app}, \pcomp, \cacert
+\draw (B13) edge[->] node[above] {$\sign{\hash{\pcomp}, \exdata}{AIK}$} (A13) 
+% sig(hash(\pcomp), ed) AIK
+           edge[implies,implies-] (B12);
+
+    \end{tikzpicture}
+  \end{center}
+
+    \begin{itemize}
+    \item Receive quote from the attestation manager
+    \item Receive evidence from the attestation manager
+    \item Evaluate evidence and quote
+    \end{itemize}
+
 \end{frame}
 
 \subsection{Appraisal}
