@@ -5,9 +5,10 @@
 
 %\usepackage{natbib}
 \usepackage{alltt}
-\usepackage{trust}
+%\usepackage{trust}
 \usepackage{fixltx2e}
-
+\usepackage{amsmath}
+\usepackage{trust-spi}
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows, matrix}
 \usepackage[underline=false]{pgf-umlsd}
@@ -34,6 +35,26 @@
 \newenvironment{fnverbatim}{\begin{alltt}\scriptsize}{\normalsize\end{alltt}}
 \newcommand{\mean}[1]{\langle#1\rangle}
 \newcommand{\rtime}{\ensuremath{\mathbb{R}^{0\leq}}}
+
+
+%constants
+\def \pmask {PCR\textsubscript{m}}
+\def \pcomp {PCR\textsubscript{c}}
+\def \evd {d}
+\def \eve {e}
+\def \cacert {\sign {\public{AIK}}{CA}}
+\def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
+\def \aikh {AIK_h}
+
+\def \app {A}
+\def \att {B}
+\def \ca {C}
+\def \mea {M}
+\def \tp {T}
+
+\def \req {R}
+\def \resp {P}
+\def \k {K}
 
 \bibliographystyle{abbrv}
 
@@ -180,85 +201,64 @@
 \begin{frame}
   \frametitle{3-4 Slides on Attestation Protocol Execution}
 \end{frame}
-
-%crypto extensions
-\newcommand{\nonce}[1]{N\textsubscript{#1}}
-
-%constants
-\def \pmask {PCR\textsubscript{m}}
-\def \pcomp {PCR\textsubscript{c}}
-\def \evd {d}
-\def \eve {e}
-\def \cacert {\sign {\public{AIK}}{CA}}
-\def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
-\def \aikh {AIK_h}
-
-\def \app {A}
-\def \att {B}
-\def \ca {C}
-\def \mea {M}
-\def \tp {T}
-
-\def \req {R}
-\def \resp {P}
-\def \k {K}
-
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Strand Space Diagram}
-  \begin{tikzpicture}[
-  implies/.style={double,double equal sign distance,-implies},
-  dot/.style={shape=circle,fill=black,minimum size=4pt,
-    inner sep=0pt,outer sep=4pt}]
 
-\matrix[matrix of nodes] {
-  |[dot,label=above:$\app$] (A1)| {}
-  &[4cm] |[dot,label=above:$\att$] (B1)| {}
-  &[3.5cm] |[label=above:$\mea$] (M1)| {} 
-  &[3.5cm] |[label=above:$\tp$] (T1)| {}
-  &[3cm] |[label=above:$\ca$] (C1)| {}\\[1cm]
-  & |[dot] (B2)| {}
-  &
-  & |[dot] (T2)| {}\\[1cm]
-  &
-  |[dot] (B3)| {}
-  &
-  & |[dot] (T3)| {}\\  [1cm]
-  &
-  |[dot] (B4)| {}
-  &
-  &
-  & |[dot] (C4)| {} \\ [1 cm]
-  &
-  |[dot] (B5)| {}
-  &
-  &
-  & |[dot] (C5)| {} \\ [1 cm]
-  &
-  |[dot] (B6)| {}
-  &
-  & |[dot] (T6)| {} \\ [1 cm]
-  &
-  |[dot] (B7)| {}
-  &
-  & |[dot] (T7)| {} \\ [1 cm]
-  &
-  |[dot] (B8)| {}
-  & |[dot] (M8)| {} \\ [1 cm]
-  &
-  |[dot] (B9)| {}
-  & |[dot] (M9)| {} \\ [1 cm]
-  &
-  |[dot] (B10)| {}
-  &
-  & |[dot] (T10)| {} \\ [1 cm]
-  &
-  |[dot] (B11)| {}
-  &
-  & |[dot] (T11)| {} \\ [1 cm]
-  |[dot] (A12)| {}
-  & |[dot] (B12)| {} \\ [1 cm]
-  |[dot] (A13)| {}
-  & |[dot] (B13)| {} \\ [1 cm]
+  \begin{tiny}
+  \begin{tikzpicture}[
+    implies/.style={double,double equal sign distance,-implies},
+    dot/.style={shape=circle,fill=black,minimum size=4pt,
+      inner sep=0pt,outer sep=4pt}]
+
+    \matrix[matrix of nodes] {
+      |[dot,label=above:$\app$] (A1)| {}
+      &[4.35cm] |[dot,label=above:$\att$] (B1)| {}
+      &[2.25cm] |[label=above:$\mea$] (M1)| {} 
+      &[2.25cm] |[label=above:$\tp$] (T1)| {}
+      &[1cm] |[label=above:$\ca$] (C1)| {}\\[0.5cm]
+      & |[dot] (B2)| {}
+      &
+      & |[dot] (T2)| {}\\[0.5cm]
+      &
+      |[dot] (B3)| {}
+      &
+      & |[dot] (T3)| {}\\  [0.5cm]
+      &
+      |[dot] (B4)| {}
+      &
+      &
+      & |[dot] (C4)| {} \\ [0.5cm]
+      &
+      |[dot] (B5)| {}
+      &
+      &
+      & |[dot] (C5)| {} \\ [0.5cm]
+      &
+      |[dot] (B6)| {}
+      &
+      & |[dot] (T6)| {} \\ [0.5cm]
+      &
+      |[dot] (B7)| {}
+      &
+      & |[dot] (T7)| {} \\ [0.5cm]
+      &
+      |[dot] (B8)| {}
+      & |[dot] (M8)| {} \\ [0.5cm]
+      &
+      |[dot] (B9)| {}
+      & |[dot] (M9)| {} \\ [0.5cm]
+      &
+      |[dot] (B10)| {}
+      &
+      & |[dot] (T10)| {} \\ [0.5cm]
+      &
+      |[dot] (B11)| {}
+      &
+      & |[dot] (T11)| {} \\ [0.5cm]
+      |[dot] (A12)| {}
+      & |[dot] (B12)| {} \\ [0.5cm]
+      |[dot] (A13)| {}
+      & |[dot] (B13)| {} \\ [0.5cm]
 };
 \draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
 \draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
@@ -290,6 +290,7 @@
 % sig(hash(\pcomp), ed) AIK
            edge[implies,implies-] (B12);
 \end{tikzpicture}
+\end{tiny}
 \end{frame}
 
 \subsection{Appraisal}
