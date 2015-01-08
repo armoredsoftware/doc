@@ -44,7 +44,7 @@
 \def \eve {e}
 \def \cacert {\sign {\public{AIK}}{CA}}
 \def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
-\def \aikh {\hash{AIK}}
+\def \aikh {AIK_h}
 
 \def \app {App}
 \def \att {Att}
@@ -416,7 +416,7 @@
         |[dot] (B11)| {}
         &|[dot] (T11)| {} \\
       };
-\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10);
+\draw (B10) edge[->] node[above] {$quote(\;AIK, \pmask, \exdata \;)$} (T10);
 % quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
 \draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
 % \pcomp, sig(\hash{\pcomp}, ed) AIK
@@ -427,7 +427,7 @@
     \begin{itemize}
     \item Request a quote from the TPM
       \begin{itemize}
-      \item $\hash{AIK}$ identifies the signing $AIK$
+      \item $AIK$ identifies the signing $AIK$
       \item $PCR_m$ identifies desired PCRs
       \item $\exdata$ guarantees integrity of returned evidence
       \end{itemize}
