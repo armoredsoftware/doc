@@ -561,6 +561,52 @@
 \begin{frame}
   \frametitle{2-3 Slides on Communication Mechanisms}
 \end{frame}
+\begin{frame}{CA communication}
+Shared notion of AIKCertRequest, AIKCert, and CAResponse JSON structures.
+$\linebreak$
+$\linebreak$
+Attester (after establishing $K$)
+\begin{itemize}
+\item {creates an AIKCert request (containing attester ID, AIK) and converts to JSON}
+\item {JSON sent as POST request to CA running as web server}
+\end{itemize}
+$\linebreak$
+Certificate Authority
+\begin{itemize}
+\item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ Cert request}
+\item {looks up TPM\_PUBKEY associated with ID in sql database}
+\item {AIKCert $\approx$ AIK signed with $CA_{-1}$}
+\item {AIKCert encrypted with $K$}
+\item {wrapped in a CAResponse, converted to JSON and sent as response. }
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{CA communication continued}
+Properties
+\begin{itemize}
+\item {CA only responds to receiving an $AIKCertRequest_{JSON}$ }
+\item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore TPM\_PRIVATEKEY)}
+\end{itemize}
+$\linebreak$
+Appraiser Knowledge after receiving Cert:
+\begin{itemize}
+\item {signature on AIK ensures it was CA who generated signature
+}
++
+\item {only an entity knowing TPM\_PRIVATEKEY could  decrypt and send me the CACert
+}
+$\linebreak$
+=
+\item {Attester is using a registered TPM}
+
+\end{itemize}
+
+\end{frame}
+
+
+
 
 \section{Short term goals and milestones}
 
