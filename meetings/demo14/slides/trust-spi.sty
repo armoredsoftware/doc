@@ -6,12 +6,14 @@
 
 \newcommand{\nonce}[1]{N\textsubscript{#1}}
 \newcommand{\crypt}[2]{\ensuremath{\{#1\}_{#2}}}
-\newcommand{\hash}[1]{\ensuremath{\mid #1 \mid}}
-\newcommand{\extend}[2]{\ensuremath{#1\mid#2}}
+\newcommand{\hash}[1]{\ensuremath{\lvert #1 \rvert}}
+\newcommand{\extend}[2]{\ensuremath{#1\vert#2}}
 \newcommand{\encrypt}[2]{\ensuremath{\{#1\}_{\public{#2}}}}
 \newcommand{\decrypt}[2]{\ensuremath{\{#1\}_{\private{#2}}}}
-\newcommand{\sign}[2]{\ensuremath{\{\mid #1\mid\}_{\private{#2}}}}
-\newcommand{\design}[2]{\ensuremath{\{\mid #1\mid\}_{\public{#2}}}}
+%\newcommand{\sign}[2]{\ensuremath{\{\lvert #1\rvert\}_{\private{#2}}}}
+\newcommand{\sign}[2]{\ensuremath{[#1]_{\private{#2}}}}
+%\newcommand{\design}[2]{\ensuremath{\{\lvert #1\rvert\}_{\public{#2}}}}
+\newcommand{\design}[2]{\ensuremath{[#1]_{\public{#2}}}}
 \newcommand{\cert}[2]{\ensuremath{[[#1]]_{#2}}}
 \newcommand{\evidence}[2]{\ensuremath{\langle #1,\sign{#2}{AIK}\rangle}}
 \newcommand{\request}[3]{\ensuremath{\langle #1,#2,#3\rangle}}
@@ -51,7 +53,7 @@
 \newcommand{\rcv}[2]{\ensuremath{#1(#2)}}
 \newcommand{\rep}[1]{\ensuremath{!#1}}
 \newcommand{\altern}{\ensuremath{\; + \;}}
-\newcommand{\cmp}{\ensuremath{ \mid }}
+\newcommand{\cmp}{\ensuremath{ \vert }}
 \newcommand{\ccase}[3]{\ensuremath{\CASE #1 \OF #2 \IN #3}}
 \newcommand{\icase}[2]{\ensuremath{\CASE #1 \OF #2}}
 \newcommand{\arm}[2]{\ensuremath{\; #1: #2}} 

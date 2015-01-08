@@ -44,13 +44,13 @@
 \def \eve {e}
 \def \cacert {\sign {\public{AIK}}{CA}}
 \def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
-\def \aikh {AIK_h}
+\def \aikh {\hash{AIK}}
 
-\def \app {A}
-\def \att {B}
-\def \ca {C}
-\def \mea {M}
-\def \tp {T}
+\def \app {App}
+\def \att {Att}
+\def \ca {CA}
+\def \mea {Meas}
+\def \tp {TPM}
 
 \def \req {R}
 \def \resp {P}
@@ -213,22 +213,22 @@
 
     \matrix[matrix of nodes] {
       |[dot,label=above:$\app$] (A1)| {}
-      &[4.35cm] |[dot,label=above:$\att$] (B1)| {}
-      &[2.25cm] |[label=above:$\mea$] (M1)| {} 
-      &[2.25cm] |[label=above:$\tp$] (T1)| {}
-      &[1cm] |[label=above:$\ca$] (C1)| {}\\[0.5cm]
+      &[4.0cm] |[dot,label=above:$\att$] (B1)| {}
+      &[1.95cm] |[] (M1)| {} 
+      &[1.95cm] |[] (T1)| {}
+      &[0.5cm] |[] (C1)| {}\\[0.05cm]
       & |[dot] (B2)| {}
       &
-      & |[dot] (T2)| {}\\[0.5cm]
+      & |[dot,label=above:$\tp$] (T2)| {}\\[0.5cm]
       &
       |[dot] (B3)| {}
       &
-      & |[dot] (T3)| {}\\  [0.5cm]
+      & |[dot] (T3)| {}\\  [0.05cm]
       &
       |[dot] (B4)| {}
       &
       &
-      & |[dot] (C4)| {} \\ [0.5cm]
+      & |[dot,label=above:$\ca$] (C4)| {} \\ [0.5cm]
       &
       |[dot] (B5)| {}
       &
@@ -241,10 +241,10 @@
       &
       |[dot] (B7)| {}
       &
-      & |[dot] (T7)| {} \\ [0.5cm]
+      & |[dot] (T7)| {} \\ [0.05cm]
       &
       |[dot] (B8)| {}
-      & |[dot] (M8)| {} \\ [0.5cm]
+      & |[dot,label=above:$\mea$] (M8)| {} \\ [0.5cm]
       &
       |[dot] (B9)| {}
       & |[dot] (M9)| {} \\ [0.5cm]
@@ -268,9 +268,9 @@
            edge[implies,implies-] (T2);
 \draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
            edge[implies,implies-] (B3);
-\draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \encrypt{\cacert}{K}$} (B5)
+\draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
-\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}})}{EK})$} (T6)
+\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}}}{EK})$} (T6)
            edge[implies,implies-] (B5);
 \draw (T7) edge[->] node[above] {$K$} (B7)
            edge[implies,implies-] (T6);
@@ -292,6 +292,97 @@
            edge[implies,implies-] (B12);
 \end{tikzpicture}
 \end{tiny}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Generating and Certifying an AIK}
+
+  \begin{columns}[c]
+    \column{.45\textwidth}
+    \begin{small}
+    \begin{itemize}
+    \item Request a new $AIK$ from TPM (optional)
+    \item Receive public $AIK$ and hash
+    \item Request $AIK$ signed by CA ($AIK$ cert)
+    \item Receive $AIK$ cert encrypted with session key $K$
+    \item Receive $K$ encrypted with private $EK$
+    \end{itemize}
+    \end{small}
+    \column{.55\textwidth}
+    \begin{small}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\att$] (B1)| {}
+        &[3.5cm] |[] (T1)| {}
+        &[0.5cm] |[] (C1)| {}\\[0.5cm]
+        |[dot] (B2)| {}
+        &|[dot,label=above:$\tp$] (T2)| {}\\[1.0cm]
+        |[dot] (B3)| {}
+        & |[dot] (T3)| {}\\  [0.5cm]
+        |[dot] (B4)| {}
+        &
+        & |[dot,label=above:$\ca$] (C4)| {} \\ [1.0cm]
+        |[dot] (B5)| {}
+        &
+        & |[dot] (C5)| {} \\ [0.5cm]
+      };
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
+           edge[implies,implies-] (B1);
+\draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
+           edge[implies,implies-] (T2);
+\draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
+           edge[implies,implies-] (B3);
+\draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
+           edge[implies,implies-] (C4);
+    \end{tikzpicture}
+    \end{small}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Activating the AIK}
+
+  \begin{center}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\att$] (B6)| {}
+        &[7.5cm] |[dot,label=above:$\tp$] (T6)| {} \\ [1.0cm]
+        |[dot] (B7)| {}
+        &|[dot] (T7)| {} \\
+      };
+\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}}}{EK})$} (T6);
+\draw (T7) edge[->] node[above] {$K$} (B7)
+           edge[implies,implies-] (T6);
+    \end{tikzpicture}
+  \end{center}
+
+    \begin{itemize}
+    \item Request TPM decryption of the $AIK$ cert
+    \item Receive $K$ used to decrypt signed public $AIK$
+    \item Only TPM can gain access to $K$
+    \item Only TPM can obtain signed, public $AIK$
+    \item Oddly, No manipulation of the $AIK$ in this ``activation''
+      process
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurement}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Generating a Quote}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Appraisal}
 \end{frame}
 
 \subsection{Appraisal}
