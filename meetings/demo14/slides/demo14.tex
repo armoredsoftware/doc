@@ -567,13 +567,13 @@ $\linebreak$
 $\linebreak$
 Attester
 \begin{itemize}
-\item {creates an AIKCert request (containing attester ID, AIK) and converts to JSON}
+\item {creates an AIKCertRequest (containing attester ID, AIK) and converts to JSON}
 \item {JSON sent as POST request to CA running as web server}
 \end{itemize}
 $\linebreak$
 Certificate Authority
 \begin{itemize}
-\item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ Cert request}
+\item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ AIKCertRequest}
 \item {looks up TPM\_PUBKEY associated with ID in sql database}
 \item {AIKCert $\approx$ AIK signed with $CA_{-1}$}
 \item {generates key $K$ and encrypts with TPM\_PUBKEY}
