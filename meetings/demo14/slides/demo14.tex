@@ -164,7 +164,35 @@
 \section{Prototype demonstration and discussion}
 
 \begin{frame}
-  \frametitle{CA-Based Attestation Protocol}
+  \frametitle{What We Are Demonstrating}
+  
+  \begin{itemize}
+  \item Execution of a CA-based Attestation Protocol
+    \begin{itemize}
+    \item Attestation request
+    \item Protocol execution
+    \item Evidence appraisal
+    \end{itemize}
+  \item Major architectural subsystems
+    \begin{itemize}
+    \item Appraiser
+    \item Attestation Manager
+    \item Measurer
+    \item Instrumented JVM
+    \item vTPM and Certificate Authority
+    \end{itemize}
+  \item Anomaly Detection
+    \begin{itemize}
+    \item Bad signatures and PCRs
+    \item Bad CA certificates
+    \item Bad quotes and AIKs
+    \item Bad measurements
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Abstract CA-Based Attestation Protocol}
   
   \begin{footnotesize}
   \begin{sequencediagram}
@@ -190,20 +218,31 @@
 
 \end{frame}
 
+\begin{frame}
+  \frametitle{Message List Representation}
+  \begin{small}
+  \begin{align*}
+  & \sndmsg {\app}{\att} {\evd, \nonce{\app}, \pmask} {\channel {\app \att}}  & \\
+  & \sndmsg{\att}{\tp} {make\_and\_load\_identity} {\channel {\att \tp}} & \\
+  & \sndmsg{\tp}{\att} {\public{AIK}, \aikh} {\channel {\tp \att}} & \\
+  & \sndmsg{\att}{\ca} {\att, \public{AIK}} {\channel {\att \ca}} & \\
+  & \sndmsg{\ca}{\att} {\encrypt{K, \hash{AIK}}{EK}, \encrypt{\cacert}{K}} {\channel {\ca \att}}& \\
+  & \sndmsg{\att}{\tp} {activate\_identity({\aikh, \hash{AIK})}} {\channel {\att \tp}} & \\
+  & \sndmsg{\tp}{\att} {K} {\channel {\tp \att}} & \\
+  & \sndmsg{\att}{\mea} {\evd} {\channel {\att \mea}} & \\
+  & \sndmsg{\mea}{\att} {\eve} {\channel {\mea \att}} & \\
+  & \sndmsg{\att}{\tp} {quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)} {\channel {\att \tp}} & \\
+  & \sndmsg{\tp}{\att} {\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}} {\channel {\tp \att}} & \\
+  & \sndmsg{\att}{\app} {\eve, \nonce{\app}, \pcomp, \cacert} {\channel {\att \app}} & \\
+  & \sndmsg{\att}{\app} {\sign{\hash{\pcomp}, \exdata}{AIK}} {\channel {\att \app}} & 
+\end{align*}
+\end{small}
+\end{frame}
+
 \subsection{Refine big picture to current demo}
 
-\begin{frame}
-  \frametitle{What We Are Demonstrating}
-\end{frame}
-
-\subsection{Protocol Execution}
-
-\begin{frame}
-  \frametitle{3-4 Slides on Attestation Protocol Execution}
-\end{frame}
-
 \begin{frame}[fragile]
-  \frametitle{Strand Space Diagram}
+  \frametitle{Strand Space Diagram Representation}
 
   \begin{tiny}
   \begin{tikzpicture}[
@@ -264,9 +303,9 @@
 \draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
 \draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
            edge[implies,implies-] (B1);
-\draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
+\draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
-\draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
            edge[implies,implies-] (B3);
 \draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
@@ -294,6 +333,34 @@
 \end{tiny}
 \end{frame}
 
+\subsection{Protocol Execution}
+
+\begin{frame}[fragile]
+  \frametitle{Attestation Request}
+  \begin{center}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\app$] (A1)| {}
+        &[7.5cm] |[dot,label=above:$\att$] (B1)| {} \\ [1.0cm]
+      };
+      \draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
+    \end{tikzpicture}
+  \end{center}
+
+    \begin{itemize}
+    \item Initiate with an attestation request
+      \begin{itemize}
+      \item $d$ abstractly defines desired evidence
+      \item $\nonce{\app}$ is the appraiser's nonce
+      \item $\pmask$ selects PCRs
+      \end{itemize}
+    \item Attestation agent selects and executes protocol based on request
+    \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]
   \frametitle{Generating and Certifying an AIK}
 
@@ -302,8 +369,8 @@
     \begin{small}
     \begin{itemize}
     \item Request a new $AIK$ from TPM (optional)
-    \item Receive public $AIK$ and hash
-    \item Request $AIK$ signed by CA ($AIK$ cert)
+    \item Receive $AIK$ handle
+    \item Request $\public{AIK}$ signed by CA ($AIK$ cert)
     \item Receive $AIK$ cert encrypted with session key $K$
     \item Receive $K$ encrypted with private $EK$
     \end{itemize}
@@ -331,9 +398,9 @@
       };
 \draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
            edge[implies,implies-] (B1);
-\draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
+\draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
-\draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
            edge[implies,implies-] (B3);
 \draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
@@ -471,6 +538,12 @@
 
 \end{frame}
 
+\subsection{Attestation Protocol Execution}
+
+\begin{frame}
+  \frametitle{3-4 Slides on Attestation Protocol Execution}
+\end{frame}
+
 \subsection{Appraisal}
 
 \begin{frame}
@@ -487,12 +560,6 @@
 
 \begin{frame}
   \frametitle{2-3 Slides on Communication Mechanisms}
-\end{frame}
-
-\subsection{Demonstration}
-
-\begin{frame}
-  \frametitle{Step Through Demonstration}
 \end{frame}
 
 \section{Short term goals and milestones}
