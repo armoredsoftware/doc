@@ -95,16 +95,13 @@
 \subsection{Big Picture}
 
 \begin{frame}
-  \frametitle{Program Goal}
+  \frametitle{Program Goals}
+  \framesubtitle{Virtual Blinking Lights}
   \begin{block}{Trust in the Cloud}
-    Provide new capabilities that help establish and maintain
-    trustworthy cloud-based application deployment
+    Provide new capabilities that establish and maintain trustworthy
+    cloud-based application deployment
   \end{block}
-\end{frame}
 
-\begin{frame}
-  \frametitle{New Capabilities}
-  
   \begin{itemize}
   \item Establish trust among cloud components
     \begin{itemize}
@@ -121,30 +118,27 @@
     \item responds to attack, failure, reconfiguration, and repair 
     \item response varies based on measurement
     \end{itemize}
-  \item Lightweight integration with existing cloud
-    \begin{itemize}
-    \item targeting TXT, Xen, Linux, and OpenStack infrastructure
-    \item user-space measurement and attestation
-    \end{itemize}
   \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{High-Level Architecture}
-  \includegraphics[width=\textwidth]{figures/system.pdf}
 \end{frame}
 
 \subsection{Implementation}
 
 \begin{frame}
-  \frametitle{Implementation Decisions}
+  \frametitle{Delivery Platform}
+  \framesubtitle{Open source, standards compliant}
 
   \begin{itemize}
-  \item Standard delivery platform
+  \item Lightweight integration with existing cloud infrastructure
     \begin{itemize}
-    \item Xen+XSM VM infrastructure
     \item OpenStack cloud infrastructure
+    \item Xen+XSM VM infrastructure
     \item Fedora, HotSpot JVM, GHC
+    \end{itemize}
+  \item Trusted Computing Group standards compliant
+    \begin{itemize}
+    \item Trusted Platform Module 1.2
+    \item TCG vTPM (in principle)
+    \item Trusted OS infrastructure
     \end{itemize}
   \item Standard communication mechanisms
     \begin{itemize}
@@ -152,17 +146,38 @@
     \item \textsl{vchan} for on-platform communication
     \item TCP/IP for off-platform communication
     \end{itemize}
-  \item Trusted Computing Group standards compliant
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{New Technologies}
+  \begin{itemize}
+  \item Trustworthy protocol execution
     \begin{itemize}
-    \item Trusted Platform Module (TPM) 1.2
-    \item TCG vTPM in principle
-    \end{itemize}
-  \item Executable protocol representation
-    \begin{itemize}
-    \item protocol fragments as first-class structures
+    \item executable protocol representation
+    \item protocol execution generates evidence of trustworthiness
+    \item highly focused protocols
     \item strand space formal semantics
     \end{itemize}
+  \item Application specific measurement
+    \begin{itemize}
+    \item managed and traditional execution environments
+    \item compile-time assistance for measurer synthesis
+    \item specialized measurement bundled with applications
+    \end{itemize}
+  \item Attestation driven cloud application and data management
+    \begin{itemize}
+    \item health monitoring
+    \item problem mitigation
+    \item application migration
+    \item access control
+    \end{itemize}
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{High-Level Architecture}
+  \includegraphics[width=\textwidth]{figures/system.pdf}
 \end{frame}
 
 \section{Prototype demonstration and discussion}
@@ -193,6 +208,59 @@
     \item Bad measurements
     \end{itemize}
   \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Abstract CA-Based Attestation Protocol}
+
+  \begin{center}
+
+    \begin{tikzpicture}[
+    implies/.style={double,double equal sign distance,-implies},
+    dot/.style={shape=circle,fill=black,minimum size=4pt,
+      inner sep=0pt,outer sep=4pt}]
+
+    \matrix[matrix of nodes] {
+      |[dot,label=above:$\app$] (A1)| {}
+      &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
+      &[2.0cm] |[] (M1)| {} 
+      &[2.0cm] |[] (T1)| {}\\[0.05cm]
+      |[] (A2)| {}
+      &|[dot] (B2)| {}
+      &|[dot,label=above:$\mea$] (M2)| {} 
+      &|[] (T2)| {}\\[0.05cm]
+      |[] (A3)| {}
+      &|[] (B3)| {}
+      &|[dot] (M3)| {} 
+      &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
+      |[] (A4)| {}
+      &|[] (B4)| {}
+      &|[dot] (M4)| {} 
+      &|[dot] (T4)| {}\\[0.6cm]
+      |[] (A5)| {}
+      &|[dot] (B5)| {}
+      &|[dot] (M5)| {} 
+      &|[] (T5)| {}\\[0.6cm]
+      |[dot] (A6)| {}
+      &[2.0cm] |[dot] (B6)| {}
+      &[2.0cm] |[] (M6)| {} 
+      &[2.0cm] |[] (T6)| {}\\
+    };
+    \draw (A1) edge[->] node[above] {request} (B1);
+    \draw (B2) edge[->] node[above] {request} (M2)
+           edge[implies,implies-] (B1);
+    \draw (M3) edge[->] node[above] {request} (T3)
+           edge[implies,implies-] (M2);
+    \draw (T4) edge[->] node[above] {measurement} (M4)
+           edge[implies,implies-] (T3);
+    \draw (M5) edge[->] node[above] {evidence} (B5)
+           edge[implies,implies-] (M4);
+    \draw (B6) edge[->] node[above] {quote} (A6)
+           edge[implies,implies-] (B5);
+    \end{tikzpicture}
+
+    \end{center}
+
 \end{frame}
 
 \begin{frame}
