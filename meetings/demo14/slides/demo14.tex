@@ -534,11 +534,12 @@
       dot/.style={shape=circle,fill=black,minimum size=4pt,
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
-        |[dot,label=above:$\att$] (B1)| {}
-        &[3.5cm] |[] (T1)| {}
-        &[0.5cm] |[] (C1)| {}\\[0.5cm]
-        |[dot] (B2)| {}
-        &|[dot,label=above:$\tp$] (T2)| {}\\[1.0cm]
+%        |[dot,label=above:$\att$] (B1)| {}
+%        &[3.5cm] |[] (T1)| {}
+%        &[0.5cm] |[] (C1)| {}\\[0.5cm]
+        |[dot,label=above:$\att$] (B2)| {}
+        &[3.5cm] |[dot,label=above:$\tp$] (T2)| {}\\
+        &[0.5cm] |[] (C2)| {}\\[1.0cm]
         |[dot] (B3)| {}
         & |[dot] (T3)| {}\\  [0.5cm]
         |[dot] (B4)| {}
@@ -548,8 +549,8 @@
         &
         & |[dot] (C5)| {} \\ [0.5cm]
       };
-\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
-           edge[implies,implies-] (B1);
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2);
+%           edge[implies,implies-] (B1);
 \draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
 \draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
