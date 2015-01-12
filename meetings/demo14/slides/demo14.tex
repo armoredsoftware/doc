@@ -40,19 +40,18 @@
 
 
 %constants
-\def \pmask {PCR\textsubscript{m}}
-\def \pcomp {PCR\textsubscript{c}}
-\def \evd {d}
-\def \eve {e}
-\def \cacert {\sign {\public{AIK}}{CA}}
-\def \exdata {\hash{(\eve, \nonce{A}, \cacert ) }}
-\def \aikh {AIK_h}
-
 \def \app {App}
 \def \att {Att}
 \def \ca {CA}
 \def \mea {Meas}
 \def \tp {TPM}
+\def \pmask {PCR\textsubscript{m}}
+\def \pcomp {PCR\textsubscript{c}}
+\def \evd {d}
+\def \eve {e}
+\def \cacert {\sign {\public{AIK}}{CA}}
+\def \exdata {\hash{(\eve, \nonce{\app}, \cacert ) }}
+\def \aikh {AIK_h}
 
 \def \req {R}
 \def \resp {P}
@@ -178,10 +177,72 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Research \& Development Plan}
+  \begin{itemize}
+  \item Development and integrate measurement capabilities
+    \begin{itemize}
+    \item hosted languages (Java)
+    \item traditional compiled languages (C, C++)
+    \item integrate with environment measurers (Xen,OpenStack,OS)
+    \end{itemize}
+  \item Develop attestation capabilities
+    \begin{itemize}
+    \item flexible, user configurable protocol representation
+    \item measured protocol execution
+    \item protocol execution appraisal
+    \end{itemize}
+  \item Develop infrastructure trust argument
+    \begin{itemize}
+    \item develop lightweight vTPM infrastructure supporting mobility
+    \item launch from known roots of trust
+    \item maintain trust evidence at run time
+    \item maintain trust over migration
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Research \& Development Plan}
+  \begin{itemize}
+  \item Automated synthesis and verification
+    \begin{itemize}
+    \item measurer synthesis at application compile time
+    \item automated evidence appraisal from protocols
+    \item formal trust argument
+    \end{itemize}
+  \item Demonstrations
+    \begin{itemize}
+    \item initial simple infrastructure demonstrations
+    \item cloud-based ``big data'' environment demonstration
+    \item federated trust demonstration
+    \item \emph{demonstrations as discovered/directed}
+    \end{itemize}
+  \item Scale up and roll out
+    \begin{itemize}
+    \item integration with Xen, OpenStack, Linux
+    \item installation management and packaging
+    \item effective web presence
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Armored Application Architecture}
-  \begin{center}
-  \includegraphics[width=0.7\textwidth]{figures/architecture.pdf}
-  \end{center}
+  \begin{columns}[c]
+    \column{.60\textwidth}
+    \begin{itemize}
+    \item Focus is user-space applications
+    \item Assesses the cloud infrastructure and environment
+    \item Attests to the state of its application
+    \item High-assurance, lightweight infrastructure
+    \item Influenced by the \emph{Trusted Research Platform} and
+      \emph{Principles of Remote Attestation}
+    \end{itemize}
+    \column{.40\textwidth}
+    \begin{center}
+    \includegraphics[width=0.55\textwidth]{figures/architecture.pdf}
+    \end{center}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
@@ -566,7 +627,7 @@
         |[dot] (B11)| {}
         &|[dot] (T11)| {} \\
       };
-\draw (B10) edge[->] node[above] {$quote(\;AIK, \pmask, \exdata \;)$} (T10);
+\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10);
 % quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
 \draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
 % \pcomp, sig(\hash{\pcomp}, ed) AIK
@@ -690,7 +751,35 @@ $\linebreak$
 \end{frame}
 
 
+\begin{frame}
+  \frametitle{Current Status}
 
+  \emph{\color{kublue}Completed four demonstrations culminating in
+    running an attestation protocol in response to an attestation
+    request.}
+
+  \begin{itemize}
+  \item Attestation and Appraisal development
+    \begin{itemize}
+    \item CA-Based attestation protocol execution example
+    \item integration with Berlios TPM 1.2 emulator
+    \item simple dynamic appraisal of attestation results
+    \end{itemize}
+  \item Measurement development
+    \begin{itemize}
+    \item on demand Java program measurement
+    \item HotSpot-based Java VM run time measurements
+    \item standard mechanism for extending measurement capabilities
+    \end{itemize}
+  \item Communication infrastructure
+    \begin{itemize}
+    \item vchan, TCP/IP and socket communication infrastructure
+    \item language-based interface with TPM 1.2
+    \item JSON-based data exchange formats
+    \item initial certificate authority API
+    \end{itemize}
+  \end{itemize}
+\end{frame}
 
 \section{Short term goals and milestones}
 
