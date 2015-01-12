@@ -650,16 +650,16 @@ $\linebreak$
 $\linebreak$
 Attester
 \begin{itemize}
-\item {creates an AIKCertRequest (containing attester ID, AIK) and converts to JSON}
-\item {JSON sent as POST request to CA running as web server}
+\item {creates an AIKCertRequest (containing attester $ID$, \public{AIK}) and converts to JSON}
+\item {JSON sent as POST request to \ca{} running as web server}
 \end{itemize}
 $\linebreak$
 Certificate Authority
 \begin{itemize}
 \item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ AIKCertRequest}
-\item {looks up TPM\_PUBKEY associated with ID in sql database}
-\item {AIKCert $\approx$ AIK signed with $CA_{-1}$}
-\item {generates key $K$ and encrypts with TPM\_PUBKEY}
+\item {looks up \public{EK} associated with $ID$ in sql database}
+\item {AIKCert $=$ \public{AIK} signed with \private{CA} }
+\item {generates key $K$ and encrypts with \public{EK}}
 \item {AIKCert encrypted with $K$}
 \item {both wrapped in a CAResponse, converted to JSON and sent as response. }
 
@@ -667,23 +667,23 @@ Certificate Authority
 
 \end{frame}
 
-\begin{frame}{CA communication continued}
+\begin{frame}{\ca{} communication continued}
 Properties
 \begin{itemize}
-\item {CA only responds to receiving an $AIKCertRequest_{JSON}$ }
-\item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore TPM\_PRIVATEKEY)}
+\item {\ca{} only responds to receiving an $AIKCertRequest_{JSON}$ }
+\item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore \private{EK})}
 \end{itemize}
 $\linebreak$
 Appraiser Knowledge after receiving Cert:
 \begin{itemize}
-\item {signature on AIK ensures it was CA who generated signature
+\item {signature on $AIK$ ensures it was \ca{} who generated signature
 }
 +
-\item {only an entity knowing TPM\_PRIVATEKEY could  decrypt and send me the CACert
+\item {only an entity knowing \private{EK} could decrypt and send the CACert
 }
 $\linebreak$
 =
-\item {Attester is using a registered TPM}
+\item {\textbf{Attester is using a registered TPM}}
 
 \end{itemize}
 
