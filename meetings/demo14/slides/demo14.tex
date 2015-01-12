@@ -623,7 +623,7 @@
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
         |[dot,label=above:$\att$] (B10)| {}
-        &[7.5cm] |[dot,label=above:$\mea$] (T10)| {} \\ [1.0cm]
+        &[7.5cm] |[dot,label=above:$\tp$] (T10)| {} \\ [1.0cm]
         |[dot] (B11)| {}
         &|[dot] (T11)| {} \\
       };
@@ -660,8 +660,8 @@
       dot/.style={shape=circle,fill=black,minimum size=4pt,
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
-        |[dot,label=above:$\att$] (A12)| {}
-        &[7.5cm] |[dot,label=above:$\mea$] (B12)| {} \\ [1.0cm]
+        |[dot,label=above:$\app$] (A12)| {}
+        &[7.5cm] |[dot,label=above:$\att$] (B12)| {} \\ [1.0cm]
         |[dot] (A13)| {}
         &|[dot] (B13)| {} \\
       };
@@ -675,23 +675,56 @@
   \end{center}
 
     \begin{itemize}
-    \item Receive quote from the attestation manager
     \item Receive evidence from the attestation manager
+      \begin{itemize}
+      \item evidence
+      \item original nonce
+      \item PCR composite 
+      \item signed $\public{AIK}$
+      \end{itemize}
+    \item Receive TPM quote from the attestation manager
+      \begin{itemize}
+      \item hash of all evidence
+      \item PCR composite
+      \item signed by $\private{AIK}$
+      \end{itemize}
     \item Evaluate evidence and quote
     \end{itemize}
+
+\end{frame}
+
+\subsection{Appraisal}
+
+\begin{frame}
+  \frametitle{Evidence Appraisal}
+
+  \begin{center}
+    {\color{kublue}Demonstration detects failure of all aspects of attestation}
+  \end{center}
+
+  \[\eve, \nonce{\app}, \pcomp, \cacert\]
+
+  \begin{itemize}
+  \item $\eve$ -- evidence gathered from running application
+  \item $\nonce{\app}$ -- prevents replay
+  \item $\pcomp$ -- evidence in the form or PCR data from the vTPM
+  \item $\cacert$ -- ensures validity of $\public{AIK}$
+  \end{itemize}
+
+  \[\sign{\hash{\pcomp}, \exdata}{AIK}\]
+
+  \begin{itemize}
+  \item $\pcomp$ -- hash ensures integrity of PCR data
+  \item $\exdata$ -- hash ensures integrity of evidence, nonce, and
+    signed $\public{AIK}$
+  \end{itemize}
 
 \end{frame}
 
 \subsection{Attestation Protocol Execution}
 
 \begin{frame}
-  \frametitle{3-4 Slides on Attestation Protocol Execution}
-\end{frame}
-
-\subsection{Appraisal}
-
-\begin{frame}
-  \frametitle{1-2 Slides on Appraisal}
+  \frametitle{Attestation Protocol Execution}
 \end{frame}
 
 \subsection{Measurement}
@@ -754,9 +787,11 @@ $\linebreak$
 \begin{frame}
   \frametitle{Current Status}
 
+  \begin{center}
   \emph{\color{kublue}Completed four demonstrations culminating in
     running an attestation protocol in response to an attestation
     request.}
+  \end{center}
 
   \begin{itemize}
   \item Attestation and Appraisal development
