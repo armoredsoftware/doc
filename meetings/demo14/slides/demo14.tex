@@ -246,6 +246,13 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Measurement and Attestation}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/ap-1.pdf}
+  \end{center}
+\end{frame}
+
+\begin{frame}
   \frametitle{System-Level Architecture}
   \begin{center}
   \includegraphics[width=0.9\textwidth]{figures/system.pdf}
@@ -282,58 +289,58 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Abstract CA-Based Attestation Protocol}
+% \begin{frame}[fragile]
+%   \frametitle{Abstract CA-Based Attestation Protocol}
 
-  \begin{center}
+%   \begin{center}
 
-    \begin{tikzpicture}[
-    implies/.style={double,double equal sign distance,-implies},
-    dot/.style={shape=circle,fill=black,minimum size=4pt,
-      inner sep=0pt,outer sep=4pt}]
+%     \begin{tikzpicture}[
+%     implies/.style={double,double equal sign distance,-implies},
+%     dot/.style={shape=circle,fill=black,minimum size=4pt,
+%       inner sep=0pt,outer sep=4pt}]
 
-    \matrix[matrix of nodes] {
-      |[dot,label=above:$\app$] (A1)| {}
-      &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
-      &[2.0cm] |[] (M1)| {} 
-      &[2.0cm] |[] (T1)| {}\\[0.05cm]
-      |[] (A2)| {}
-      &|[dot] (B2)| {}
-      &|[dot,label=above:$\mea$] (M2)| {} 
-      &|[] (T2)| {}\\[0.05cm]
-      |[] (A3)| {}
-      &|[] (B3)| {}
-      &|[dot] (M3)| {} 
-      &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
-      |[] (A4)| {}
-      &|[] (B4)| {}
-      &|[dot] (M4)| {} 
-      &|[dot] (T4)| {}\\[0.6cm]
-      |[] (A5)| {}
-      &|[dot] (B5)| {}
-      &|[dot] (M5)| {} 
-      &|[] (T5)| {}\\[0.6cm]
-      |[dot] (A6)| {}
-      &[2.0cm] |[dot] (B6)| {}
-      &[2.0cm] |[] (M6)| {} 
-      &[2.0cm] |[] (T6)| {}\\
-    };
-    \draw (A1) edge[->] node[above] {request} (B1);
-    \draw (B2) edge[->] node[above] {request} (M2)
-           edge[implies,implies-] (B1);
-    \draw (M3) edge[->] node[above] {request} (T3)
-           edge[implies,implies-] (M2);
-    \draw (T4) edge[->] node[above] {measurement} (M4)
-           edge[implies,implies-] (T3);
-    \draw (M5) edge[->] node[above] {evidence} (B5)
-           edge[implies,implies-] (M4);
-    \draw (B6) edge[->] node[above] {quote} (A6)
-           edge[implies,implies-] (B5);
-    \end{tikzpicture}
+%     \matrix[matrix of nodes] {
+%       |[dot,label=above:$\app$] (A1)| {}
+%       &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
+%       &[2.0cm] |[] (M1)| {} 
+%       &[2.0cm] |[] (T1)| {}\\[0.05cm]
+%       |[] (A2)| {}
+%       &|[dot] (B2)| {}
+%       &|[dot,label=above:$\mea$] (M2)| {} 
+%       &|[] (T2)| {}\\[0.05cm]
+%       |[] (A3)| {}
+%       &|[] (B3)| {}
+%       &|[dot] (M3)| {} 
+%       &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
+%       |[] (A4)| {}
+%       &|[] (B4)| {}
+%       &|[dot] (M4)| {} 
+%       &|[dot] (T4)| {}\\[0.6cm]
+%       |[] (A5)| {}
+%       &|[dot] (B5)| {}
+%       &|[dot] (M5)| {} 
+%       &|[] (T5)| {}\\[0.6cm]
+%       |[dot] (A6)| {}
+%       &[2.0cm] |[dot] (B6)| {}
+%       &[2.0cm] |[] (M6)| {} 
+%       &[2.0cm] |[] (T6)| {}\\
+%     };
+%     \draw (A1) edge[->] node[above] {request} (B1);
+%     \draw (B2) edge[->] node[above] {request} (M2)
+%            edge[implies,implies-] (B1);
+%     \draw (M3) edge[->] node[above] {request} (T3)
+%            edge[implies,implies-] (M2);
+%     \draw (T4) edge[->] node[above] {measurement} (M4)
+%            edge[implies,implies-] (T3);
+%     \draw (M5) edge[->] node[above] {evidence} (B5)
+%            edge[implies,implies-] (M4);
+%     \draw (B6) edge[->] node[above] {quote} (A6)
+%            edge[implies,implies-] (B5);
+%     \end{tikzpicture}
 
-    \end{center}
+%     \end{center}
 
-\end{frame}
+% \end{frame}
 
 \begin{frame}
   \frametitle{Abstract CA-Based Attestation Protocol}
@@ -341,14 +348,15 @@
   \begin{footnotesize}
   \begin{sequencediagram}
     \newthread[white]{appr}{Appraiser}
-    \newinst[1.0]{attest}{Attestation}
-    \newinst[1.5]{meas}{Measurer}
-    \newinst[1.0]{app}{Application}
+    \newinst[0.7]{attest}{Attestation}
+    \newinst[0.7]{ca}{CA}
+    \newinst[0.7]{meas}{Measurer}
+    \newinst[0.7]{app}{Application}
     
-    \begin{call}{appr}{Request}{attest}{Evidence}
-      \begin{callself}{attest}{Protocol Selection}{}
-      \end{callself}
-      \begin{call}{attest}{Request}{meas}{Value}
+    \begin{call}{appr}{Att Request}{attest}{Evidence}
+      \begin{call}{attest}{Cert Request}{ca}{AIK Cert}
+      \end{call}
+      \begin{call}{attest}{Measurement Request}{meas}{Value}
         \begin{call}{meas}{Measurement}{app}{Value}
         \end{call}
       \end{call}
