@@ -3,7 +3,7 @@
 % theme definition
 \usetheme{KU}
 
-\usepackage{natbib}
+%\usepackage{natbib}
 \usepackage{alltt}
 %\usepackage{trust}
 \usepackage{fixltx2e}
@@ -17,14 +17,14 @@
 
 \setbeamercolor{title}{fg=kublue}
 \setbeamercolor{subtitle}{fg=kugray} 
-\setbeamercolor{institute}{fg=black}
+\setbeamercolor{institute}{fg=kugray}
 \setbeamercolor{frametitle}{fg=kublue}
 \setbeamercolor{frametitle}{bg=white}
 \setbeamercolor{framesubtitle}{fg=kugray}
 \setbeamercolor{framesubtitle}{bg=white}
 \setbeamercolor{item}{fg=black}
-\setbeamercolor{subitem}{fg=black}
-\setbeamercolor{itemize/enumerate subbody}{fg=black}
+\setbeamercolor{subitem}{fg=kugray}
+\setbeamercolor{itemize/enumerate subbody}{fg=kugray}
 \setbeamercolor{block title}{bg=kublue}
 \setbeamercolor{block title}{fg=white}
 \setbeamercolor{block body}{bg=sand}
@@ -57,7 +57,7 @@
 \def \resp {P}
 \def \k {K}
 
-\bibliographystyle{apalike}
+\bibliographystyle{abbrv}
 
 \logo{}
 
@@ -93,6 +93,7 @@
 \end{frame}
 
 \section{Introduction and Project Goals}
+\subsection{Big Picture}
 
 \begin{frame}
   \frametitle{Program Goals}
@@ -121,32 +122,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{New Technologies}
-  \framesubtitle{Cloud-based trust infrastructure}
-  \begin{itemize}
-  \item Trustworthy protocol execution
-    \begin{itemize}
-    \item executable protocol representation
-    \item protocol execution generates evidence of trustworthiness
-    \item highly focused protocols
-    \item strand space formal semantics
-    \end{itemize}
-  \item Application specific measurement
-    \begin{itemize}
-    \item managed and traditional execution environments
-    \item compile-time assistance for measurer synthesis
-    \item specialized measurement bundled with applications
-    \end{itemize}
-  \item Attestation driven cloud application and data management
-    \begin{itemize}
-    \item health monitoring
-    \item problem mitigation
-    \item application migration
-    \item access control
-    \end{itemize}
-  \end{itemize}
-\end{frame}
+\subsection{Implementation}
 
 \begin{frame}
   \frametitle{Delivery Platform}
@@ -170,6 +146,32 @@
     \item JSON structures for all exchanged data
     \item \textsl{vchan} for on-platform communication
     \item TCP/IP for off-platform communication
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{New Technologies}
+  \begin{itemize}
+  \item Trustworthy protocol execution
+    \begin{itemize}
+    \item executable protocol representation
+    \item protocol execution generates evidence of trustworthiness
+    \item highly focused protocols
+    \item strand space formal semantics
+    \end{itemize}
+  \item Application specific measurement
+    \begin{itemize}
+    \item managed and traditional execution environments
+    \item compile-time assistance for measurer synthesis
+    \item specialized measurement bundled with applications
+    \end{itemize}
+  \item Attestation driven cloud application and data management
+    \begin{itemize}
+    \item health monitoring
+    \item problem mitigation
+    \item application migration
+    \item access control
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -233,7 +235,6 @@
     \item Assesses the cloud infrastructure and environment
     \item Attests to the state of its application
     \item High-assurance, lightweight infrastructure
-    \item Support for new and legacy software
     \item Influenced by the \emph{Trusted Research Platform} and
       \emph{Principles of Remote Attestation}
     \end{itemize}
@@ -390,6 +391,8 @@
 \end{small}
 \end{frame}
 
+\subsection{Refine big picture to current demo}
+
 \begin{frame}[fragile]
   \frametitle{Strand Space Diagram Representation}
 
@@ -482,8 +485,10 @@
 \end{tiny}
 \end{frame}
 
+\subsection{Protocol Execution}
+
 \begin{frame}[fragile]
-  \frametitle{Requesting an Attestation}
+  \frametitle{Attestation Request}
   \begin{center}
     \begin{tikzpicture}[
       implies/.style={double,double equal sign distance,-implies},
@@ -529,12 +534,11 @@
       dot/.style={shape=circle,fill=black,minimum size=4pt,
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
-%        |[dot,label=above:$\att$] (B1)| {}
-%        &[3.5cm] |[] (T1)| {}
-%        &[0.5cm] |[] (C1)| {}\\[0.5cm]
-        |[dot,label=above:$\att$] (B2)| {}
-        &[3.5cm] |[dot,label=above:$\tp$] (T2)| {}\\
-        &[0.5cm] |[] (C2)| {}\\[1.0cm]
+        |[dot,label=above:$\att$] (B1)| {}
+        &[3.5cm] |[] (T1)| {}
+        &[0.5cm] |[] (C1)| {}\\[0.5cm]
+        |[dot] (B2)| {}
+        &|[dot,label=above:$\tp$] (T2)| {}\\[1.0cm]
         |[dot] (B3)| {}
         & |[dot] (T3)| {}\\  [0.5cm]
         |[dot] (B4)| {}
@@ -544,8 +548,8 @@
         &
         & |[dot] (C5)| {} \\ [0.5cm]
       };
-\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2);
-%           edge[implies,implies-] (B1);
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
+           edge[implies,implies-] (B1);
 \draw (T3) edge[->] node[above] {$\aikh$} (B3)
            edge[implies,implies-] (T2);
 \draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
@@ -589,7 +593,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Gathering Measurements}
+  \frametitle{Measurement}
 
   \begin{center}
     \begin{tikzpicture}[
@@ -656,7 +660,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Returning Evidence}
+  \frametitle{Appraisal}
 
   \begin{center}
     \begin{tikzpicture}[
@@ -697,6 +701,8 @@
 
 \end{frame}
 
+\subsection{Appraisal}
+
 \begin{frame}
   \frametitle{Evidence Appraisal}
 
@@ -723,13 +729,79 @@
 
 \end{frame}
 
+\subsection{Attestation Protocol Execution}
+
 \begin{frame}
   \frametitle{Attestation Protocol Execution}
 \end{frame}
 
+\subsection{Measurement}
+
 \begin{frame}
-  \frametitle{3-4 Slides on Measurement}
+  \frametitle{Measurement Basics}
+  \begin{itemize}
+  \item Measurement Mechanisms
+    \begin{itemize}
+    \item Sampling: Measurer spawns asynchronous sampler thread to take measurements in parallel with application threads
+    \item Instrumentation: Measurer inserts/toggles code instrumentation in the application threads to take measurements
+    \end{itemize}    
+   \item Measurement Components 
+    \begin{itemize}
+    \item Measurer Thread services individual measurements, dispatches sampler threads, and toggles measurement instrumentation
+    \item Communications Thread communicates between the Attester (Vchan) and the Measurer Thread (within run-time)
+    \end{itemize}    
+   \item Measurement Request Types 
+    \begin{itemize}
+    \item individual measurements: get evidence
+    \item continuous measurements: initiate, terminate, get evidence
+    \end{itemize}
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Individual Sample}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Basic.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Continuous Sampling}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Sampler.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Continuous Instrumentation}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Instrumentor.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurement Status}
+  \begin{itemize}
+  \item Current Demo
+    \begin{itemize}
+    \item Individual measurement of user variable, specified externally
+    \item Performed by the measurer thread by monitoring the stack or heap contents
+    \end{itemize}    
+   \item Static Analysis to define Application Expectations
+    \begin{itemize}
+    \item Use static analysis to generate "golden" expectations for applications. Run-time measurements should fall within these defined expectations.
+    \item E.g. Generate a static callgraph and provide this an the "golden"
+      bounds to the appraiser. Track the dynamic callgraph during execution.
+      Send the dynamic callgraph to the appraiser when requested to ensure
+      the program never breaks the static expectation.
+    \end{itemize}   
+  \end{itemize}
+\end{frame}
+
+
+
+
+\subsection{Communication}
 
 \begin{frame}
   \frametitle{2-3 Slides on Communication Mechanisms}
@@ -812,57 +884,19 @@ $\linebreak$
   \end{itemize}
 \end{frame}
 
-\section{Year 2 Goals and Milestones}
+\section{Short term goals and milestones}
 
 \begin{frame}
   \frametitle{Goals and Milestones for 2015}
 
   \begin{itemize}
   \item Push to the cloud
-    \begin{itemize}
-    \item integration with OpenStack
-    \item migration across Xen instances
-    \item vTPM function migration
-    \end{itemize}
-  \item Establish roots-of-trust and trust argument
-    \begin{itemize}
-    \item measured launch and remeasurement of ArmoredSoftware
-    \item establish trust in the Xen/OpenStack infrastructure
-    \end{itemize}
+  \item Establish roots of trust and trust argument
   \item Executable protocol representation and protocol semantics
-    \begin{itemize}
-    \item richer protocol collection
-    \item evidence of proper execution
-    \item protocol-centered appraisal
-    \end{itemize}
   \item Operational, integrated vTPM prototype
-    \begin{itemize}
-    \item integration with TPM 1.2
-    \item find and integrate, not build (we hope)
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Goals and Milestones for 2015}
-
-  \begin{itemize}
-  \item More robust communication and system services
-    \begin{itemize}
-    \item Armor Authority prototype
-    \item Certificate Authority integration
-    \item communications management
-    \end{itemize}
+  \item Name Server / Certificate Authority prototype
   \item More capable measurement
-    \begin{itemize}
-    \item compiler directed measurement
-    \item continuous measurement of trends
-    \end{itemize}
-  \item More interesting download-able demonstration
-    \begin{itemize}
-    \item sponsor-defined problem
-    \item more realistic attacker model
-    \end{itemize}
+  \item Downloadable demonstration
   \end{itemize}
 \end{frame}
 
@@ -872,28 +906,17 @@ $\linebreak$
   \frametitle{Questions and Guidance}
 
   \begin{itemize}
+  \item What problems are interesting?
+  \item What problem would be a nice attention grabber?
   \item What should we be watching and integrating with?
-    \begin{itemize}
-    \item operational vTPM infrastructure
-    \item infrastructure measured boot
-    \end{itemize}
-  \item What demonstration problems are relevant?
-    \begin{itemize}
-    \item federated trust
-    \item trust in the infrastructure
-    \item trust among application collections
-    \end{itemize}
-  \item What would convince you to work a problem with us?
   \end{itemize}
 \end{frame}
 
-\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa,Ryan:09:Introduction-to}
+\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa}
 
 \begin{frame}
   \frametitle{References}
-  \begin{small}
   \bibliography{demo14}
-  \end{small}
 \end{frame}
 
 \end{document}
