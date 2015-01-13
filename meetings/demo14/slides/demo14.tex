@@ -13,6 +13,19 @@
 \usetikzlibrary{arrows,shadows, matrix}
 \usepackage[underline=false]{pgf-umlsd}
 
+\usepackage{graphicx}
+
+\usepackage{listings}
+\lstset{language=Haskell, emph={main, Request, CAResponse, CACertificate, EvidencePackage, Response, Att,TPM_KEY ,TPM_KEY_USAGE
+    , TPM_KEY_FLAGS
+    , TPM_AUTH_DATA_USAGE
+    , TPM_KEY_PARMS
+    , ByteString
+    , TPM_STORE_PUBKEY, OIAP, OSAP, TPM_NONCE, TPM_DIGEST, TPM_QUOTE_INFO, TPM_COMPOSITE_HASH, Binary, Get, TPM_STRUCT_VER, TPM, TPM_KEY_HANDLE, TPM_KEY, Session}, emphstyle=\textbf, deletekeywords={putStrLn, Handle}, showstringspaces=false}
+\lstset{%
+  literate={->}{{ ${\rightarrow}$ }}3 {<-}{{ $\leftarrow$ }}3 
+}
+
 \setbeamertemplate{blocks}[rounded][shadow=true]
 
 \setbeamercolor{title}{fg=kublue}
@@ -766,8 +779,58 @@
 
 \subsection{Attestation Protocol Execution}
 
-\begin{frame}
-  \frametitle{Attestation Protocol Execution}
+\begin{frame}[fragile]
+  \frametitle{Implementation}
+  \begin{tiny}
+  \begin{columns}[T]
+  \begin{column}{.48\textwidth}
+  \begin{center}
+  \lstinputlisting{appMainImplSample.hs}
+  \end{center}
+  \end{column}
+  \vrule{}
+  \begin{column}{.48\textwidth}
+  \begin{center}
+  \lstinputlisting{attMainImplSample.hs}
+  \end{center}
+  \end{column}
+  \end{columns}
+  \end{tiny}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementation}
+ % \begin{center}
+  \scalebox{.40}{
+  \lstinputlisting{attMkResponseImplSample.hs}
+  }
+ % \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementation}
+  \begin{tiny}
+  \lstinputlisting{tpmImplSample.hs}
+  \end{tiny}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Implementation}
+  \begin{tiny}
+  \begin{columns}[T]
+  \begin{column}{.48\textwidth}
+  \begin{center}
+  \lstinputlisting[lastline=22]{tpmTypesImplSample.hs}
+  \end{center}
+  \end{column}
+  \vrule{}
+  \begin{column}{.48\textwidth}
+  \begin{center}
+  \lstinputlisting[firstline=25, lastline=42]{tpmTypesImplSample.hs}
+  \end{center}
+  \end{column}
+  \end{columns}
+  \end{tiny}
 \end{frame}
 
 \subsection{Measurement}
