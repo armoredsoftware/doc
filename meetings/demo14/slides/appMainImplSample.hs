@@ -1,5 +1,3 @@
---Appraiser Main
-
 main = do 
   putStrLn "START main of Appraiser\n"
   (pcrSelect, nonce) <- mkTPMRequest ([0..23]::[Word8])

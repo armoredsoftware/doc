@@ -12,7 +12,6 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows, matrix}
 \usepackage[underline=false]{pgf-umlsd}
-
 \usepackage{graphicx}
 
 \usepackage{listings}
@@ -106,7 +105,6 @@
 \end{frame}
 
 \section{Introduction and Project Goals}
-\subsection{Big Picture}
 
 \begin{frame}
   \frametitle{Program Goals}
@@ -134,8 +132,6 @@
     \end{itemize}
   \end{itemize}
 \end{frame}
-
-\subsection{Implementation}
 
 \begin{frame}
   \frametitle{Delivery Platform}
@@ -238,6 +234,8 @@
     \end{itemize}
   \end{itemize}
 \end{frame}
+
+\section{System Architecture}
 
 \begin{frame}
   \frametitle{Semantic Remote Attestation}
@@ -439,8 +437,6 @@
 \end{small}
 \end{frame}
 
-\subsection{Refine big picture to current demo}
-
 \begin{frame}[fragile]
   \frametitle{Strand Space Diagram Representation}
 
@@ -532,8 +528,6 @@
 \end{tikzpicture}
 \end{tiny}
 \end{frame}
-
-\subsection{Protocol Execution}
 
 \begin{frame}[fragile]
   \frametitle{Attestation Request}
@@ -749,8 +743,6 @@
 
 \end{frame}
 
-\subsection{Appraisal}
-
 \begin{frame}
   \frametitle{Evidence Appraisal}
 
@@ -777,63 +769,63 @@
 
 \end{frame}
 
-\subsection{Attestation Protocol Execution}
-
 \begin{frame}[fragile]
-  \frametitle{Implementation}
+  \frametitle{Sample Implementation}
+  \framesubtitle{Main Appraiser loop}
   \begin{tiny}
-  \begin{columns}[T]
-  \begin{column}{.48\textwidth}
+%  \begin{columns}[T]
+%  \begin{column}{.48\textwidth}
   \begin{center}
   \lstinputlisting{appMainImplSample.hs}
   \end{center}
-  \end{column}
-  \vrule{}
-  \begin{column}{.48\textwidth}
-  \begin{center}
-  \lstinputlisting{attMainImplSample.hs}
-  \end{center}
-  \end{column}
-  \end{columns}
+%  \end{column}
+%  \vrule{}
+%  \begin{column}{.48\textwidth}
+%  \begin{center}
+%  \lstinputlisting{attMainImplSample.hs}
+%  \end{center}
+%  \end{column}
+%  \end{columns}
   \end{tiny}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Implementation}
- % \begin{center}
-  \scalebox{.40}{
-  \lstinputlisting{attMkResponseImplSample.hs}
-  }
- % \end{center}
-\end{frame}
+% \begin{frame}[fragile]
+%   \frametitle{Implementation}
+%  % \begin{center}
+%   \scalebox{.40}{
+%   \lstinputlisting{attMkResponseImplSample.hs}
+%   }
+%  % \end{center}
+% \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Implementation}
+  \frametitle{Sample Implementation}
+  \framesubtitle{TPM Key Definition and Load Key Instruction}
   \begin{tiny}
+  \lstinputlisting[lastline=9]{tpmTypesImplSample.hs}
   \lstinputlisting{tpmImplSample.hs}
   \end{tiny}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Implementation}
-  \begin{tiny}
-  \begin{columns}[T]
-  \begin{column}{.48\textwidth}
-  \begin{center}
-  \lstinputlisting[lastline=22]{tpmTypesImplSample.hs}
-  \end{center}
-  \end{column}
-  \vrule{}
-  \begin{column}{.48\textwidth}
-  \begin{center}
-  \lstinputlisting[firstline=25, lastline=42]{tpmTypesImplSample.hs}
-  \end{center}
-  \end{column}
-  \end{columns}
-  \end{tiny}
-\end{frame}
-
-\subsection{Measurement}
+% \begin{frame}[fragile]
+%   \frametitle{Sample Implementation}
+%   \framesubtitle{TPM Key Structure}
+%   \begin{tiny}
+%  \begin{columns}[T]
+%  \begin{column}{.48\textwidth}
+  % \begin{center}
+  % \lstinputlisting[lastline=9]{tpmTypesImplSample.hs}
+  % \end{center}
+%  \end{column}
+%  \vrule{}
+%  \begin{column}{.48\textwidth}
+%  \begin{center}
+%  \lstinputlisting[firstline=25, lastline=42]{tpmTypesImplSample.hs}
+%  \end{center}
+%  \end{column}
+%  \end{columns}
+%  \end{tiny}
+%\end{frame}
 
 \begin{frame}
   \frametitle{Measurement Basics}
@@ -896,11 +888,6 @@
   \end{itemize}
 \end{frame}
 
-
-
-
-\subsection{Communication}
-
 \begin{frame}
   \frametitle{2-3 Slides on Communication Mechanisms}
 \end{frame}
@@ -949,7 +936,6 @@ $\linebreak$
 
 \end{frame}
 
-
 \begin{frame}
   \frametitle{Current Status}
 
@@ -981,6 +967,8 @@ $\linebreak$
     \end{itemize}
   \end{itemize}
 \end{frame}
+
+\section{Year 2 Goals and Milestones}
 
 \begin{frame}
   \frametitle{Goals and Milestones for 2015}
