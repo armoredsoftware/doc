@@ -246,6 +246,13 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Measurement and Attestation}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/ap-1.pdf}
+  \end{center}
+\end{frame}
+
+\begin{frame}
   \frametitle{System-Level Architecture}
   \begin{center}
   \includegraphics[width=0.9\textwidth]{figures/system.pdf}
@@ -282,58 +289,58 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Abstract CA-Based Attestation Protocol}
+% \begin{frame}[fragile]
+%   \frametitle{Abstract CA-Based Attestation Protocol}
 
-  \begin{center}
+%   \begin{center}
 
-    \begin{tikzpicture}[
-    implies/.style={double,double equal sign distance,-implies},
-    dot/.style={shape=circle,fill=black,minimum size=4pt,
-      inner sep=0pt,outer sep=4pt}]
+%     \begin{tikzpicture}[
+%     implies/.style={double,double equal sign distance,-implies},
+%     dot/.style={shape=circle,fill=black,minimum size=4pt,
+%       inner sep=0pt,outer sep=4pt}]
 
-    \matrix[matrix of nodes] {
-      |[dot,label=above:$\app$] (A1)| {}
-      &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
-      &[2.0cm] |[] (M1)| {} 
-      &[2.0cm] |[] (T1)| {}\\[0.05cm]
-      |[] (A2)| {}
-      &|[dot] (B2)| {}
-      &|[dot,label=above:$\mea$] (M2)| {} 
-      &|[] (T2)| {}\\[0.05cm]
-      |[] (A3)| {}
-      &|[] (B3)| {}
-      &|[dot] (M3)| {} 
-      &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
-      |[] (A4)| {}
-      &|[] (B4)| {}
-      &|[dot] (M4)| {} 
-      &|[dot] (T4)| {}\\[0.6cm]
-      |[] (A5)| {}
-      &|[dot] (B5)| {}
-      &|[dot] (M5)| {} 
-      &|[] (T5)| {}\\[0.6cm]
-      |[dot] (A6)| {}
-      &[2.0cm] |[dot] (B6)| {}
-      &[2.0cm] |[] (M6)| {} 
-      &[2.0cm] |[] (T6)| {}\\
-    };
-    \draw (A1) edge[->] node[above] {request} (B1);
-    \draw (B2) edge[->] node[above] {request} (M2)
-           edge[implies,implies-] (B1);
-    \draw (M3) edge[->] node[above] {request} (T3)
-           edge[implies,implies-] (M2);
-    \draw (T4) edge[->] node[above] {measurement} (M4)
-           edge[implies,implies-] (T3);
-    \draw (M5) edge[->] node[above] {evidence} (B5)
-           edge[implies,implies-] (M4);
-    \draw (B6) edge[->] node[above] {quote} (A6)
-           edge[implies,implies-] (B5);
-    \end{tikzpicture}
+%     \matrix[matrix of nodes] {
+%       |[dot,label=above:$\app$] (A1)| {}
+%       &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
+%       &[2.0cm] |[] (M1)| {} 
+%       &[2.0cm] |[] (T1)| {}\\[0.05cm]
+%       |[] (A2)| {}
+%       &|[dot] (B2)| {}
+%       &|[dot,label=above:$\mea$] (M2)| {} 
+%       &|[] (T2)| {}\\[0.05cm]
+%       |[] (A3)| {}
+%       &|[] (B3)| {}
+%       &|[dot] (M3)| {} 
+%       &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
+%       |[] (A4)| {}
+%       &|[] (B4)| {}
+%       &|[dot] (M4)| {} 
+%       &|[dot] (T4)| {}\\[0.6cm]
+%       |[] (A5)| {}
+%       &|[dot] (B5)| {}
+%       &|[dot] (M5)| {} 
+%       &|[] (T5)| {}\\[0.6cm]
+%       |[dot] (A6)| {}
+%       &[2.0cm] |[dot] (B6)| {}
+%       &[2.0cm] |[] (M6)| {} 
+%       &[2.0cm] |[] (T6)| {}\\
+%     };
+%     \draw (A1) edge[->] node[above] {request} (B1);
+%     \draw (B2) edge[->] node[above] {request} (M2)
+%            edge[implies,implies-] (B1);
+%     \draw (M3) edge[->] node[above] {request} (T3)
+%            edge[implies,implies-] (M2);
+%     \draw (T4) edge[->] node[above] {measurement} (M4)
+%            edge[implies,implies-] (T3);
+%     \draw (M5) edge[->] node[above] {evidence} (B5)
+%            edge[implies,implies-] (M4);
+%     \draw (B6) edge[->] node[above] {quote} (A6)
+%            edge[implies,implies-] (B5);
+%     \end{tikzpicture}
 
-    \end{center}
+%     \end{center}
 
-\end{frame}
+% \end{frame}
 
 \begin{frame}
   \frametitle{Abstract CA-Based Attestation Protocol}
@@ -341,14 +348,15 @@
   \begin{footnotesize}
   \begin{sequencediagram}
     \newthread[white]{appr}{Appraiser}
-    \newinst[1.0]{attest}{Attestation}
-    \newinst[1.5]{meas}{Measurer}
-    \newinst[1.0]{app}{Application}
+    \newinst[0.7]{attest}{Attestation}
+    \newinst[0.7]{ca}{CA}
+    \newinst[0.7]{meas}{Measurer}
+    \newinst[0.7]{app}{Application}
     
-    \begin{call}{appr}{Request}{attest}{Evidence}
-      \begin{callself}{attest}{Protocol Selection}{}
-      \end{callself}
-      \begin{call}{attest}{Request}{meas}{Value}
+    \begin{call}{appr}{Att Request}{attest}{Evidence}
+      \begin{call}{attest}{Cert Request}{ca}{AIK Cert}
+      \end{call}
+      \begin{call}{attest}{Measurement Request}{meas}{Value}
         \begin{call}{meas}{Measurement}{app}{Value}
         \end{call}
       \end{call}
@@ -623,7 +631,7 @@
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
         |[dot,label=above:$\att$] (B10)| {}
-        &[7.5cm] |[dot,label=above:$\mea$] (T10)| {} \\ [1.0cm]
+        &[7.5cm] |[dot,label=above:$\tp$] (T10)| {} \\ [1.0cm]
         |[dot] (B11)| {}
         &|[dot] (T11)| {} \\
       };
@@ -660,8 +668,8 @@
       dot/.style={shape=circle,fill=black,minimum size=4pt,
         inner sep=0pt,outer sep=4pt}]
       \matrix[matrix of nodes] {
-        |[dot,label=above:$\att$] (A12)| {}
-        &[7.5cm] |[dot,label=above:$\mea$] (B12)| {} \\ [1.0cm]
+        |[dot,label=above:$\app$] (A12)| {}
+        &[7.5cm] |[dot,label=above:$\att$] (B12)| {} \\ [1.0cm]
         |[dot] (A13)| {}
         &|[dot] (B13)| {} \\
       };
@@ -675,30 +683,123 @@
   \end{center}
 
     \begin{itemize}
-    \item Receive quote from the attestation manager
     \item Receive evidence from the attestation manager
+      \begin{itemize}
+      \item evidence
+      \item original nonce
+      \item PCR composite 
+      \item signed $\public{AIK}$
+      \end{itemize}
+    \item Receive TPM quote from the attestation manager
+      \begin{itemize}
+      \item hash of all evidence
+      \item PCR composite
+      \item signed by $\private{AIK}$
+      \end{itemize}
     \item Evaluate evidence and quote
     \end{itemize}
+
+\end{frame}
+
+\subsection{Appraisal}
+
+\begin{frame}
+  \frametitle{Evidence Appraisal}
+
+  \begin{center}
+    {\color{kublue}Demonstration detects failure of all aspects of attestation}
+  \end{center}
+
+  \[\eve, \nonce{\app}, \pcomp, \cacert\]
+
+  \begin{itemize}
+  \item $\eve$ -- evidence gathered from running application
+  \item $\nonce{\app}$ -- prevents replay
+  \item $\pcomp$ -- evidence in the form or PCR data from the vTPM
+  \item $\cacert$ -- ensures validity of $\public{AIK}$
+  \end{itemize}
+
+  \[\sign{\hash{\pcomp}, \exdata}{AIK}\]
+
+  \begin{itemize}
+  \item $\pcomp$ -- hash ensures integrity of PCR data
+  \item $\exdata$ -- hash ensures integrity of evidence, nonce, and
+    signed $\public{AIK}$
+  \end{itemize}
 
 \end{frame}
 
 \subsection{Attestation Protocol Execution}
 
 \begin{frame}
-  \frametitle{3-4 Slides on Attestation Protocol Execution}
-\end{frame}
-
-\subsection{Appraisal}
-
-\begin{frame}
-  \frametitle{1-2 Slides on Appraisal}
+  \frametitle{Attestation Protocol Execution}
 \end{frame}
 
 \subsection{Measurement}
 
 \begin{frame}
-  \frametitle{3-4 Slides on Measurement}
+  \frametitle{Measurement Basics}
+  \begin{itemize}
+  \item Measurement Mechanisms
+    \begin{itemize}
+    \item Sampling: Measurer spawns asynchronous sampler thread to take measurements in parallel with application threads
+    \item Instrumentation: Measurer inserts/toggles code instrumentation in the application threads to take measurements
+    \end{itemize}    
+   \item Measurement Components 
+    \begin{itemize}
+    \item Measurer Thread services individual measurements, dispatches sampler threads, and toggles measurement instrumentation
+    \item Communications Thread communicates between the Attester (Vchan) and the Measurer Thread (within run-time)
+    \end{itemize}    
+   \item Measurement Request Types 
+    \begin{itemize}
+    \item individual measurements: get evidence
+    \item continuous measurements: initiate, terminate, get evidence
+    \end{itemize}
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Individual Sample}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Basic.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Continuous Sampling}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Sampler.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurer - Continuous Instrumentation}
+  \begin{center}
+  \includegraphics[width=0.9\textwidth]{figures/Measurer_Instrumentor.pdf}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measurement Status}
+  \begin{itemize}
+  \item Current Demo
+    \begin{itemize}
+    \item Individual measurement of user variable, specified externally
+    \item Performed by the measurer thread by monitoring the stack or heap contents
+    \end{itemize}    
+   \item Static Analysis to define Application Expectations
+    \begin{itemize}
+    \item Use static analysis to generate "golden" expectations for applications. Run-time measurements should fall within these defined expectations.
+    \item E.g. Generate a static callgraph and provide this an the "golden"
+      bounds to the appraiser. Track the dynamic callgraph during execution.
+      Send the dynamic callgraph to the appraiser when requested to ensure
+      the program never breaks the static expectation.
+    \end{itemize}   
+  \end{itemize}
+\end{frame}
+
+
+
 
 \subsection{Communication}
 
@@ -754,9 +855,11 @@ $\linebreak$
 \begin{frame}
   \frametitle{Current Status}
 
+  \begin{center}
   \emph{\color{kublue}Completed four demonstrations culminating in
     running an attestation protocol in response to an attestation
     request.}
+  \end{center}
 
   \begin{itemize}
   \item Attestation and Appraisal development
