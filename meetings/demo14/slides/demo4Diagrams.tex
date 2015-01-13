@@ -19,6 +19,15 @@
 \usetikzlibrary{arrows,shadows,matrix}
 \usepackage[underline=false]{pgf-umlsd}
 
+\usepackage{listings}
+
+\usepackage[T1]{fontenc}  
+\usepackage{textcomp}  
+\usepackage{lmodern} 
+
+
+
+
 \lhead{ArmoredSoftware Architecture}
 \rhead{Alexander, Gill, Kulkarni, Searl}
 \lfoot{\copyright The University of Kansas, 2013}
@@ -174,6 +183,34 @@ e : & gathered evidence \\
 % sig(hash(\pcomp), ed) AIK
            edge[implies,implies-] (B12);
 \end{tikzpicture}
+
+
+\newpage
+
+\lstset{language=Haskell, emph={main, Request, CAResponse, CACertificate, EvidencePackage, Response, Att}, emphstyle=\textbf, deletekeywords={putStrLn, Handle}, showstringspaces=false}
+\lstset{%
+  literate={->}{{ ${\rightarrow}$ }}3 {<-}{{ $\leftarrow$ }}3 {"}{\textquotedbl}1
+}
+ 
+%\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
+
+
+
+
+\newpage
+
+\lstinputlisting {appMainImplSample.hs}
+
+\newpage
+
+\lstinputlisting {attMainImplSample.hs}
+
+\newpage
+
+\lstinputlisting {attMkResponseImplSample.hs}
+
+
+
 
 
 \end {document}
