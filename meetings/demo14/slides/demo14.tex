@@ -227,6 +227,41 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Semantic Remote Attestation}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+    \item Appraiser requests a quote
+      \begin{itemize}
+      \item specifies needed information
+      \item provides a nonce
+      \end{itemize}
+    \item Target gathers evidence
+      \begin{itemize}
+      \item measures application
+      \item gathers evidence of trust
+      \end{itemize}
+    \item Target generates quote
+      \begin{itemize}
+      \item measurements and evidence
+      \item original nonce
+      \item cryptographic signature
+      \end{itemize}
+    \item Appraiser assesses quote
+      \begin{itemize}
+      \item good application behavior
+      \item infrastructure trustworthiness
+      \end{itemize}
+    \end{itemize}
+    \column{0.45\textwidth}
+    \begin{center}
+      \includegraphics[width=.95\textwidth]{figures/remote-att.pdf}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
   \frametitle{Armored Application Architecture}
   \begin{columns}[c]
     \column{.60\textwidth}
@@ -884,19 +919,55 @@ $\linebreak$
   \end{itemize}
 \end{frame}
 
-\section{Short term goals and milestones}
-
 \begin{frame}
   \frametitle{Goals and Milestones for 2015}
 
   \begin{itemize}
   \item Push to the cloud
-  \item Establish roots of trust and trust argument
+    \begin{itemize}
+    \item integration with OpenStack
+    \item migration across Xen instances
+    \item vTPM function migration
+    \end{itemize}
+  \item Establish roots-of-trust and trust argument
+    \begin{itemize}
+    \item measured launch and remeasurement of ArmoredSoftware
+    \item establish trust in the Xen/OpenStack infrastructure
+    \end{itemize}
   \item Executable protocol representation and protocol semantics
+    \begin{itemize}
+    \item richer protocol collection
+    \item evidence of proper execution
+    \item protocol-centered appraisal
+    \end{itemize}
   \item Operational, integrated vTPM prototype
-  \item Name Server / Certificate Authority prototype
+    \begin{itemize}
+    \item integration with TPM 1.2
+    \item find and integrate, not build (we hope)
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Goals and Milestones for 2015}
+
+  \begin{itemize}
+  \item More robust communication and system services
+    \begin{itemize}
+    \item Armor Authority prototype
+    \item Certificate Authority integration
+    \item communications management
+    \end{itemize}
   \item More capable measurement
-  \item Downloadable demonstration
+    \begin{itemize}
+    \item compiler directed measurement
+    \item continuous measurement of trends
+    \end{itemize}
+  \item More interesting download-able demonstration
+    \begin{itemize}
+    \item sponsor-defined problem
+    \item more realistic attacker model
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -906,9 +977,18 @@ $\linebreak$
   \frametitle{Questions and Guidance}
 
   \begin{itemize}
-  \item What problems are interesting?
-  \item What problem would be a nice attention grabber?
   \item What should we be watching and integrating with?
+    \begin{itemize}
+    \item operational vTPM infrastructure
+    \item infrastructure measured boot
+    \end{itemize}
+  \item What demonstration problems are relevant?
+    \begin{itemize}
+    \item federated trust
+    \item trust in the infrastructure
+    \item trust among application collections
+    \end{itemize}
+  \item What would convince you to work a problem with us?
   \end{itemize}
 \end{frame}
 
