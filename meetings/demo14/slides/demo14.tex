@@ -227,6 +227,41 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Semantic Remote Attestation}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+    \item Appraiser requests a quote
+      \begin{itemize}
+      \item specifies needed information
+      \item provides a nonce
+      \end{itemize}
+    \item Target gathers evidence
+      \begin{itemize}
+      \item measures application
+      \item gathers evidence of trust
+      \end{itemize}
+    \item Target generates quote
+      \begin{itemize}
+      \item measurements and evidence
+      \item original nonce
+      \item cryptographic signature
+      \end{itemize}
+    \item Appraiser assesses quote
+      \begin{itemize}
+      \item good application behavior
+      \item infrastructure trustworthiness
+      \end{itemize}
+    \end{itemize}
+    \column{0.45\textwidth}
+    \begin{center}
+      \includegraphics[width=.95\textwidth]{figures/remote-att.pdf}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
   \frametitle{Armored Application Architecture}
   \begin{columns}[c]
     \column{.60\textwidth}
