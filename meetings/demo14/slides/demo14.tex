@@ -870,71 +870,104 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Measurement Status}
+  \frametitle{Measurement Approaches}
   \begin{itemize}
-  \item Current Demo
+  \item Current measurer
     \begin{itemize}
-    \item Individual measurement of user variable, specified externally
-    \item Performed by the measurer thread by monitoring the stack or heap contents
-    \end{itemize}    
-   \item Static Analysis to define Application Expectations
+    \item individual measurement of user variables
+    \item variables specified externally
+    \item measurer thread monitors the stack or heap contents
+    \end{itemize}
+  \item Use provisioning to fine expected variable values
     \begin{itemize}
-    \item Use static analysis to generate "golden" expectations for applications. Run-time measurements should fall within these defined expectations.
-    \item E.g. Generate a static callgraph and provide this an the "golden"
-      bounds to the appraiser. Track the dynamic callgraph during execution.
-      Send the dynamic callgraph to the appraiser when requested to ensure
-      the program never breaks the static expectation.
+    \item generate ``golden'' values to define expected state
+    \item track variables at runtie
+    \item dynamic variables are evidence the appraiser uses to ensure
+      application meets expectations
+    \end{itemize}
+  \item Use static analysis to find expected behavior
+    \begin{itemize}
+    \item generate a ``golden'' static callgraph and provide this to the
+      appraiser
+    \item track the dynamic callgraph during execution
+    \item dynamic callgraph is evidence the appraiser uses to ensure
+      application meets expectations
     \end{itemize}   
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{2-3 Slides on Communication Mechanisms}
+  \frametitle{Communication Mechanisms}
+  \begin{itemize}
+  \item Exploring standard communication mechanisms
+    \begin{itemize}
+    \item Sockets for processes
+    \item \emph{vchan} for IVC within Xen instances
+    \item TCP/IP for IVC between Xen instances
+    \end{itemize}
+  \item Developing standard abstract communication concept
+    \begin{itemize}
+    \item $A->B:M\; on\; c$ is the abstraction users should see
+    \item independent of the type of communication
+    \item manage failure and time-out behind the scenes
+    \item JSON structures for all data communicated
+    \item type preserving communication
+    \end{itemize}
+  \item Armor Authority provides services among  VMs
+    \begin{itemize}
+    \item name services, migration services, certificate authority
+    \item as small as possible
+    \item reuse wherever possible
+    \end{itemize}
+  \end{itemize}
 \end{frame}
-\begin{frame}{CA communication}
-Shared notion of AIKCertRequest, AIKCert, and CAResponse JSON structures.
-$\linebreak$
-$\linebreak$
-Attester
-\begin{itemize}
-\item {creates an AIKCertRequest (containing attester $ID$, \public{AIK}) and converts to JSON}
-\item {JSON sent as POST request to \ca{} running as web server}
-\end{itemize}
-$\linebreak$
-Certificate Authority
-\begin{itemize}
-\item {POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ AIKCertRequest}
-\item {looks up \public{EK} associated with $ID$ in sql database}
-\item {AIKCert $=$ \public{AIK} signed with \private{CA} }
-\item {generates key $K$ and encrypts with \public{EK}}
-\item {AIKCert encrypted with $K$}
-\item {both wrapped in a CAResponse, converted to JSON and sent as response. }
 
-\end{itemize}
+\begin{frame}
+  \frametitle{Example Communication Activity}
+  \framesubtitle{CA communication}
 
-\end{frame}
-
-\begin{frame}{\ca{} communication continued}
-Properties
 \begin{itemize}
-\item {\ca{} only responds to receiving an $AIKCertRequest_{JSON}$ }
-\item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore \private{EK})}
-\end{itemize}
-$\linebreak$
-Appraiser Knowledge after receiving Cert:
-\begin{itemize}
-\item {signature on $AIK$ ensures it was \ca{} who generated signature
-}
-+
-\item {only an entity knowing \private{EK} could decrypt and send the CACert
-}
-$\linebreak$
-=
-\item {\textbf{Attester is using a registered TPM}}
-
+\item Attester
+  \begin{itemize}
+  \item creates an $AIKCertRequest$ containing $ID$ and $\public{AIK}$
+  \item converts $AIKCertRequest$ to JSON
+  \item JSON sent as POST request to certificate authority
+  \item $AIKCertRequest$ $->$ JSON $->$ UTF8 $->$ POST body bytes
+  \end{itemize}
+\item Certificate Authority
+  \begin{itemize}
+  \item POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ $AIKCertRequest$
+  \item looks up \public{EK} associated with $ID$
+  \item $AIKCert$ is \sign{\public{AIK}}{CA}
+  \item generates session key $K$ and encrypts with \public{EK}
+  \item $AIKCert$ encrypted with $K$
+  \item $CAResponse$ converted to JSON and sent as response
+  \end{itemize}
 \end{itemize}
 
 \end{frame}
+
+% \begin{frame}{\ca{} communication continued}
+% Properties
+% \begin{itemize}
+% \item {\ca{} only responds to receiving an $AIKCertRequest_{JSON}$ }
+% \item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore \private{EK})}
+% \end{itemize}
+% $\linebreak$
+% Appraiser Knowledge after receiving Cert:
+% \begin{itemize}
+% \item {signature on $AIK$ ensures it was \ca{} who generated signature
+% }
+% +
+% \item {only an entity knowing \private{EK} could decrypt and send the CACert
+% }
+% $\linebreak$
+% =
+% \item {\textbf{Attester is using a registered TPM}}
+
+% \end{itemize}
+
+% \end{frame}
 
 \begin{frame}
   \frametitle{Current Status}
