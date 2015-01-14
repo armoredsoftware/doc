@@ -829,18 +829,19 @@
   \begin{itemize}
   \item Measurement Mechanisms
     \begin{itemize}
-    \item Sampling: Measurer spawns asynchronous sampler thread to take measurements in parallel with application threads
-    \item Instrumentation: Measurer inserts/toggles code instrumentation in the application threads to take measurements
+    \item sampling where measurer spawns asynchronous sampler thread to take measurements in parallel with application threads
+    \item instrumentation where measurer inserts/toggles code instrumentation in the application threads to take measurements
     \end{itemize}    
    \item Measurement Components 
     \begin{itemize}
     \item Measurer Thread services individual measurements, dispatches sampler threads, and toggles measurement instrumentation
-    \item Communications Thread communicates between the Attester (Vchan) and the Measurer Thread (within run-time)
+    \item Communications Thread communicates between the Attester and the Measurer Thread (within run-time)
     \end{itemize}    
    \item Measurement Request Types 
     \begin{itemize}
-    \item individual measurements: get evidence
-    \item continuous measurements: initiate, terminate, get evidence
+    \item individual measurements gather evidence
+    \item continuous measurements initiate, terminate, evidence gathering
+    \item triggered measurements witness an event and gather evidence
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -1002,6 +1003,10 @@
 
 \begin{frame}
   \frametitle{Goals and Milestones for 2015}
+
+  \begin{center}
+    {\color{kublue}Increased functionality and robustness}
+  \end{center}
 
   \begin{itemize}
   \item Push to the cloud
