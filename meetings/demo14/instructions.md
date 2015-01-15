@@ -22,3 +22,9 @@ Paul’s CA runs on compute6
 1. HACK0 in measurer (not relay)
 1. Hit enter in attester
 1. RESTORE in measurer to restore good values
+
+## For starting the CA
+
+1. ssh into compute6
+2. cd /home/armored/protocolsDir2/protocol/tpm/scottyca
+3. ./dist/build/ScottyCA/ScottyCA
