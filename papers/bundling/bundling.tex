@@ -1,0 +1,265 @@
+\documentclass[10pt]{article}
+
+%\usepackage{hyperref}
+\usepackage{alltt}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{trust}
+\usepackage{subfigure}
+\usepackage{ifthen}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shadows}
+\usepackage[underline=false]{pgf-umlsd}
+
+\lhead{ArmoredSoftware Architecture}
+\rhead{Alexander, Gill, Kulkarni, Searl}
+\lfoot{\copyright The University of Kansas, 2013}
+\cfoot{\thepage}
+
+
+\newboolean{submission}  %%set to true for the submission version
+\setboolean{submission}{false}
+%\setboolean{submission}{true}
+\ifthenelse
+{\boolean{submission}}
+{ \newcommand{\todo}[1]{ } } % hide todo
+{ \newcommand{\todo}[1]{ % show todo
+   \marginpar{\raggedright\footnotesize{#1}}
+               }}
+\newcommand{\squash}{\parskip=0pt\itemsep=0pt}
+
+\parskip=\medskipamount
+\parindent=0pt
+
+
+\bibliographystyle{abbrvnat}
+
+\title{Musings on Gathering and Bundling Evidence}
+\author{Perry Alexander \\
+ \url{palexand@ku.edu}}
+
+\begin{document}
+
+\maketitle
+%\tableofcontents
+%\listoffigures
+%\listoftables
+
+\begin{abstract}
+  This document captures discussions on evidence bundling in semantic
+  remote attestation.  Evidence Bundling is described as aggregation
+  of evidence from multiple sources into a trustworthy package.  This
+  necessarily includes primary evidence from the system being
+  appraised and meta-evidence describing the evidence gathering
+  process.  This is a living document and will be updated frequently.
+\end{abstract}
+
+\section{Introduction}
+
+Consider the problem of determining the status of virus checking on a
+remote system.  This might occur when a new computer is asking to join
+a controlled network such as a university wireless system.  The
+appraiser representing the university wireless system wants to
+determine the status of an attestation manager representing the new
+computing system.
+
+On the appraiser side a trivial protocol runs sending a request
+(\Verb+r+) to a target (\Verb+t+) and in response receiving a protocol
+(\Verb+Some q+) or refusal to participate (\Verb+None+):
+
+\begin{alltt}
+  do \{ sndRequest(r,t);
+       q <- rcvProt(t)
+       e <- case q of
+              Some p : sndRemote(p,t)
+              None : None
+            end;
+       case e of 
+         Some v : appraise(v)
+         None : None
+       end
+  \}
+\end{alltt}
+
+If the request returns a protocol (\Verb+p+), the appraiser sends the
+protocol to execute on the target. Evidence (\Verb+e+) is received
+from the target and appraised if it is valid evidence.
+
+On the attestation manager, a protocol runs that receives a request
+from the appraiser (\Verb+a+), evaluates its privacy policy
+(\Verb+priv+) with respect to the request and the appraiser's ID.  If
+its privacy policy is respected and the appraiser trusted, it returns
+a single attestation protocol (\Verb+p0+).  Otherwise, it refuses to
+participate (\Verb+None+):
+
+\begin{alltt}
+  do \{ (r,a) <- rcvRequest;
+       p <- if (priv r a) then Some p0 else None;
+       sndProt(p,a);
+       (q,a) <- rcvRemote;
+       e <- if p=q then execute(q) else None;
+       sndEvidence(e,a)
+  \}
+\end{alltt}
+
+There is no negotiation, just a simple determination if the request
+satisfies the target's privacy policy.  If so, the only protocol that
+can be returned and executed is \Verb+p0+.
+
+The interface between this negotiation protocol and the attestation
+protocol resulting from it is the \Verb+execute+ function that causes
+the attestation protocol to run on the attestation manager.
+
+To consider bundling, we look at several examples of an attestation
+protocols (\Verb+p0+) for determining the status of a target's virus
+checking software.
+
+First is a protocol that assesses several properties and runs locally
+on the attestation manager's system:
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       sig <- getSigFileEvidence;
+       src <- getSigFileSrc;
+       e <- createEvidence(id,sig,src);
+       returnEvidence(e)
+  \}
+\end{alltt}
+
+This protocol gets the checker ID (\Verb+getVCID+), checks the
+signature file (\Verb+getSigFileEvidence+), and checks the source of
+the signature file (\Verb+getSigFileSrc+). Then it bundles all
+evidence into a single evidence package (\Verb+createEvidence+) and
+returns it (\Verb+returnEvidence+) to be sent back to the appraiser by
+the negotiation protocol.  The appraiser then consumes the resulting
+evidence to perform appraisal (\Verb+appraise+).
+
+The evidence returned has approximately the following form:
+
+\[\evidence{(id,sig,src)}{\hashe{(id,sig,src)},PCRComp_0}{AIK_0}\]
+
+where $(id,sig,src)$ is primary evidence and hashes and signatures are
+meta-evidence.  An appraiser can check: (i) primary evidence to assess
+the measured virus checking subsystem; and (ii) the signature on the
+quote to determine its authenticity and $PCRComp$ to assess the
+platform construction.  This is a trivial example of what we call
+bundling---combining primary evidence and meta-evidence in the same
+evidence package.
+
+Another protocol represents simply telling the appraiser a virus
+checker is running:
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       e <- createEvidence(id);
+       returnEvidence(e)
+  \}
+\end{alltt}
+
+This simpler protocol generates less evidence than the first, but may
+be more acceptable to the target system.  The appraiser could
+determine this is insufficient or limit access to resources and
+services based on its appraisal.
+
+%% Negotiation example here
+
+A more interesting case for the attestation protocol happens in the
+presence of more complex bundling:
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       sig <- getSigFileEvidence;
+       src <- getSigFileSrc;
+       srcQuote <- appraiseSrc(src);
+       e <- createEvidence(id,sig,src,srcEvidence)
+       returnEvidence(e)
+  \}
+\end{alltt}
+
+In this case the \Verb+appraiseSrc+ function does a full appraisal of
+the signature file server, \Verb+src+. The function communicates its
+need for evidence from the signature file source to the appraiser
+associated with the attestation manager.  That attestation manager
+then executes a similar negotiation protocol as the one that started
+the appraisal process.  The resulting evidence, \Verb+srcEvidence+,
+has the form:
+
+\[\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
+
+is signed by the signature file server, not the original appraisal
+target with its own AIK. Thus, the information from the encapsulated
+quote is bundled in the outer quote:
+
+\[b=\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
+\[\evidence{(id,sig,src,b)}{\hashe{(id,sig,src,b)},PCRComp_0}{AIK_0}\]
+
+The appraiser must somehow interpret the quote from the signature file
+server without \emph{a priori} knowledge of its identity.
+
+This more general version of the bundling problem requires:
+
+\begin{itemize}
+  \parskip=0pt\itemsep=0pt
+\item Strong identification of the signature file server to the appraiser
+\item Nested evaluation of the privacy policy for the ``other''
+  attestation manager before executing the entire attestation
+  protocol.
+\end{itemize}
+
+An alternative implementation would have the attestation manager
+return the identity of the signature server and allow the appraiser to
+negotiate separately with the signature server.  This could be called
+\emph{flattening} the protocol if there is a desire to name it.
+
+\begin{alltt}
+  do \{ sndRequest(r0,t0);
+       q0 <- rcvProt(t0);
+       e0 <- case q0 of
+               Some p : sndRemote(p,t0)
+               None : None
+             end;
+       r1 <- appraise(e0);
+       
+       sndRequest(r1,t1);
+       q1 <- rcvProt(t);
+       e1 <- case q1 of
+               Some p : sndRemote(p,t1)
+               None : None
+             end;
+       appraise(e1)
+  \}
+\end{alltt}
+
+Is this flattening operation---eliminating hierarchy in the
+attestation protocol---a general operation or something that applies
+only here?  If it is not general, can we live with its limitations?
+Can we assert any correctness properties for it?  Could there be an
+interesting man-in-the-middle attack where the outer attestation
+manager could negotiate in bad faith and return instructions to the
+appraiser that produce a bad result?
+
+\appendix
+
+\section{Glossary}
+
+\begin{description}
+\item[Primary Evidence] Evidence describing the measured application.
+\item[Meta-Evidence] Evidence describing properties of other evidence.
+\item[Negotiation Protocol] Sequence of events used to determine what
+  protocol(s) to run and when to run it/them.
+\item[Attestation Protocol] Sequence of events used to gather and
+  prepare evidence by invoking attestation service providers.
+\item[Attestation Protocol Block (APB)] See Attestation Protocol
+  Instance (API).
+\end{description}
+
+%%\nocite{}
+
+\bibliography{bundling}
+
+\end{document}
