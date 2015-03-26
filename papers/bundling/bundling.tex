@@ -12,13 +12,15 @@
 \usepackage{subfigure}
 \usepackage{ifthen}
 
+%\newcommand{\squash}{}{\itemsep=0pt\parskip=0pt}
+
 \usepackage{tikz}
 \usetikzlibrary{arrows,shadows}
 \usepackage[underline=false]{pgf-umlsd}
 
-\lhead{ArmoredSoftware Architecture}
-\rhead{Alexander, Gill, Kulkarni, Searl}
-\lfoot{\copyright The University of Kansas, 2013}
+\lhead{Gathering and Bundling Evidence}
+\rhead{Alexander}
+\lfoot{\copyright The University of Kansas, 2015}
 \cfoot{\thepage}
 
 
@@ -31,7 +33,10 @@
 { \newcommand{\todo}[1]{ % show todo
    \marginpar{\raggedright\footnotesize{#1}}
                }}
+
 \newcommand{\squash}{\parskip=0pt\itemsep=0pt}
+
+\newtheorem{assertion}{Assertion}
 
 \parskip=\medskipamount
 \parindent=0pt
@@ -53,13 +58,56 @@
 \begin{abstract}
   This document captures discussions on evidence bundling in semantic
   remote attestation.  Evidence Bundling is described as aggregation
-  of evidence from multiple sources into a trustworthy package.  This
-  necessarily includes primary evidence from the system being
-  appraised and meta-evidence describing the evidence gathering
-  process.  This is a living document and will be updated frequently.
+  of evidence from multiple sources into a package whose overall
+  trustworthiness can be appraised.  This necessarily includes primary
+  evidence from the system being appraised and meta-evidence
+  describing the evidence gathering process.  This is a living
+  document and will be updated frequently.
 \end{abstract}
 
-\section{Introduction}
+\section*{Notation}
+
+Throughout we use a trivial monadic notation for protocols that serves
+as our ``assembly language'' target for protocol compilation.
+The following conventions hold:
+
+\begin{alltt}
+  do \{                % evaluate functions in sequence
+       f(x);          % calculate f(x) and discard the result
+       y <- f(x);      % calculate f(x) and bind the result to y
+       sndXXX(x,a);   % operation on x that sends something to a
+       y <- rcvXXX(a) % an operation that receives something from a
+                      %  and binds it to y
+  \}
+\end{alltt}
+
+This is early work, so we play fast and loose with specific syntax and
+semantics.
+
+\section*{Bundling}
+
+A working definition of bundling from ongoing discussions:
+
+\begin{quotation}
+  ``If an attestation [protocol] is negotiated and an appraiser receives
+  evidence that some set of components is uncompromised, then
+  ensure the appraiser can verify that those uncompromised
+  components executed their part of the plan'' -- Paul Rowe and Joshua
+  Guttman
+\end{quotation}
+
+Said differently, bundling is the assembly of evidence from multiple
+sources in a way that enables an appraiser to determine that each
+element was obtained by the correct measurement component at the
+correct time.
+
+Following we will outline working examples of when and how bundling
+occurs.  We will start by defining a simple negotiation among an
+appraiser and attestation manager.  Then we will define several
+potential results of that negotiation and discuss how those examples
+reflect bundling issues.
+
+\subsection*{Negotiation}
 
 Consider the problem of determining the status of virus checking on a
 remote system.  This might occur when a new computer is asking to join
@@ -70,7 +118,7 @@ computing system.
 
 On the appraiser side a trivial protocol runs sending a request
 (\Verb+r+) to a target (\Verb+t+) and in response receiving a protocol
-(\Verb+Some q+) or refusal to participate (\Verb+None+):
+(\Verb+Some p+) or refusal to participate (\Verb+None+):
 
 \begin{alltt}
   do \{ sndRequest(r,t);
@@ -99,7 +147,7 @@ participate (\Verb+None+):
 
 \begin{alltt}
   do \{ (r,a) <- rcvRequest;
-       p <- if (priv r a) then Some p0 else None;
+       p <- if (priv r a) then (Some p0) else None;
        sndProt(p,a);
        (q,a) <- rcvRemote;
        e <- if p=q then execute(q) else None;
@@ -114,6 +162,8 @@ can be returned and executed is \Verb+p0+.
 The interface between this negotiation protocol and the attestation
 protocol resulting from it is the \Verb+execute+ function that causes
 the attestation protocol to run on the attestation manager.
+
+\subsection*{Attestation}
 
 To consider bundling, we look at several examples of an attestation
 protocols (\Verb+p0+) for determining the status of a target's virus
@@ -147,12 +197,20 @@ where $(id,sig,src)$ is primary evidence and hashes and signatures are
 meta-evidence.  An appraiser can check: (i) primary evidence to assess
 the measured virus checking subsystem; and (ii) the signature on the
 quote to determine its authenticity and $PCRComp$ to assess the
-platform construction.  This is a trivial example of what we call
-bundling---combining primary evidence and meta-evidence in the same
-evidence package.
+platform construction.
 
-Another protocol represents simply telling the appraiser a virus
-checker is running:
+This is a simple example of evidence bundling---combining primary
+evidence from three ASPs and meta-evidence from the appraisal
+environment in the same package.  In this case, primary evidence gives
+us information about the running system and meta-evidence gives us
+information about how the evidence was gathered.  The appraiser first
+needs to determine if the quote and $PCRComp$ are sufficient
+meta-evidence for it to trust its primary evidence and then determine
+if $(id,sig,src)$ is sufficient to trust that the remote system is
+running an appropriately configured virus checker.
+
+Another protocol represents simply providing the appraiser evidence
+that a virus checker is running:
 
 \begin{alltt}
   do \{ id <- getVCID;
@@ -166,16 +224,17 @@ be more acceptable to the target system.  The appraiser could
 determine this is insufficient or limit access to resources and
 services based on its appraisal.
 
-%% Negotiation example here
+\emph{Note: This example will expand into a more involved negotiation
+  of a protocol.}
 
 A more interesting case for the attestation protocol happens in the
-presence of more complex bundling:
+presence of complex bundling:
 
 \begin{alltt}
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
-       srcQuote <- appraiseSrc(src);
+       srcEvidence <- appraiseSrc(src);
        e <- createEvidence(id,sig,src,srcEvidence)
        returnEvidence(e)
   \}
@@ -193,13 +252,13 @@ has the form:
 
 is signed by the signature file server, not the original appraisal
 target with its own AIK. Thus, the information from the encapsulated
-quote is bundled in the outer quote:
+evidence is bundled in the outer evidence:
 
 \[b=\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
 \[\evidence{(id,sig,src,b)}{\hashe{(id,sig,src,b)},PCRComp_0}{AIK_0}\]
 
-The appraiser must somehow interpret the quote from the signature file
-server without \emph{a priori} knowledge of its identity.
+The appraiser must somehow interpret the evidence from the signature
+file server without \emph{a priori} knowledge of its identity.
 
 This more general version of the bundling problem requires:
 
@@ -235,6 +294,19 @@ negotiate separately with the signature server.  This could be called
   \}
 \end{alltt}
 
+The evidence produced from both requests from the appraiser has the
+following form:
+
+\[\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
+\[\evidence{(id,sig,src)}{\hashe{(id,sig,src)},PCRComp_0}{AIK_0}\]
+
+Note that this is quite similar to the evidence produced by the
+earlier, un-flattened attestation.  We have the same PCR composites
+and evidence signed by the same AIK instances.  The distinction is the
+evidence packages are not nested.  Semantically, what is the
+distinction between these two results?  Is one preferable to another
+from an evidence perspective?
+
 Is this flattening operation---eliminating hierarchy in the
 attestation protocol---a general operation or something that applies
 only here?  If it is not general, can we live with its limitations?
@@ -243,9 +315,55 @@ interesting man-in-the-middle attack where the outer attestation
 manager could negotiate in bad faith and return instructions to the
 appraiser that produce a bad result?
 
+\section*{Privacy Policies}
+
+Each protocol executed in the virus checking example is evaluated by a
+privacy policy.  This policy governs access to information available
+from the attestation target.  
+
+Formally, let $T_i$ be a security type that may be associated with
+appraisers, attestation managers, and evidence.  Denote $p$ as
+belonging to type $T_i$ by $p:T_i$.  Given an appraiser, $a:T_a$,
+making a request and target, $t:T_t$, with measurable evidence
+$e:T_e$, $a$ is authorized to access $e$ if the $t$'s privacy policy
+allows domains of type $T_a$ access to evidence of type $T_e$. A
+privacy policy for target type $T_t$ is expressed as a relation,
+$\mathsf{PRIV}$:
+
+\[\mathsf{PRIV}_{T_t}(T_a,T_e)\]
+
+In the protocols above, \Verb+priv+ corresponds to $\mathsf{PRIV}$ and
+checking privacy policy \Verb+(priv r a)+ is determining the truth
+value of $\mathsf{PRIV}_{T_t}(T_a,T_e)$.  This semantics is derived
+from SELinux policy developed by~\citet{Hicks:07:A-logical-speci}.
+
+
+
+
+\begin{assertion}[$\mathsf{PRIV}$ is not transitive]
+  $\mathsf{PRIV}_{T_t}(T_a,T_e)\wedge\mathsf{PRIV}_{T_a}(T_b,T_e)$ does
+  not imply $\mathsf{PRIV}_{T_t}(T_b,T_e)$.  Informally, if $t$ trusts
+  $a$ with evidence of type $T_e$ and $a$ trusts $b$ with evidence of
+  type $T_e$, it does necessarily follow that $t$ trusts $b$ with
+  evidence of type $T_e$.
+\end{assertion}
+
+\begin{assertion}[$\mathsf{PRIV}$ is not symmetric]
+  $\mathsf{PRIV}_{T_t}(T_a,T_e)$ does not imply that
+  $\mathsf{PRIV}_{T_a}(T_t,T_e)$.  In formally, if $t$ trusts $a$ with
+  evidence of type $T_e$, it does not necessarily follow that $a$
+  trusts $t$ with evidence of type $T_e$.
+\end{assertion}
+
+\begin{assertion}[$\mathsf{PRIV}$ is reflexive]
+  $\forall t,e\cdot\mathsf{PRIV}_{T_t}(T_t,T_e)$. This is not a
+  particularly useful property in that it only states $T_t$ trusts
+  itself with its own evidence.
+\end{assertion}
+
 \appendix
 
-\section{Glossary}
+\section*{Glossary}
 
 \begin{description}
 \item[Primary Evidence] Evidence describing the measured application.
@@ -258,7 +376,18 @@ appraiser that produce a bad result?
   Instance (API).
 \end{description}
 
-%%\nocite{}
+\nocite{Coker::Principles-of-R,Loscocco:98:The-Inevitabili}
+
+\section*{Notes}
+
+\begin{itemize}
+  \squash
+\item relative order of measurements (temporal ordering)
+\item order measures are constructed relative to request (freshness)
+\item trust status of keys
+\item relevant FLASK policies that restrict communications (platform MAC)
+\item vantage point from which evidence was created
+\end{itemize}
 
 \bibliography{bundling}
 
