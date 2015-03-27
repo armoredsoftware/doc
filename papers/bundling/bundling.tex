@@ -37,6 +37,7 @@
 \newcommand{\squash}{\parskip=0pt\itemsep=0pt}
 
 \newtheorem{assertion}{Assertion}
+\newtheorem{definition}{Definition}
 
 \parskip=\medskipamount
 \parindent=0pt
@@ -74,10 +75,12 @@ The following conventions hold:
 \begin{alltt}
   do \{                % evaluate functions in sequence
        f(x);          % calculate f(x) and discard the result
-       y <- f(x);      % calculate f(x) and bind the result to y
-       sndXXX(x,a);   % operation on x that sends something to a
-       y <- rcvXXX(a) % an operation that receives something from a
-                      %  and binds it to y
+       y <- f(x);     % calculate f(x) and bind the result to y
+       sndXXX(x,a);   % an operation on x that performs a calculation
+                      %  and sends data to a
+       y <- rcvXXX(a) % an operation that receives data from
+                      %  a performs a calculation and binds the
+                      %  result to y
   \}
 \end{alltt}
 
@@ -88,18 +91,11 @@ semantics.
 
 A working definition of bundling from ongoing discussions:
 
-\begin{quotation}
-  ``If an attestation [protocol] is negotiated and an appraiser receives
-  evidence that some set of components is uncompromised, then
-  ensure the appraiser can verify that those uncompromised
-  components executed their part of the plan'' -- Paul Rowe and Joshua
-  Guttman
-\end{quotation}
-
-Said differently, bundling is the assembly of evidence from multiple
-sources in a way that enables an appraiser to determine that each
-element was obtained by the correct measurement component at the
-correct time.
+\begin{definition}[Bundling]
+  Bundling is the assembly of evidence from multiple sources in a way
+  that enables an appraiser to determine that each evidence component
+  was obtained by the correct measurement component at the correct time.
+\end{definition}
 
 Following we will outline working examples of when and how bundling
 occurs.  We will start by defining a simple negotiation among an
@@ -108,6 +104,12 @@ potential results of that negotiation and discuss how those examples
 reflect bundling issues.
 
 \subsection*{Negotiation}
+
+\begin{definition}[Negotiation]
+  Negotiation is the process of finding an attestation protocol that
+  satisfies the needs of an appraiser and the privacy policy of an
+  attestation target.
+\end{definition}
 
 Consider the problem of determining the status of virus checking on a
 remote system.  This might occur when a new computer is asking to join
@@ -165,6 +167,12 @@ the attestation protocol to run on the attestation manager.
 
 \subsection*{Attestation}
 
+\begin{definition}[Attestation]
+  Attestation is the process of executing a protocol to gather and
+  bundle evidence for appraising the trustworthiness of a target
+  system.
+\end{definition}
+
 To consider bundling, we look at several examples of an attestation
 protocols (\Verb+p0+) for determining the status of a target's virus
 checking software.
@@ -181,13 +189,14 @@ on the attestation manager's system:
   \}
 \end{alltt}
 
-This protocol gets the checker ID (\Verb+getVCID+), checks the
-signature file (\Verb+getSigFileEvidence+), and checks the source of
-the signature file (\Verb+getSigFileSrc+). Then it bundles all
-evidence into a single evidence package (\Verb+createEvidence+) and
-returns it (\Verb+returnEvidence+) to be sent back to the appraiser by
-the negotiation protocol.  The appraiser then consumes the resulting
-evidence to perform appraisal (\Verb+appraise+).
+This protocol gets the checker ID (\Verb+getVCID+), measures the
+checker's signature file (\Verb+getSigFileEvidence+), and determines
+the source of the signature file (\Verb+getSigFileSrc+). Then it
+bundles all evidence into a single evidence package
+(\Verb+createEvidence+) and returns it (\Verb+returnEvidence+) to be
+sent back to the appraiser by the negotiation protocol.  The appraiser
+then consumes the resulting evidence to perform appraisal
+(\Verb+appraise+).
 
 The evidence returned has approximately the following form:
 
@@ -337,20 +346,17 @@ checking privacy policy \Verb+(priv r a)+ is determining the truth
 value of $\mathsf{PRIV}_{T_t}(T_a,T_e)$.  This semantics is derived
 from SELinux policy developed by~\citet{Hicks:07:A-logical-speci}.
 
-
-
-
 \begin{assertion}[$\mathsf{PRIV}$ is not transitive]
-  $\mathsf{PRIV}_{T_t}(T_a,T_e)\wedge\mathsf{PRIV}_{T_a}(T_b,T_e)$ does
-  not imply $\mathsf{PRIV}_{T_t}(T_b,T_e)$.  Informally, if $t$ trusts
-  $a$ with evidence of type $T_e$ and $a$ trusts $b$ with evidence of
-  type $T_e$, it does necessarily follow that $t$ trusts $b$ with
-  evidence of type $T_e$.
+  $\mathsf{PRIV}_{T_t}(T_a,T_e)\wedge\mathsf{PRIV}_{T_a}(T_b,T_e)$
+  does not necessarily imply $\mathsf{PRIV}_{T_t}(T_b,T_e)$.
+  Informally, if $t$ trusts $a$ with evidence of type $T_e$ and $a$
+  trusts $b$ with evidence of type $T_e$, it does necessarily follow
+  that $t$ trusts $b$ with evidence of type $T_e$.
 \end{assertion}
 
 \begin{assertion}[$\mathsf{PRIV}$ is not symmetric]
-  $\mathsf{PRIV}_{T_t}(T_a,T_e)$ does not imply that
-  $\mathsf{PRIV}_{T_a}(T_t,T_e)$.  In formally, if $t$ trusts $a$ with
+  $\mathsf{PRIV}_{T_t}(T_a,T_e)$ does not necessarily imply that
+  $\mathsf{PRIV}_{T_a}(T_t,T_e)$.  Informally, if $t$ trusts $a$ with
   evidence of type $T_e$, it does not necessarily follow that $a$
   trusts $t$ with evidence of type $T_e$.
 \end{assertion}
@@ -379,6 +385,8 @@ from SELinux policy developed by~\citet{Hicks:07:A-logical-speci}.
 \nocite{Coker::Principles-of-R,Loscocco:98:The-Inevitabili}
 
 \section*{Notes}
+
+Example meta-properties useful during appraisal:
 
 \begin{itemize}
   \squash
