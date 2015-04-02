@@ -1,0 +1,249 @@
+\documentclass%[12pt]
+{llncs}  % report article
+
+\newif\ifieee
+\ieeefalse		%\ieeetrue
+
+\newif\ifllncs
+\llncstrue		%\llncsfalse
+
+\newif\ifamsart
+\amsartfalse             %\amsarttrue
+
+
+\newif\ifproofs
+\proofstrue             %\proofsfalse
+
+%\usepackage{times}
+\normalfont
+\usepackage[T1]{fontenc}
+
+
+%\ifllncs\usepackage{smallsubsub}\fi
+%\input{macros} 
+
+
+\usepackage{enumerate}
+\usepackage[all]{xypic}
+\usepackage{multirow}
+\usepackage{csquotes}
+%\usepackage{hyperref}
+
+
+%macros
+\newcommand{\enc}[2]{\{\!|#1|\!\}_{#2}}
+
+
+
+\pagestyle{plain}
+
+\title{Examples of Multi-Realm Attestation}
+\author{Paul D. Rowe \and Joshua D. Guttman}
+\institute{The MITRE Corporation}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section*{A Simple Protocol}
+We start from the same example explored by Perry, namely the problem
+of determining the status of a virus checker on a remote system. We
+assume the appraisal happens as part of the entrance to a wireless
+network. The appraiser wants to ensure that, at the time of entrance
+to the network, the target system has a virus checker that is the
+current version and is using the expected signature files. The
+appraiser is willing to live with the risk that a compromise happens
+once the target is on the network. 
+
+We assume the appraiser wants to see the virus checker version number
+$vn$ and (a hash of?) the signature file $sf$ being used. (We ignore
+the source of the signature file for now.) The following depicts a
+possible expected message flow of a protocol consistent with Perry's
+description. We instantiate some choices that will turn out to be
+problematic to demonstrate the kinds of things that can go wrong. 
+
+\begin{figure}[h]
+  \centering
+  \begin{displaymath}
+  \xymatrix{
+  APB & & ASP & & TPM \\
+  \bullet \ar[rr]^{n,mspec}
+         \ar@{=>}[dddd] & & \bullet \ar@{=>}[d] & & ~\\
+   ~& & \circ \ar@{}[r]|{~~~~~meas:~vn,~sf}\ar@2{->}[d] & & ~\\
+   ~& & \bullet \ar@2{->}[d]\ar[rr]^{quote~req.~n,~vn,~sf} & & \bullet
+   \ar@2{->}[d]\\
+   ~& & \bullet \ar@2{->}[d] & & \bullet \ar[ll]_{quote}\\
+   \bullet & & \bullet \ar[ll]_{bundle} & &~}
+  \end{displaymath}
+ \begin{tabular}[h]{rl}
+   $quote:$ & $\enc{h(n,vn,sf),PCRComp_0}{AIK_0}$\\
+   $bundle:$ & $\langle (vn,sf), quote\rangle$
+ \end{tabular}
+  \caption{Message flow for simple protocol}
+  \label{fig:protocol flow}
+\end{figure}
+
+The APB forwards to the relevant ASP the measurement spec (that
+specifies the version number and signature file) and a nonce $n$
+provided by the appraiser. The ASP takes the measurements, and then
+requests a quote from the TPM (possibly vTPM). We might assume that
+$PCRComp_0$ reflects the load-time state of the M\&A domain, or at
+least the APB and ASP. The ASP may then bundle the quote together
+with the plaintext of the measurements and hand it back to the APB.
+
+In this example, $vn$ and $sf$ represent the primary evidence, while
+the bundle is intended to provided secondary evidence about how the
+primary evidence was collected. We are particularly interested in how
+an appraiser might infer what happened on the system in order to
+determine that its desired goal is met. Let's assume for now that the
+appraiser is willing to trust the APB and ASP on the basis of the
+load-time information conveyed in $PCRComp_0$, and that this trust is
+well-placed. That is, suppose those components have not been
+compromised. Then the appraiser would like to trust the quote because
+it came from a legitimate TPM and the trustworthy ASP made the
+request. Because the ASP is trustworthy, it will only include the true
+measurements it took. 
+
+\subsection*{An attack}
+
+It turns out the above protocol will not ensure the target has
+up-to-date signature files and version number. To see this, consider
+what an attacker might do. At any time prior to the attestation
+request, the attacker can change the signature file to ensure it
+cannot be detected by the virus checker. When it detects the
+attestation request, it can grab the appraiser's nonce and directly
+request a quote from the TPM using the expected values instead of the
+actual values. The attacker might then ensure this quote is sent back
+to the appraiser instead of the quote requested by the ASP that would
+contain the actual (and unacceptable) measurement values. The end
+result is that the appraiser is fooled into thinking the ASP took
+measurements that indicated acceptable values, when in fact, the ASP
+measurement yielded unacceptable values.
+
+The problem is obviously not with the measurement gathering process
+since that part is not tampered with. Rather, the problem is that the
+quote is insufficient to allow the appraiser to infer who provided the
+measurement values to the TPM. This particular bundling mechanism is
+consistent with several executions of the platform, one of which
+defeats the goals of the attestation. This is our first example of a
+bundling mechanism being untrustworthy. It also suggests a first rule
+of thumb for bundling mechanisms:
+
+\begin{displayquote}
+  \textbf{Rule of Thumb~1:} Evidence should not be incorporated into a
+  quote solely in the ExternalData (a.k.a. nonce) field. A TPM quote
+  should always indicate which component provided the evidence to the
+  TPM.
+\end{displayquote}
+
+\subsection*{A mitigation}
+The above rule of thumb suggests that we should modify the protocol to
+ensure the appraiser can correctly determine that the source of the
+measurement values is the ASP. Below is an initial suggestion.
+
+
+\begin{figure}[h]
+  \centering
+  \begin{displaymath}
+  \xymatrix{
+  APB && ASP && TPM \\
+  \bullet \ar[rr]^{n,mspec}
+         \ar@{=>}[ddddd] && \bullet \ar@{=>}[d] &&\\
+   && \circ \ar@{}[r]|{~~~~~meas:~vn,~sf}\ar@2{->}[d] &&\\
+   && \bullet \ar@2{->}[d]\ar[rr]^{extend~vn,~sf} &&\bullet \ar@2{->}[d]\\
+   && \bullet \ar@2{->}[d]\ar[rr]^{quote~req.~n} && \bullet
+   \ar@2{->}[d]\\
+   && \bullet \ar@2{->}[d] && \bullet \ar[ll]_{quote}\\
+   \bullet && \bullet \ar[ll]_{bundle} &&}
+  \end{displaymath}
+ \begin{tabular}[h]{rl}
+   $quote:$ & $\enc{n,PCRComp_1}{AIK_0}$\\
+   $bundle:$ & $\langle (vn,sf), quote\rangle$
+ \end{tabular}
+  \caption{Message flow for amended protocol}
+  \label{fig:protocol amended}
+\end{figure}
+
+This protocol has the ASP extending the measurement values into a TPM
+PCR, which could be a resettable PCR to which the ASP has exclusive
+access. The quote now includes a new PCR composite value $PCRComp_1$
+that covers PCRs reflecting the load-time state of the ASP and also
+the newly included PCR that contains info about the status of the
+virus checker. 
+
+Although this protocol provides the same evidence to the appraiser
+(namely, $vn$ and $sf$) as the original protocol, the bundling
+mechanism allows for fewer executions on the target platform that are
+consistent with the generation of the bundle. In particular, a
+corrupted user machine can no longer create a quote with the expected
+measurement values in the right location. If the ASP is trustworthy,
+and if the ASP truly has exclusive access to the resettable PCR, then
+the appraiser can believe the values reported in the quote are the
+result of the ASP's measurement.
+
+\subsection*{Towards multi-realm attestations}
+So far, we have used a simple, single-realm attestation protocol to
+demonstrate the way in which one bundling mechanism may be preferred
+to another that bundles the same primary evidence. The improved
+bundling mechanism prevents undesirable executions that the original
+mechnaism allows, but only under explicit trust assumptions about the
+lower layers of the system. This suggests that the appraiser would
+like to recieve more evidence about the underlying system in order to
+validate those trust assumptions. Of course, depending on the context,
+the target system may be unwilling to provide such further
+evidence. This is the basic tension between the appraiser's policy and
+the target's policy. 
+
+Extending the particular example from above, the appraiser needs
+evidence that the ASP is trustworthy at the time of the attestation,
+and that the relevant combination of policies are in place to ensure
+that the ASP has exclusive access to the relevant PCR. Depending on
+the appraiser's policy, it may be willing to settle for the load-time
+measurements of the ASP and relevant policies, or it might require a
+runtime re-measurement of both. In the former case, the amended
+protocol of Figure~\ref{fig:protocol amended} would be sufficient. 
+
+If, however, the appraiser believes the ASP could be corrupted after
+load-time, or the relevant policy could be changed, then that protocol
+is insufficient. If the ASP can be corrupted at runtime, then the
+load-time measurement of it, reflected in $PCRComp_1$, will not detect
+the corruption. This corrupted ASP could use its privilege to extend
+the expected measurement values into the restricted PCR even if the
+signature file has been modified. Similarly, if the policy is modified
+to allow unrestricted access to the PCR in question, then the attack
+described above---in which an attacker on the user VM creates a valid
+quote with expected values---is again possible. 
+
+As this note evolves, we will want to explore some strategies for
+collecting the lower-level measurements of the ASP and access control
+policies and bundling it with the evidence of the virus checker. There
+are many more options both for how to gather the evidence (it may
+matter whether the lower-level measurements are taken first) and how
+to bundle the evidence from the various realms. Here is a brief list
+of the types of things we expect to find with examples of poorly
+chosen mechanisms:
+
+\begin{itemize}
+  \item Attacker can reuse old measurements of the low-level
+    components
+  \item Attacker can request fresh, clean measurements of another
+    machine
+  \item A compromised ASP might be able to forge lower-level quotes
+    with its TPM using a different AIK
+  \item A compromised user-level attestation manager may negotiate a
+    different attestation in bad faith allowing it to evade detection
+\end{itemize}
+
+The last item begins to hint at the issues surrounding policy
+distribution and enforcement that we have discussed before. We will
+want to explore the consequences of different choices for how to
+negotiate attestation protocols. 
+
+
+
+
+
+
+
+\end{document}

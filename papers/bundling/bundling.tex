@@ -91,15 +91,22 @@ semantics.
 
 A working definition of bundling from ongoing discussions:
 
-\begin{definition}[Bundling]
-  Bundling is the assembly of evidence from multiple sources in a way
-  that enables an appraiser to determine that each evidence component
-  was obtained by the correct measurement component at the correct time.
+\begin{definition}[Bundling Evidence]
+  Bundling is the assembly of evidence gathered from multiple sources
+  in different realms.
+\end{definition}
+
+A working definition of bundling soundness:
+
+\begin{definition}[Sound Bundling]
+  A bundling of evidence is sound if it enables an appraiser to
+  determine that each evidence component was obtained by the correct
+  measurement component at the correct time.
 \end{definition}
 
 Following we will outline working examples of when and how bundling
 occurs.  We will start by defining a simple negotiation among an
-appraiser and attestation manager.  Then we will define several
+appraiser and attester.  Then we will define several
 potential results of that negotiation and discuss how those examples
 reflect bundling issues.
 
@@ -107,27 +114,31 @@ reflect bundling issues.
 
 \begin{definition}[Negotiation]
   Negotiation is the process of finding an attestation protocol that
-  satisfies the needs of an appraiser and the privacy policy of an
-  attestation target.
+  mutually satisfies the needs and policy of an appraiser and the
+  policy of an attester.
 \end{definition}
 
 Consider the problem of determining the status of virus checking on a
 remote system.  This might occur when a new computer is asking to join
 a controlled network such as a university wireless system.  The
 appraiser representing the university wireless system wants to
-determine the status of an attestation manager representing the new
+determine the status of an attester representing the new
 computing system.
 
 On the appraiser side a trivial protocol runs sending a request
-(\Verb+r+) to a target (\Verb+t+) and in response receiving a protocol
-(\Verb+Some p+) or refusal to participate (\Verb+None+):
+(\Verb+r+) to a target (\Verb+t+) and in response receiving a set of
+proposals (\Verb+q+) each of which is a protocol, evidence descriptor
+pair.  If the proposal set is empty, the attester cannot participate
+in any protocol and the process halts.
+
+%% Add a nonce to the request
 
 \begin{alltt}
   do \{ sndRequest(r,t);
-       q <- rcvProt(t)
-       e <- case q of
-              Some p : sndRemote(p,t)
-              None : None
+       q <- rcvProp(t);
+       e <- case \{p:q | policy?(p)\} of
+              \(\emptyset\) : None
+              p : sndRemote(choose(p),t)
             end;
        case e of 
          Some v : appraise(v)
@@ -136,23 +147,26 @@ On the appraiser side a trivial protocol runs sending a request
   \}
 \end{alltt}
 
-If the request returns a protocol (\Verb+p+), the appraiser sends the
-protocol to execute on the target. Evidence (\Verb+e+) is received
-from the target and appraised if it is valid evidence.
+If the attester returns a nonempty proposal set, the appraiser chooses
+a proposal (\Verb+choose(p)+) from the a subset of proposals that
+satisfy the appraiser's policy (\Verb+{p:q | policy?(p)}+).  The
+selected proposal is then returned to the attester for execution.  If
+evidence is produced, \Verb+(e)+, it is appraised by the appraiser.
 
-On the attestation manager, a protocol runs that receives a request
-from the appraiser (\Verb+a+), evaluates its privacy policy
-(\Verb+priv+) with respect to the request and the appraiser's ID.  If
-its privacy policy is respected and the appraiser trusted, it returns
-a single attestation protocol (\Verb+p0+).  Otherwise, it refuses to
-participate (\Verb+None+):
+
+On the attester, a protocol runs that receives a request from the
+appraiser (\Verb+a+), evaluates its policy (\Verb+policy?+) with
+respect to the request and the appraiser's ID.  If its policy is
+respected and the appraiser trusted, it returns a set of attestation
+protocol, evidence descriptor pairs (\Verb+(p0,d0)+).  Otherwise, it
+refuses to participate by offering no proposals ($\emptyset$):
 
 \begin{alltt}
   do \{ (r,a) <- rcvRequest;
-       p <- if (priv r a) then (Some p0) else None;
-       sndProt(p,a);
-       (q,a) <- rcvRemote;
-       e <- if p=q then execute(q) else None;
+       p <- if (policy? r a) then \{(p0,d0),...,(pk,dk)\} else \(\emptyset\);
+       sndProp(p,a);
+       (q,t) <- rcvRemote;
+       e <- if q \(\in\) p then execute(q) else None;
        sndEvidence(e,a)
   \}
 \end{alltt}
@@ -163,14 +177,30 @@ can be returned and executed is \Verb+p0+.
 
 The interface between this negotiation protocol and the attestation
 protocol resulting from it is the \Verb+execute+ function that causes
-the attestation protocol to run on the attestation manager.
+the attestation protocol to run on the attester.
 
-\subsection*{Attestation}
+\subsection*{Measurement and Attestation}
 
 \begin{definition}[Attestation]
-  Attestation is the process of executing a protocol to gather and
-  bundle evidence for appraising the trustworthiness of a target
-  system.
+  Attestation is the process of executing a protocol that interacts
+  with attestation service providers (ASPs) to gather and return evidence for
+  appraising the trustworthiness of a target system.
+\end{definition}
+
+Attestation service providers present interfaces for performing
+attestation services to attestation protocols:
+
+\begin{definition}[Attestation Service Provider]
+  An attestation service provider (ASP) is a routine that provides
+  specific services to an attestation protocol.  ASPs may invoke
+  measurers, interact with a (v)TPM, invoke appraisers and attesters,
+  and invoke meta-measurers.
+\end{definition}
+
+Measurement is the process of gathering evidence directly from a target:
+
+\begin{definition}[Measurement]
+  Measurement is the process of gathering evidence from a system.
 \end{definition}
 
 To consider bundling, we look at several examples of an attestation
@@ -178,7 +208,7 @@ protocols (\Verb+p0+) for determining the status of a target's virus
 checking software.
 
 First is a protocol that assesses several properties and runs locally
-on the attestation manager's system:
+on the attester's system:
 
 \begin{alltt}
   do \{ id <- getVCID;
@@ -252,7 +282,7 @@ presence of complex bundling:
 In this case the \Verb+appraiseSrc+ function does a full appraisal of
 the signature file server, \Verb+src+. The function communicates its
 need for evidence from the signature file source to the appraiser
-associated with the attestation manager.  That attestation manager
+associated with the attester.  That attester
 then executes a similar negotiation protocol as the one that started
 the appraisal process.  The resulting evidence, \Verb+srcEvidence+,
 has the form:
@@ -275,11 +305,11 @@ This more general version of the bundling problem requires:
   \parskip=0pt\itemsep=0pt
 \item Strong identification of the signature file server to the appraiser
 \item Nested evaluation of the privacy policy for the ``other''
-  attestation manager before executing the entire attestation
+  attester before executing the entire attestation
   protocol.
 \end{itemize}
 
-An alternative implementation would have the attestation manager
+An alternative implementation would have the attester
 return the identity of the signature server and allow the appraiser to
 negotiate separately with the signature server.  This could be called
 \emph{flattening} the protocol if there is a desire to name it.
@@ -331,7 +361,7 @@ privacy policy.  This policy governs access to information available
 from the attestation target.  
 
 Formally, let $T_i$ be a security type that may be associated with
-appraisers, attestation managers, and evidence.  Denote $p$ as
+appraisers, attesters, and evidence.  Denote $p$ as
 belonging to type $T_i$ by $p:T_i$.  Given an appraiser, $a:T_a$,
 making a request and target, $t:T_t$, with measurable evidence
 $e:T_e$, $a$ is authorized to access $e$ if the $t$'s privacy policy
