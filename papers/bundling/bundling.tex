@@ -207,6 +207,8 @@ To consider bundling, we look at several examples of an attestation
 protocols (\Verb+p0+) for determining the status of a target's virus
 checking software.
 
+\subsubsection*{Local Execution}
+
 First is a protocol that assesses several properties and runs locally
 on the attester's system:
 
@@ -248,8 +250,13 @@ meta-evidence for it to trust its primary evidence and then determine
 if $(id,sig,src)$ is sufficient to trust that the remote system is
 running an appropriately configured virus checker.
 
-Another protocol represents simply providing the appraiser evidence
-that a virus checker is running:
+\todo{This example will expand into a more involved negotiation
+  of a protocol.}
+
+\subsubsection*{Trivial Local Execution}
+
+Another attestation protocol represents simply providing the appraiser
+evidence that a virus checker is running:
 
 \begin{alltt}
   do \{ id <- getVCID;
@@ -263,29 +270,29 @@ be more acceptable to the target system.  The appraiser could
 determine this is insufficient or limit access to resources and
 services based on its appraisal.
 
-\emph{Note: This example will expand into a more involved negotiation
-  of a protocol.}
+\subsubsection*{Nested Attestation}
 
 A more interesting case for the attestation protocol happens in the
-presence of complex bundling:
+presence of complex bundling where the attester requests evidence from
+a remote target:
 
 \begin{alltt}
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
-       srcEvidence <- appraiseSrc(src);
+       srcEvidence <- attestSrc(src);
        e <- createEvidence(id,sig,src,srcEvidence)
        returnEvidence(e)
   \}
 \end{alltt}
 
-In this case the \Verb+appraiseSrc+ function does a full appraisal of
-the signature file server, \Verb+src+. The function communicates its
-need for evidence from the signature file source to the appraiser
-associated with the attester.  That attester
-then executes a similar negotiation protocol as the one that started
-the appraisal process.  The resulting evidence, \Verb+srcEvidence+,
-has the form:
+In this case the \Verb+attestSrc+ function sends an attestation
+request to the signature file server, \Verb+src+. The function
+communicates its need for evidence from the signature file source to
+the appraiser associated with the attester.  That attester then
+executes a similar negotiation protocol as the one that started the
+appraisal process.  The resulting evidence, \Verb+srcEvidence+, has
+the form:
 
 \[\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
 
@@ -308,6 +315,45 @@ This more general version of the bundling problem requires:
   attester before executing the entire attestation
   protocol.
 \end{itemize}
+
+\subsubsection*{Nested Appraisal}
+
+A variant on the protocol implementing nested attestation is a
+protocol that performs nested appraisal.  The distinction is subtle in
+that the attester does a full appraisal of the nested target rather
+than simply returning attestation results.
+
+This protocol is identical to the nested attestation with an
+additional appraisal step.  \Verb+srcEvidence+ is gathered in the same
+way, but it is appraised locally (\Verb+appraiseSrc+) and the result
+is signed to create a certificate (\Verb+srcCert+) that binds the
+appraisal result with the attester.  In effect, the certificate
+ensures the appraisal was performed by the right entity.
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       sig <- getSigFileEvidence;
+       src <- getSigFileSrc;
+       srcEvidence <- attestSrc(src);
+       srcCert <- sign(appraiseSrc(srcEvidence));
+       e <- createEvidence(id,sig,src,srcCert)
+       returnEvidence(e)
+  \}
+\end{alltt}
+
+The evidence returned to the appraiser as \Verb+e+ has roughly the
+following form:
+
+\[b=\cert{appraiseSrc(srcEvidence)}{\private{ATT}}\]
+\[\evidence{(id,sig,src,b)}{\hashe{(id,sig,src,b)},PCRComp_0}{AIK_0}\]
+
+In this case, \Verb+b+ is not an evidence package signed during the
+nested attestation, but a certificate that binds an appraisal result
+to the attester.  The appraiser need not know anything about the
+signature server and is trusting the attester to perform an
+appraisal.
+
+\subsubsection*{Protocol Flattening}
 
 An alternative implementation would have the attester
 return the identity of the signature server and allow the appraiser to
