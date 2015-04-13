@@ -76,16 +76,15 @@ The following conventions hold:
   do \{                % evaluate functions in sequence
        f(x);          % calculate f(x) and discard the result
        y <- f(x);     % calculate f(x) and bind the result to y
-       sndXXX(x,a);   % an operation on x that performs a calculation
-                      %  and sends data to a
-       y <- rcvXXX(a) % an operation that receives data from
-                      %  a performs a calculation and binds the
-                      %  result to y
+       send a \$ x;    % evaluate x and send the result to a
+       y <- receive a % receive data from a and the result to y
   \}
 \end{alltt}
 
 This is early work, so we play fast and loose with specific syntax and
-semantics.
+semantics.  \Verb+send+ and \Verb+receive+ operate synchronously.
+Each \Verb+send+ must have a corresponding \Verb+receive+ to complete
+its operation.
 
 \section*{Bundling}
 
@@ -134,11 +133,11 @@ in any protocol and the process halts.
 %% Add a nonce to the request
 
 \begin{alltt}
-  do \{ sndRequest(r,t);
-       q <- rcvProp(t);
+  do \{ send t \$ r;
+       q <- receive t;
        e <- case \{p:q | policy?(p)\} of
               \(\emptyset\) : None
-              p : sndRemote(choose(p),t)
+              p : send t \$ choose(p)
             end;
        case e of 
          Some v : appraise(v)
@@ -162,12 +161,12 @@ protocol, evidence descriptor pairs (\Verb+(p0,d0)+).  Otherwise, it
 refuses to participate by offering no proposals ($\emptyset$):
 
 \begin{alltt}
-  do \{ (r,a) <- rcvRequest;
+  do \{ r <- receive a;
        p <- if (policy? r a) then \{(p0,d0),...,(pk,dk)\} else \(\emptyset\);
-       sndProp(p,a);
-       (q,t) <- rcvRemote;
+       send a \$ p;
+       q <- receive t;
        e <- if q \(\in\) p then execute(q) else None;
-       sndEvidence(e,a)
+       send a \$ e
   \}
 \end{alltt}
 
@@ -280,19 +279,17 @@ a remote target:
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
-       srcEvidence <- attestSrc(src);
+       srcEvidence <- send src \$ r;
        e <- createEvidence(id,sig,src,srcEvidence)
        returnEvidence(e)
   \}
 \end{alltt}
 
-In this case the \Verb+attestSrc+ function sends an attestation
-request to the signature file server, \Verb+src+. The function
-communicates its need for evidence from the signature file source to
-the appraiser associated with the attester.  That attester then
-executes a similar negotiation protocol as the one that started the
-appraisal process.  The resulting evidence, \Verb+srcEvidence+, has
-the form:
+In this case the protocol sends an attestation request (\Verb+r+) to
+the signature file server, \Verb+src+. The attester then executes a
+similar negotiation protocol as the one that started the appraisal
+process.  Negotiation is left out here for simplicity.  The resulting
+evidence, \Verb+srcEvidence+, has the form:
 
 \[\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
 
@@ -334,7 +331,7 @@ ensures the appraisal was performed by the right entity.
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
-       srcEvidence <- attestSrc(src);
+       srcEvidence <- snd src \$ r;
        srcCert <- sign(appraiseSrc(srcEvidence));
        e <- createEvidence(id,sig,src,srcCert)
        returnEvidence(e)
@@ -361,18 +358,18 @@ negotiate separately with the signature server.  This could be called
 \emph{flattening} the protocol if there is a desire to name it.
 
 \begin{alltt}
-  do \{ sndRequest(r0,t0);
-       q0 <- rcvProt(t0);
+  do \{ sent r0 \$ t0;
+       q0 <- receive t0;
        e0 <- case q0 of
-               Some p : sndRemote(p,t0)
+               Some p : send t0 \$ p
                None : None
              end;
        r1 <- appraise(e0);
        
-       sndRequest(r1,t1);
-       q1 <- rcvProt(t);
+       send t1 \$ r1;
+       q1 <- receive t1;
        e1 <- case q1 of
-               Some p : sndRemote(p,t1)
+               Some p : send t1 p
                None : None
              end;
        appraise(e1)
