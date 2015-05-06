@@ -1,0 +1,65 @@
+\DeclareOptionBeamer{height}
+{\PassOptionsToPackage{height=#1}{beamerouterthemesidebar}}
+
+\DeclareOptionBeamer{width}
+{\PassOptionsToPackage{width=#1}{beamerouterthemesidebar}}
+
+\DeclareOptionBeamer{hideothersubsections}
+{\PassOptionsToPackage{hideothersubsections=#1}{beamerouterthemesidebar}}
+
+\DeclareOptionBeamer{hideallsubsections}
+{\PassOptionsToPackage{hideallsubsections=#1}{beamerouterthemesidebar}}
+
+\ProcessOptionsBeamer
+
+\mode<presentation>
+
+\useoutertheme[height=0pt,width=10pt,hideothersubsections,hideallsubsections,left]{KU}
+
+\usecolortheme{KU}
+\setbeamercolor*{titlelike}{parent=structure}
+
+\useinnertheme{default}
+\setbeamertemplate{frametitle}[default][right]
+
+\mode
+<all>
+
+\pgfdeclareimage[height=1.0cm]{jhwk4C_RF}{figures/jhwk4C_RF}
+\pgfdeclareimage[height=1.0cm]{2CHoriz25}{figures/2CHoriz25}
+\logo{\pgfuseimage{2CHoriz25}}
+
+\titlegraphic{\includegraphics[height=1.25cm]{figures/2CHoriz25}~\includegraphics[height=1.1cm]{figures/sce-logo}}
+
+
+
+\usepackage{ifthen}
+\newboolean{arial}
+\setboolean{arial}{true} % Arial (okay, really Adobe Helvetica, but close
+                         % enough).  This looks a lot better in xpdf.
+
+%\setboolean{arial}{false} % Trebuchet
+\ifthenelse
+{\boolean{arial}}
+{ \renewcommand{\rmdefault}{phv}
+\renewcommand{\sfdefault}{phv}
+
+\renewcommand{\familydefault}{\sfdefault}
+}
+{
+% Hack for getting the good-looking cmtt font back, by pretending
+% that it is T1 encoded.  If anyone knows a proper way to get
+% a vectorized T1-encoded cmtt, please fix!
+\DeclareFontFamily{T1}{cmtt}{\hyphenchar \font\m@ne}
+\DeclareFontShape{T1}{cmtt}{m}{n}
+     {%
+      <5><6><7><8>cmtt8<9>cmtt9%
+      <10><10.95>cmtt10%
+      <12><14.4><17.28><20.74><24.88>cmtt12%
+      }{}
+
+\renewcommand{\encodingdefault}{T1}
+\renewcommand{\sfdefault}{trebuchet}
+}
+
+

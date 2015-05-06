@@ -72,14 +72,14 @@ Throughout we use a trivial monadic notation for protocols that serves
 as our ``assembly language'' target for protocol compilation.
 The following conventions hold:
 
-\begin{alltt}
+\begin{listing}
   do \{                % evaluate functions in sequence
        f(x);          % calculate f(x) and discard the result
        y <- f(x);     % calculate f(x) and bind the result to y
        send a \$ x;    % evaluate x and send the result to a
        y <- receive a % receive data from a and the result to y
   \}
-\end{alltt}
+\end{listing}
 
 This is early work, so we play fast and loose with specific syntax and
 semantics.  \Verb+send+ and \Verb+receive+ operate synchronously.
@@ -290,6 +290,8 @@ the signature file server, \Verb+src+. The attester then executes a
 similar negotiation protocol as the one that started the appraisal
 process.  Negotiation is left out here for simplicity.  The resulting
 evidence, \Verb+srcEvidence+, has the form:
+
+< e, {\||\}\(\sb{AIK{\sp{-1}}}\} >
 
 \[\evidence{(e)}{\hashe{e},PCRComp_1}{AIK_1}\]
 

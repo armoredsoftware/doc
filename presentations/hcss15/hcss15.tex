@@ -1,0 +1,1283 @@
+\documentclass{beamer}
+
+% theme definition
+\usetheme{KU}
+
+\usepackage{natbib}
+\usepackage{alltt}
+\usepackage{trust}
+\usepackage{fixltx2e}
+\usepackage{amsmath}
+%\usepackage{trust-spi}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shadows, matrix}
+\usepackage[underline=false]{pgf-umlsd}
+\usepackage{graphicx}
+
+\usepackage{listings}
+\lstset{language=Haskell, emph={main, Request, CAResponse, CACertificate, EvidencePackage, Response, Att,TPM_KEY ,TPM_KEY_USAGE
+    , TPM_KEY_FLAGS
+    , TPM_AUTH_DATA_USAGE
+    , TPM_KEY_PARMS
+    , ByteString
+    , TPM_STORE_PUBKEY, OIAP, OSAP, TPM_NONCE, TPM_DIGEST, TPM_QUOTE_INFO, TPM_COMPOSITE_HASH, Binary, Get, TPM_STRUCT_VER, TPM, TPM_KEY_HANDLE, TPM_KEY, Session}, emphstyle=\textbf, deletekeywords={putStrLn, Handle}, showstringspaces=false}
+\lstset{%
+  literate={->}{{ ${\rightarrow}$ }}3 {<-}{{ $\leftarrow$ }}3 
+}
+
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+\setbeamercolor{title}{fg=kublue}
+\setbeamercolor{subtitle}{fg=kugray} 
+\setbeamercolor{institute}{fg=kugray}
+\setbeamercolor{frametitle}{fg=kublue}
+\setbeamercolor{frametitle}{bg=white}
+\setbeamercolor{framesubtitle}{fg=kugray}
+\setbeamercolor{framesubtitle}{bg=white}
+\setbeamercolor{item}{fg=black}
+\setbeamercolor{subitem}{fg=kugray}
+\setbeamercolor{itemize/enumerate subbody}{fg=kugray}
+\setbeamercolor{block title}{bg=kublue}
+\setbeamercolor{block title}{fg=white}
+\setbeamercolor{block body}{bg=sand}
+\setbeamercolor{block body}{fg=black}
+
+%\setbeamertemplate{footline}[frame number]
+
+\usefonttheme{serif}
+
+\newenvironment{fnverbatim}{\begin{alltt}\scriptsize}{\normalsize\end{alltt}}
+\newcommand{\mean}[1]{\langle#1\rangle}
+\newcommand{\rtime}{\ensuremath{\mathbb{R}^{0\leq}}}
+
+
+%constants
+\def \app {App}
+\def \att {Att}
+\def \ca {CA}
+\def \mea {Meas}
+\def \tp {TPM}
+\def \pmask {PCR\textsubscript{m}}
+\def \pcomp {PCR\textsubscript{c}}
+\def \evd {d}
+\def \eve {e}
+\def \cacert {\sign {\public{AIK}}{CA}}
+\def \exdata {\hash{(\eve, \nonce{\app}, \cacert ) }}
+\def \aikh {AIK_h}
+
+\def \req {R}
+\def \resp {P}
+\def \k {K}
+
+\bibliographystyle{apalike}
+
+\logo{}
+
+\title{Remote Attestation for Cloud-Based Systems}
+
+\author{Dr. Perry Alexander\inst{1} \and Dr. Andrew Gill\inst{1} \and Dr. Prasad
+  Kulkarni\inst{1} \and
+  Adam Petz\inst{1} \and Paul Kline\inst{1} \and Justin Dawson\inst{1}
+  \and Jason~Gevargizian\inst{1} 
+  \and Mark Grebe\inst{1} \and Edward Komp\inst{1} \and
+  Edward~Bishop\inst{2}} 
+
+\date{{\color{kugray}May 6, 2015}}
+
+% turns off navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+\institute{
+  \inst{1}
+    Information and Telecommunication Technology Center \\
+    Electrical Engineering and Computer Science \\
+    The University of Kansas \\
+    \medskip
+  \inst{2} Southern Cross Engineering}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\logo{\pgfuseimage{jhwk4C_RF}}
+
+% \begin{frame}
+%   \frametitle{Outline}
+%   \tableofcontents
+% \end{frame}
+
+\begin{frame}
+  \frametitle{Clouds and Trust}
+  \begin{itemize}
+  \item The promises of the cloud are substantial
+    \begin{itemize}
+    \item reduced hardware and software costs
+    \item reduced resource consumption
+    \item improved availability and reliability
+    \end{itemize}
+  \item The structure of the cloud complicates assurance
+    \begin{itemize}
+    \item not under the desk
+    \item ambiguous and changing runtime environment
+    \item unknown and unknowable actors in the same environment
+    \end{itemize}
+  \item Is trust possible in the cloud environment?
+    \begin{itemize}
+    \item unambiguous identification
+    \item confirmation of uninhibited execution
+    \item direct or trusted indirect observation of good behavior  
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+%%  \frametitle{Program Goals}
+  \frametitle{Virtual Blinking Lights}
+  Provide new capabilities that establish and maintain trustworthy
+  cloud-based application deployment
+  \medskip
+  \medskip
+  \begin{itemize}
+  \item Establish trust in cloud applications
+    \begin{itemize}
+    \item trust in cloud infrastructure
+    \item trust in user-space applications 
+    \item trust in application cohorts
+    \end{itemize}
+  \item Promote informed decision making
+    \begin{itemize}
+    \item confirm data confidentiality
+    \item confirm execution and data integrity
+    \end{itemize}
+  \item Autonomous run-time response and reconfiguration
+    \begin{itemize}
+    \item respond to attack, failure, reconfiguration, and repair 
+    \item appraisal informs response
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Semantic Remote Attestation}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+    \item Appraiser requests a quote
+      \begin{itemize}
+      \item specifies needed information
+      \item provides a nonce
+      \end{itemize}
+    \item Target gathers evidence
+      \begin{itemize}
+      \item measures application
+      \item gathers evidence of trust
+      \end{itemize}
+    \item Target generates quote
+      \begin{itemize}
+      \item measurements and evidence
+      \item original nonce
+      \item cryptographic signature
+      \end{itemize}
+    \item Appraiser assesses quote
+      \begin{itemize}
+      \item good application behavior
+      \item infrastructure trustworthiness
+      \end{itemize}
+    \end{itemize}
+    \column{0.45\textwidth}
+    \begin{center}
+      \includegraphics[width=.95\textwidth]{figures/remote-att.pdf}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Trusted Platform Module}
+  \begin{itemize}
+  \item Provides and Protects Roots of Trust
+    \begin{itemize}
+    \item Storage Root Key (SRK) - root of trust for storage
+    \item Endorsement Key (EK) - root of trust for reporting
+    \end{itemize}
+  \item Quote generation
+    \begin{itemize}
+    \item high integrity quotes - (\sign{RS}{AIK}, SML, \sign{n,PCRComp}{AIK})
+    \item high integrity evidence - (\tuple{E,n}, \sign{\hash{\tuple{E,n}},PCR}{AIK}
+    \end{itemize}
+  \item Sealing data to state
+    \begin{itemize}
+    \item \encrypt{D,PCR}{K} will not decrypt unless PCR = current PCR
+    \item data is safe even in the presence of malicious machine
+    \end{itemize}
+  \item Binding data to TPMs and machines
+    \begin{itemize}
+    \item (\encrypt{\private{K}}{SRK},K) - \encrypt{D}{K} cannot be decrypted unless \private{SRK} is installed
+    \item (\encrypt{\private{J}}{K},J) - \encrypt{D}{J} cannot be decrypted
+      unless \private{K} and \private{SRK} are installed
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Cloud Challenge}
+  \framesubtitle{Chasing the bottom turtle}
+  \begin{center}
+  \only<1>{\includegraphics[width=0.75\textwidth]{figures/cloud-1.pdf}}
+  \only<2>{\includegraphics[width=0.75\textwidth]{figures/cloud-2.pdf}}
+  \only<3>{\includegraphics[width=0.75\textwidth]{figures/cloud-3.pdf}}
+  \only<4>{\includegraphics[width=0.75\textwidth]{figures/cloud-4.pdf}}
+  \only<5>{\includegraphics[width=0.75\textwidth]{figures/cloud-5.pdf}}
+  \only<6>{\includegraphics[width=0.90\textwidth]{figures/cloud-full.pdf}}
+  \end{center}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{Delivery Platform}
+%   \framesubtitle{Open source, standards compliant}
+
+%   \begin{itemize}
+%   \item Lightweight integration with existing cloud infrastructure
+%     \begin{itemize}
+%     \item OpenStack cloud infrastructure
+%     \item Xen+XSM VM infrastructure
+%     \item Fedora, HotSpot JVM, GHC
+%     \end{itemize}
+%   \item Trusted Computing Group standards compliant
+%     \begin{itemize}
+%     \item Trusted Platform Module 1.2
+%     \item TCG vTPM (in principle)
+%     \item Trusted OS infrastructure
+%     \end{itemize}
+%   \item Standard communication mechanisms
+%     \begin{itemize}
+%     \item JSON structures for all exchanged data
+%     \item \textsl{vchan} for on-platform communication
+%     \item TCP/IP for off-platform communication
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+
+\begin{frame}
+  \frametitle{Enabling Technologies}
+  \begin{itemize}
+  \item Trustworthy protocol execution
+    \begin{itemize}
+    \item executable and analyzable protocol representation
+    \item generates evidence of trustworthiness
+    \item negotiates attestation details
+    \item designed for highly focused appraisal
+    \end{itemize}
+  \item Application specific measurement
+    \begin{itemize}
+    \item managed and traditional execution environments
+    \item compile-time assistance for measurer synthesis
+    \item specialized measurement bundled with applications
+    \end{itemize}
+  \item Lightweight trust infrastructure
+    \begin{itemize}
+    \item abstract communications capability
+    \item migration support
+    \item strong identity
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Armored Application Architecture}
+  \framesubtitle{M\&A targeted to an application}
+  \begin{columns}[c]
+    \column{.60\textwidth}
+    \begin{itemize}
+    \item Appraiser makes attestation requests
+    \item Attester responds to attestation requests
+    \item Measurer gathers evidence from application
+    \item Influenced by the \emph{Trusted Research Platform} and
+      \emph{Principles of Remote Attestation}
+    \end{itemize}
+    \column{.40\textwidth}
+    \begin{center}
+    \includegraphics[width=0.55\textwidth]{figures/architecture.pdf}
+    \end{center}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{System-Level Architecture}
+  \begin{center}
+  \includegraphics[width=1.0\textwidth]{figures/system.pdf}
+  \end{center}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{What We Are Demonstrating}
+  
+%   \begin{itemize}
+%   \item Execution of a CA-based Attestation Protocol
+%     \begin{itemize}
+%     \item Attestation request
+%     \item Protocol execution
+%     \item Evidence appraisal
+%     \end{itemize}
+%   \item Major architectural subsystems
+%     \begin{itemize}
+%     \item Appraiser
+%     \item Attestation Manager
+%     \item Measurer
+%     \item Instrumented JVM
+%     \item vTPM and Certificate Authority
+%     \end{itemize}
+%   \item Anomaly Detection
+%     \begin{itemize}
+%     \item Bad signatures and PCRs
+%     \item Bad CA certificates
+%     \item Bad quotes and AIKs
+%     \item Bad measurements
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Abstract CA-Based Attestation Protocol}
+
+%   \begin{center}
+
+%     \begin{tikzpicture}[
+%     implies/.style={double,double equal sign distance,-implies},
+%     dot/.style={shape=circle,fill=black,minimum size=4pt,
+%       inner sep=0pt,outer sep=4pt}]
+
+%     \matrix[matrix of nodes] {
+%       |[dot,label=above:$\app$] (A1)| {}
+%       &[2.0cm] |[dot,label=above:$\att$] (B1)| {}
+%       &[2.0cm] |[] (M1)| {} 
+%       &[2.0cm] |[] (T1)| {}\\[0.05cm]
+%       |[] (A2)| {}
+%       &|[dot] (B2)| {}
+%       &|[dot,label=above:$\mea$] (M2)| {} 
+%       &|[] (T2)| {}\\[0.05cm]
+%       |[] (A3)| {}
+%       &|[] (B3)| {}
+%       &|[dot] (M3)| {} 
+%       &|[dot,label=above:$Tar$] (T3)| {}\\[0.6cm]
+%       |[] (A4)| {}
+%       &|[] (B4)| {}
+%       &|[dot] (M4)| {} 
+%       &|[dot] (T4)| {}\\[0.6cm]
+%       |[] (A5)| {}
+%       &|[dot] (B5)| {}
+%       &|[dot] (M5)| {} 
+%       &|[] (T5)| {}\\[0.6cm]
+%       |[dot] (A6)| {}
+%       &[2.0cm] |[dot] (B6)| {}
+%       &[2.0cm] |[] (M6)| {} 
+%       &[2.0cm] |[] (T6)| {}\\
+%     };
+%     \draw (A1) edge[->] node[above] {request} (B1);
+%     \draw (B2) edge[->] node[above] {request} (M2)
+%            edge[implies,implies-] (B1);
+%     \draw (M3) edge[->] node[above] {request} (T3)
+%            edge[implies,implies-] (M2);
+%     \draw (T4) edge[->] node[above] {measurement} (M4)
+%            edge[implies,implies-] (T3);
+%     \draw (M5) edge[->] node[above] {evidence} (B5)
+%            edge[implies,implies-] (M4);
+%     \draw (B6) edge[->] node[above] {quote} (A6)
+%            edge[implies,implies-] (B5);
+%     \end{tikzpicture}
+
+%     \end{center}
+
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Abstract CA-Based Attestation Protocol}
+  
+%   \begin{footnotesize}
+%   \begin{sequencediagram}
+%     \newthread[white]{appr}{Appraiser}
+%     \newinst[0.7]{attest}{Attestation}
+%     \newinst[0.7]{ca}{CA}
+%     \newinst[0.7]{meas}{Measurer}
+%     \newinst[0.7]{app}{Application}
+    
+%     \begin{call}{appr}{Att Request}{attest}{Evidence}
+%       \begin{call}{attest}{Cert Request}{ca}{AIK Cert}
+%       \end{call}
+%       \begin{call}{attest}{Measurement Request}{meas}{Value}
+%         \begin{call}{meas}{Measurement}{app}{Value}
+%         \end{call}
+%       \end{call}
+%       \begin{callself}{attest}{Quote Assembly}{}
+%       \end{callself}
+%     \end{call}
+%     \begin{callself}{appr}{Appraisal}{Execute Decision}
+%     \end{callself}
+%   \end{sequencediagram}
+%   \end{footnotesize}
+
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Message List Representation}
+%   \begin{small}
+%   \begin{align*}
+%   & \sndmsg {\app}{\att} {\evd, \nonce{\app}, \pmask} {\channel {\app \att}}  & \\
+%   & \sndmsg{\att}{\tp} {make\_and\_load\_identity} {\channel {\att \tp}} & \\
+%   & \sndmsg{\tp}{\att} {\public{AIK}, \aikh} {\channel {\tp \att}} & \\
+%   & \sndmsg{\att}{\ca} {\att, \public{AIK}} {\channel {\att \ca}} & \\
+%   & \sndmsg{\ca}{\att} {\encrypt{K, \hash{AIK}}{EK}, \encrypt{\cacert}{K}} {\channel {\ca \att}}& \\
+%   & \sndmsg{\att}{\tp} {activate\_identity({\aikh, \hash{AIK})}} {\channel {\att \tp}} & \\
+%   & \sndmsg{\tp}{\att} {K} {\channel {\tp \att}} & \\
+%   & \sndmsg{\att}{\mea} {\evd} {\channel {\att \mea}} & \\
+%   & \sndmsg{\mea}{\att} {\eve} {\channel {\mea \att}} & \\
+%   & \sndmsg{\att}{\tp} {quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)} {\channel {\att \tp}} & \\
+%   & \sndmsg{\tp}{\att} {\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}} {\channel {\tp \att}} & \\
+%   & \sndmsg{\att}{\app} {\eve, \nonce{\app}, \pcomp, \cacert} {\channel {\att \app}} & \\
+%   & \sndmsg{\att}{\app} {\sign{\hash{\pcomp}, \exdata}{AIK}} {\channel {\att \app}} & 
+% \end{align*}
+% \end{small}
+% \end{frame}
+
+
+
+\begin{frame}[fragile]
+  \frametitle{Privacy CA Attestation}
+
+  \begin{tiny}
+  \begin{tikzpicture}[
+    implies/.style={double,double equal sign distance,-implies},
+    dot/.style={shape=circle,fill=black,minimum size=4pt,
+      inner sep=0pt,outer sep=4pt}]
+
+    \matrix[matrix of nodes] {
+      |[dot,label=above:$\app$] (A1)| {}
+      &[4.0cm] |[dot,label=above:$\att$] (B1)| {}
+      &[1.95cm] |[] (M1)| {} 
+      &[1.95cm] |[] (T1)| {}
+      &[0.5cm] |[] (C1)| {}\\[0.05cm]
+      & |[dot] (B2)| {}
+      &
+      & |[dot,label=above:$\tp$] (T2)| {}\\[0.5cm]
+      &
+      |[dot] (B3)| {}
+      &
+      & |[dot] (T3)| {}\\  [0.05cm]
+      &
+      |[dot] (B4)| {}
+      &
+      &
+      & |[dot,label=above:$\ca$] (C4)| {} \\ [0.5cm]
+      &
+      |[dot] (B5)| {}
+      &
+      &
+      & |[dot] (C5)| {} \\ [0.5cm]
+      &
+      |[dot] (B6)| {}
+      &
+      & |[dot] (T6)| {} \\ [0.5cm]
+      &
+      |[dot] (B7)| {}
+      &
+      & |[dot] (T7)| {} \\ [0.05cm]
+      &
+      |[dot] (B8)| {}
+      & |[dot,label=above:$\mea$] (M8)| {} \\ [0.5cm]
+      &
+      |[dot] (B9)| {}
+      & |[dot] (M9)| {} \\ [0.5cm]
+      &
+      |[dot] (B10)| {}
+      &
+      & |[dot] (T10)| {} \\ [0.5cm]
+      &
+      |[dot] (B11)| {}
+      &
+      & |[dot] (T11)| {} \\ [0.5cm]
+      |[dot] (A12)| {}
+      & |[dot] (B12)| {} \\ [0.5cm]
+      |[dot] (A13)| {}
+      & |[dot] (B13)| {} \\ [0.5cm]
+};
+\draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
+           edge[implies,implies-] (B1);
+\draw (T3) edge[->] node[above] {$\aikh$} (B3)
+           edge[implies,implies-] (T2);
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
+           edge[implies,implies-] (B3);
+\draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
+           edge[implies,implies-] (C4);
+\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}}}{EK})$} (T6)
+           edge[implies,implies-] (B5);
+\draw (T7) edge[->] node[above] {$K$} (B7)
+           edge[implies,implies-] (T6);
+\draw (B8) edge[->] node[above] {$\evd$} (M8)
+           edge[implies,implies-] (B7);
+\draw (M9) edge[->] node[above] {$\eve$} (B9)
+           edge[implies,implies-] (M8);
+\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10)
+% quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
+           edge[implies,implies-] (B9);
+\draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
+% \pcomp, sig(\hash{\pcomp}, ed) AIK
+           edge[implies,implies-] (T10);
+\draw (B12) edge[->] node[above] {$\eve, \nonce{\app}, \pcomp, \cacert$} (A12)
+% \eve, \nonce{\app}, \pcomp, \cacert
+           edge[implies,implies-] (B11);
+\draw (B13) edge[->] node[above] {$\sign{\hash{\pcomp}, \exdata}{AIK}$} (A13) 
+% sig(hash(\pcomp), ed) AIK
+           edge[implies,implies-] (B12);
+\end{tikzpicture}
+\end{tiny}
+\end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Attestation Request}
+%   \begin{center}
+%     \begin{tikzpicture}[
+%       implies/.style={double,double equal sign distance,-implies},
+%       dot/.style={shape=circle,fill=black,minimum size=4pt,
+%         inner sep=0pt,outer sep=4pt}]
+%       \matrix[matrix of nodes] {
+%         |[dot,label=above:$\app$] (A1)| {}
+%         &[7.5cm] |[dot,label=above:$\att$] (B1)| {} \\ [1.0cm]
+%       };
+%       \draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
+%     \end{tikzpicture}
+%   \end{center}
+
+%     \begin{itemize}
+%     \item Initiate with an attestation request
+%       \begin{itemize}
+%       \item $d$ abstractly defines desired evidence
+%       \item $\nonce{\app}$ is the appraiser's nonce
+%       \item $\pmask$ selects PCRs
+%       \end{itemize}
+%     \item Attestation agent selects and executes protocol based on request
+%     \end{itemize}
+% \end{frame}
+
+
+% \begin{frame}[fragile]
+%   \frametitle{Activating the AIK}
+
+%   \begin{center}
+%     \begin{tikzpicture}[
+%       implies/.style={double,double equal sign distance,-implies},
+%       dot/.style={shape=circle,fill=black,minimum size=4pt,
+%         inner sep=0pt,outer sep=4pt}]
+%       \matrix[matrix of nodes] {
+%         |[dot,label=above:$\att$] (B6)| {}
+%         &[7.5cm] |[dot,label=above:$\tp$] (T6)| {} \\ [1.0cm]
+%         |[dot] (B7)| {}
+%         &|[dot] (T7)| {} \\
+%       };
+% \draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hash{\public{AIK}}}{EK})$} (T6);
+% \draw (T7) edge[->] node[above] {$K$} (B7)
+%            edge[implies,implies-] (T6);
+%     \end{tikzpicture}
+%   \end{center}
+
+%     \begin{itemize}
+%     \item Request TPM decryption of the $AIK$ cert
+%     \item Receive $K$ used to decrypt signed public $AIK$
+%     \item Only TPM can gain access to $K$
+%     \item Only TPM can obtain signed, public $AIK$
+%     \item Oddly, No manipulation of the $AIK$ in this ``activation''
+%       process
+%     \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Measurement}
+
+%   \begin{center}
+%     \begin{tikzpicture}[
+%       implies/.style={double,double equal sign distance,-implies},
+%       dot/.style={shape=circle,fill=black,minimum size=4pt,
+%         inner sep=0pt,outer sep=4pt}]
+%       \matrix[matrix of nodes] {
+%         |[dot,label=above:$\att$] (B8)| {}
+%         &[7.5cm] |[dot,label=above:$\mea$] (M8)| {} \\ [1.0cm]
+%         |[dot] (B9)| {}
+%         &|[dot] (M9)| {} \\
+%       };
+%       \draw (B8) edge[->] node[above] {$\evd$} (M8);
+%       \draw (M9) edge[->] node[above] {$\eve$} (B9)
+%       edge[implies,implies-] (M8);
+%     \end{tikzpicture}
+%   \end{center}
+
+%     \begin{itemize}
+%     \item Request information from measurer
+%     \item Receive evidence $e$ from measurer
+%     \item $d$ is abstract allowing protocol reuse
+%     \item Most protocols make many requests of the measurer
+%     \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Generating a Quote}
+
+%   \begin{center}
+%     \begin{tikzpicture}[
+%       implies/.style={double,double equal sign distance,-implies},
+%       dot/.style={shape=circle,fill=black,minimum size=4pt,
+%         inner sep=0pt,outer sep=4pt}]
+%       \matrix[matrix of nodes] {
+%         |[dot,label=above:$\att$] (B10)| {}
+%         &[7.5cm] |[dot,label=above:$\tp$] (T10)| {} \\ [1.0cm]
+%         |[dot] (B11)| {}
+%         &|[dot] (T11)| {} \\
+%       };
+% \draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10);
+% % quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
+% \draw (T11) edge[->] node[above] {$\pcomp, \sign{\hash{\pcomp}, \exdata}{AIK}$} (B11)
+% % \pcomp, sig(\hash{\pcomp}, ed) AIK
+%            edge[implies,implies-] (T10);
+%     \end{tikzpicture}
+%   \end{center}
+
+%     \begin{itemize}
+%     \item Request a quote from the TPM
+%       \begin{itemize}
+%       \item $AIK$ identifies the signing $AIK$
+%       \item $PCR_m$ identifies desired PCRs
+%       \item $\exdata$ guarantees integrity of returned evidence
+%       \end{itemize}
+%     \item Receive quote from TPM
+%       \begin{itemize}
+%       \item $\pcomp$ is PCR composite built from requested PCRs
+%       \item $\sign{\hash{\pcomp}, \exdata}{AIK}$ is the signed quote
+%       \end{itemize}
+%     \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Appraisal}
+
+%   \begin{center}
+%     \begin{tikzpicture}[
+%       implies/.style={double,double equal sign distance,-implies},
+%       dot/.style={shape=circle,fill=black,minimum size=4pt,
+%         inner sep=0pt,outer sep=4pt}]
+%       \matrix[matrix of nodes] {
+%         |[dot,label=above:$\app$] (A12)| {}
+%         &[7.5cm] |[dot,label=above:$\att$] (B12)| {} \\ [1.0cm]
+%         |[dot] (A13)| {}
+%         &|[dot] (B13)| {} \\
+%       };
+%       \draw (B12) edge[->] node[above] {$\eve, \nonce{\app}, \pcomp, \cacert$} (A12);
+%       % \eve, \nonce{\app}, \pcomp, \cacert
+% \draw (B13) edge[->] node[above] {$\sign{\hash{\pcomp}, \exdata}{AIK}$} (A13) 
+% % sig(hash(\pcomp), ed) AIK
+%            edge[implies,implies-] (B12);
+
+%     \end{tikzpicture}
+%   \end{center}
+
+%     \begin{itemize}
+%     \item Receive evidence from the attestation manager
+%       \begin{itemize}
+%       \item evidence
+%       \item original nonce
+%       \item PCR composite 
+%       \item signed $\public{AIK}$
+%       \end{itemize}
+%     \item Receive TPM quote from the attestation manager
+%       \begin{itemize}
+%       \item hash of all evidence
+%       \item PCR composite
+%       \item signed by $\private{AIK}$
+%       \end{itemize}
+%     \item Evaluate evidence and quote
+%     \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Evidence Appraisal}
+
+%   \begin{center}
+%     {\color{kublue}Demonstration detects failure of all aspects of attestation}
+%   \end{center}
+
+%   \[\eve, \nonce{\app}, \pcomp, \cacert\]
+
+%   \begin{itemize}
+%   \item $\eve$ -- evidence gathered from running application
+%   \item $\nonce{\app}$ -- prevents replay
+%   \item $\pcomp$ -- evidence in the form or PCR data from the vTPM
+%   \item $\cacert$ -- ensures validity of $\public{AIK}$
+%   \end{itemize}
+
+%   \[\sign{\hash{\pcomp}, \exdata}{AIK}\]
+
+%   \begin{itemize}
+%   \item $\pcomp$ -- hash ensures integrity of PCR data
+%   \item $\exdata$ -- hash ensures integrity of evidence, nonce, and
+%     signed $\public{AIK}$
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Live Demonstration}
+%   \begin{center}
+%     {\color{kublue}Switch to live demo or video...}
+%   \end{center}
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Sample Implementation}
+%   \framesubtitle{Main Appraiser loop}
+%   \begin{tiny}
+% %  \begin{columns}[T]
+% %  \begin{column}{.48\textwidth}
+%   \begin{center}
+%   \lstinputlisting{appMainImplSample.hs}
+%   \end{center}
+% %  \end{column}
+% %  \vrule{}
+% %  \begin{column}{.48\textwidth}
+% %  \begin{center}
+% %  \lstinputlisting{attMainImplSample.hs}
+% %  \end{center}
+% %  \end{column}
+% %  \end{columns}
+%   \end{tiny}
+% \end{frame}
+
+% % \begin{frame}[fragile]
+% %   \frametitle{Implementation}
+% %  % \begin{center}
+% %   \scalebox{.40}{
+% %   \lstinputlisting{attMkResponseImplSample.hs}
+% %   }
+% %  % \end{center}
+% % \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Sample Implementation}
+%   \framesubtitle{TPM Key Definition and Load Key Instruction}
+%   \begin{tiny}
+%   \lstinputlisting[lastline=9]{tpmTypesImplSample.hs}
+%   \lstinputlisting{tpmImplSample.hs}
+%   \end{tiny}
+% \end{frame}
+
+% % \begin{frame}[fragile]
+% %   \frametitle{Sample Implementation}
+% %   \framesubtitle{TPM Key Structure}
+% %   \begin{tiny}
+% %  \begin{columns}[T]
+% %  \begin{column}{.48\textwidth}
+%   % \begin{center}
+%   % \lstinputlisting[lastline=9]{tpmTypesImplSample.hs}
+%   % \end{center}
+% %  \end{column}
+% %  \vrule{}
+% %  \begin{column}{.48\textwidth}
+% %  \begin{center}
+% %  \lstinputlisting[firstline=25, lastline=42]{tpmTypesImplSample.hs}
+% %  \end{center}
+% %  \end{column}
+% %  \end{columns}
+% %  \end{tiny}
+% %\end{frame}
+
+% \begin{frame}
+%   \frametitle{Measurement Basics}
+%   \begin{itemize}
+%   \item Measurement Mechanisms
+%     \begin{itemize}
+%     \item sampling where measurer spawns asynchronous sampler thread to take measurements in parallel with application threads
+%     \item instrumentation where measurer inserts/toggles code instrumentation in the application threads to take measurements
+%     \end{itemize}    
+%    \item Measurement Components 
+%     \begin{itemize}
+%     \item Measurer Thread services individual measurements, dispatches sampler threads, and toggles measurement instrumentation
+%     \item Communications Thread communicates between the Attester and the Measurer Thread (within run-time)
+%     \end{itemize}    
+%    \item Measurement Request Types 
+%     \begin{itemize}
+%     \item individual measurements gather evidence
+%     \item continuous measurements initiate, terminate, evidence gathering
+%     \item triggered measurements witness an event and gather evidence
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Measurer - Individual Sample}
+%   \begin{center}
+%   \includegraphics[width=0.9\textwidth]{figures/Measurer_Basic.pdf}
+%   \end{center}  
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Measurer - Continuous Sampling}
+%   \begin{center}
+%   \includegraphics[width=0.9\textwidth]{figures/Measurer_Sampler.pdf}
+%   \end{center}  
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Measurer - Continuous Instrumentation}
+%   \begin{center}
+%   \includegraphics[width=0.9\textwidth]{figures/Measurer_Instrumentor.pdf}
+%   \end{center}  
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Measurement Approaches}
+%   \begin{itemize}
+%   \item Current measurer
+%     \begin{itemize}
+%     \item individual measurement of user variables
+%     \item variables specified externally
+%     \item measurer thread monitors the stack or heap contents
+%     \end{itemize}
+%   \item Use provisioning to fine expected variable values
+%     \begin{itemize}
+%     \item generate ``golden'' values to define expected state
+%     \item track variables at runtie
+%     \item dynamic variables are evidence the appraiser uses to ensure
+%       application meets expectations
+%     \end{itemize}
+%   \item Use static analysis to find expected behavior
+%     \begin{itemize}
+%     \item generate a ``golden'' static callgraph and provide this to the
+%       appraiser
+%     \item track the dynamic callgraph during execution
+%     \item dynamic callgraph is evidence the appraiser uses to ensure
+%       application meets expectations
+%     \end{itemize}   
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Communication Mechanisms}
+%   \begin{itemize}
+%   \item Exploring standard communication mechanisms
+%     \begin{itemize}
+%     \item Sockets for processes
+%     \item \emph{vchan} for IVC within Xen instances
+%     \item TCP/IP for IVC between Xen instances
+%     \end{itemize}
+%   \item Developing standard abstract communication concept
+%     \begin{itemize}
+%     \item $A->B:M\; on\; c$ is the abstraction users should see
+%     \item independent of the type of communication
+%     \item manage failure and time-out behind the scenes
+%     \item JSON structures for all data communicated
+%     \item type preserving communication
+%     \end{itemize}
+%   \item Armor Authority provides services among  VMs
+%     \begin{itemize}
+%     \item name services, migration services, certificate authority
+%     \item as small as possible
+%     \item reuse wherever possible
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+% \begin{frame}
+%   \frametitle{Example Communication Activity}
+%   \framesubtitle{CA communication}
+
+% \begin{itemize}
+% \item Attester
+%   \begin{itemize}
+%   \item creates an $AIKCertRequest$ containing $ID$ and $\public{AIK}$
+%   \item converts $AIKCertRequest$ to JSON
+%   \item JSON sent as POST request to certificate authority
+%   \item $AIKCertRequest$ $->$ JSON $->$ UTF8 $->$ POST body bytes
+%   \end{itemize}
+% \item Certificate Authority
+%   \begin{itemize}
+%   \item POST body bytes $\rightarrow$ UTF8 $\rightarrow$ JSON $\rightarrow$ $AIKCertRequest$
+%   \item looks up \public{EK} associated with $ID$
+%   \item $AIKCert$ is \sign{\public{AIK}}{CA}
+%   \item generates session key $K$ and encrypts with \public{EK}
+%   \item $AIKCert$ encrypted with $K$
+%   \item $CAResponse$ converted to JSON and sent as response
+%   \end{itemize}
+% \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}{\ca{} communication continued}
+% Properties
+% \begin{itemize}
+% \item {\ca{} only responds to receiving an $AIKCertRequest_{JSON}$ }
+% \item {The CACert can \emph{only} be decrypted by knowing $K$ (and therefore \private{EK})}
+% \end{itemize}
+% $\linebreak$
+% Appraiser Knowledge after receiving Cert:
+% \begin{itemize}
+% \item {signature on $AIK$ ensures it was \ca{} who generated signature
+% }
+% +
+% \item {only an entity knowing \private{EK} could decrypt and send the CACert
+% }
+% $\linebreak$
+% =
+% \item {\textbf{Attester is using a registered TPM}}
+
+% \end{itemize}
+
+% \end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{Remote Monads}
+%   \framesubtitle{Principled communication}
+
+%   \begin{columns}[c]
+%     \column{0.6\textwidth}
+%     \begin{itemize}
+%     \item Principled RPC-style capability
+%       \begin{itemize}
+%       \item Requests remote execution
+%       \item Defines \verb+send+ and \verb+receive+ operations
+%       \end{itemize}
+%     \item Abstracts away communication mechanism
+%       \begin{itemize}
+%       \item Creates http, TCP/IP, vchan channels
+%       \item Caches channels for efficiency
+%       \end{itemize}
+%     \end{itemize}
+%     \column{0.4\textwidth}
+%   \begin{alltt}
+%   do \{
+%        p <- do \{ ... \}
+%        send a \$ p;
+%        e <- receive a
+%   \}
+%   \end{alltt}
+%   \end{columns}
+% \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{EDSL for Protocol}
+  \framesubtitle{First-class protocol structures}
+
+  \begin{columns}[c]
+    \column{0.6\textwidth}
+    \begin{itemize}
+    \item First-class structure for protocols
+      \begin{itemize}
+      \item encapsulates a protocol-centered computation
+      \item semantics provide a basis for static analysis
+      \item based loosely on the \verb+Reader+ monad
+      \end{itemize}
+    \item Abstract communication primitives
+      \begin{itemize}
+      \item extended RPC-style capability
+      \item requests remote execution
+      \item defines \verb+send+ and \verb+receive+ operations
+      \item abstracts away communication details
+      \end{itemize}
+%    \item Creates http, TCP/IP, vchan channels
+%    \item Caches channels for efficiency
+    \end{itemize}
+    \column{0.4\textwidth}
+  \begin{alltt}
+  do \{
+       f(x);
+       y <- f(x);
+       send a x;
+       y <- receive a
+  \}
+  \end{alltt}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiating a Protocol}
+  \framesubtitle{Respecting privacy}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+ %   \begin{small}
+    \begin{itemize}
+    \item Typical negotiation
+      \begin{itemize}
+      \item request sent to Attester
+      \item Attester generates proposal
+      \item Appraiser selects protocol
+      \item Attester executes protocol
+      \end{itemize}
+    \item Three kinds of requests
+      \begin{itemize}
+      \item execute protocol \verb+22+
+      \item provide \verb+{OS_config+, \verb+http_stat+, \verb+firewall_stat}+
+      \item execute protocol \verb+do { ... }+
+      \end{itemize}
+    \item Three negotiation criteria
+      \begin{itemize}
+      \item ability to satisfy the request
+      \item satisfaction of appraiser and attester privacy policies
+      \item previously obtained evidence
+      \end{itemize}
+    \end{itemize}
+%    \end{small}
+    \column{0.45\textwidth}
+    \begin{small}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\app$] (B2)| {}
+        &[3.5cm] |[dot,label=above:$\att$] (T2)| {}\\[1.0cm]
+        |[dot] (B3)| {}
+        & |[dot] (T3)| {}\\  [1.0cm]
+        |[dot] (B4)| {}
+        & |[dot] (T4)| {} \\ [1.0cm]
+        |[dot] (B5)| {}
+        & |[dot] (T5)| {} \\ [0.5cm]
+      };
+\draw (B2) edge[->] node[above] {Attestation Request} (T2)
+           edge[implies] (B3);
+\draw (T3) edge[->] node[above] {Proposal Set} (B3)
+           edge[implies,implies-] (T2)
+           edge[implies] (T4);
+\draw (B4) edge[->] node[above] {Accepted Proposal} (T4)
+           edge[implies,implies-] (B3)
+           edge[implies] (B5);
+\draw (T5) edge[->] node[above] {Evidence} (B5)
+           edge[implies,implies-] (T4);
+    \end{tikzpicture}
+    \end{small}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiation Protocol}
+  \framesubtitle{Request and Select}
+
+  \begin{itemize}
+  \item Requests an attestation
+  \item Receives proposals
+  \item Selects from proposals
+  \end{itemize}
+
+  \begin{alltt}
+  do \{ send t r;
+       q <- receive t;
+       e <- case \{p:q | (policy? p)\} of
+              \(\emptyset\) : None
+              p : send t (choose p)
+            end;
+       case e of 
+         Some v : (appraise v)
+         None : None
+       end \}
+\end{alltt}
+
+\begin{center}
+  Negotiation is a protocol that can itself be selected or negotiated
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiation Results}
+
+  \begin{itemize}
+  \item Evidence and Protocol pairs
+  \item Satisfies privacy policy of attester
+  \item Provide some or all of requested information
+  \end{itemize}
+
+  \begin{alltt}
+   ((ID,SIGHASH,SIGSRC),
+    do \{ id <- getVCID;
+         sig <- getSigFileEvidence;
+         src <- getSigFileSrc;
+         e <- createEvidence(id,sig,src);
+         returnEvidence(e) \})
+  \end{alltt}
+
+
+  % \begin{block}{Proposals}
+  %   \[
+  %   \{\tuple{E_0,P_0},\tuple{E_1,P_1},\ldots,\tuple{E_n,P_n}\}
+  %   \]
+  % \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Reified Protocol}
+
+  Generated negotiation protocol code (currently by hand):
+
+  \begin{small}
+  \begin{alltt}
+P = CreateChannel (AChannel "attesterChan") Target	      
+    $ Send ANRequest (AChannel "attesterChan")
+    $ Receive (Var "counterOffer") (AChannel "attesterChan")
+    $ CalculateFinalRequest (Var "finalReq")
+                            ANRequest
+                            (Var "counterOffer")
+    $ Send (Var "finalReq") (AChannel "attesterChan")
+    $ Receive (Var "finalConfirmation")
+              (AChannel "attesterChan")
+    $ Case (Var "finalConfirmation") [(Var "finalReq")]
+           (HandleFinalChoice (Var "result") (Var "finalReq")
+           (Result (Var "result")))
+           (Stuck "finalConf and finalReq match error")
+  \end{alltt}
+  \end{small}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Performing Measurement and Attestation}
+  \begin{center}
+  \includegraphics[width=0.95\textwidth]{figures/ap-1.pdf}
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Single Realm Attestation}
+
+Protocol for gathering virus checker evidence
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       sig <- getSigFileEvidence;
+       src <- getSigFileSrc;
+       e <- createEvidence(id,sig,src);
+       returnEvidence(e) \}
+\end{alltt}
+
+\noindent and generates evidence of the form:
+
+\[\evidence{(id,sig,src)}{\hash{(id,sig,src)},PCRComp_0}{AIK_0}\]
+
+\noindent Appraisal replays the protocol up to crypto operations with
+known good measurements
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Multi-Realm Attestation}
+
+Nested attestation requests evidence from the signature server directly:
+
+\begin{alltt}
+  do \{ id <- getVCID;
+       sig <- getSigFileEvidence;
+       src <- getSigFileSrc;
+       srcEvidence <- send src r;
+       e <- createEvidence(id,sig,src,srcEvidence)
+       returnEvidence(e)
+  \}
+\end{alltt}
+
+\noindent and generates bundled evidence:
+
+\begin{eqnarray*}
+  \mathsf{let} & b & = \evidence{(e)}{\hash{e},PCRComp_1}{AIK_1}\; \mathsf{in} \\
+  & & \evidence{(id,sig,src,b)}{\hash{(id,sig,src,b)},PCRComp_0}{AIK_0}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Trusting Evidence}
+  \framesubtitle{Why bundling is hard}
+  \begin{itemize}
+  \item Trusting evidence
+    \begin{itemize}
+    \item hashes and TPM quotes
+    \item measure and appraise the attestation infrastructure
+    \item gather evidence of good protocol execution
+    \end{itemize}
+  \item Trusting bundled evidence
+    \begin{itemize}
+    \item appraisers do not know the source of evidence \emph{a
+        priori}
+    \item no global name space for evidence sources
+    \item bundled appraisals vs bundled evidence
+    \end{itemize}
+  \item Trusting the appraiser
+    \begin{itemize}
+    \item negotiated protocols must satisfy privacy policies
+    \item trust may not be transitive for applications and
+      infrastructure
+    \item global policy is not an answer
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Current Status}
+  \framesubtitle{Demos available}
+
+  \begin{itemize}
+  \item Attestation and Appraisal development
+    \begin{itemize}
+    \item CA-Based attestation protocol execution example
+    \item simple dynamic appraisal of attestation results
+    \item integrated negotiation protocol and attestation protocols
+    \end{itemize}
+  \item Measurement development
+    \begin{itemize}
+    \item HotSpot-based Java VM run time measurements
+    \item detect and report several runtime anomalies
+    \item standard mechanism for extending measurement capabilities
+    \end{itemize}
+  \item Infrastructure development
+    \begin{itemize}
+    \item vchan, TCP/IP and socket communication infrastructure
+    \item initial certificate authority implementation
+    \item language-based interface with TPM 1.2
+    \item integrated Berlios TPM emulator
+    \item JSON-based data exchange formats
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ongoing Work}
+  \framesubtitle{Goals for 2015}
+
+  \begin{itemize}
+  \item Establish roots-of-trust and trust argument
+    \begin{itemize}
+    \item measured launch and remeasurement of ArmoredSoftware
+    \item establish trust in the Xen/OpenStack infrastructure
+    \end{itemize}
+  \item Executable protocol representation and protocol semantics
+    \begin{itemize}
+    \item evidence of proper execution
+    \item static trust analysis
+    \item protocol-centered appraisal
+    \end{itemize}
+  \item More capable measurement
+    \begin{itemize}
+    \item compiler directed measurement
+    \item continuous measurement---tripping and trending
+    \end{itemize}
+  \item Publicly available libraries and infrastructure
+  \end{itemize}
+\end{frame}
+
+\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa,Ryan:09:Introduction-to,Loscocco:98:The-Inevitabili}
+
+\begin{frame}
+  \frametitle{References}
+  \begin{small}
+  \bibliography{hcss15}
+  \end{small}
+\end{frame}
+
+\end{document}
+
