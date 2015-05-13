@@ -1,7 +1,7 @@
 \documentclass{beamer}
 
 % theme definition
-\usetheme{KU}
+%\usetheme{KU}
 
 \usepackage{natbib}
 \usepackage{alltt}
@@ -25,26 +25,29 @@
   literate={->}{{ ${\rightarrow}$ }}3 {<-}{{ $\leftarrow$ }}3 
 }
 
-\setbeamertemplate{blocks}[rounded][shadow=true]
+%\setbeamertemplate{blocks}[rounded][shadow=true]
 
-\setbeamercolor{title}{fg=kublue}
-\setbeamercolor{subtitle}{fg=kugray} 
-\setbeamercolor{institute}{fg=kugray}
-\setbeamercolor{frametitle}{fg=kublue}
-\setbeamercolor{frametitle}{bg=white}
-\setbeamercolor{framesubtitle}{fg=kugray}
-\setbeamercolor{framesubtitle}{bg=white}
-\setbeamercolor{item}{fg=black}
-\setbeamercolor{subitem}{fg=kugray}
-\setbeamercolor{itemize/enumerate subbody}{fg=kugray}
-\setbeamercolor{block title}{bg=kublue}
-\setbeamercolor{block title}{fg=white}
-\setbeamercolor{block body}{bg=sand}
-\setbeamercolor{block body}{fg=black}
+% \setbeamercolor{title}{fg=kublue}
+% \setbeamercolor{subtitle}{fg=kugray} 
+% \setbeamercolor{institute}{fg=kugray}
+% \setbeamercolor{frametitle}{fg=kublue}
+% \setbeamercolor{frametitle}{bg=white}
+% \setbeamercolor{framesubtitle}{fg=kugray}
+% \setbeamercolor{framesubtitle}{bg=white}
+% \setbeamercolor{item}{fg=black}
+% \setbeamercolor{subitem}{fg=kugray}
+% \setbeamercolor{itemize/enumerate subbody}{fg=kugray}
+% \setbeamercolor{block title}{bg=kublue}
+% \setbeamercolor{block title}{fg=white}
+% \setbeamercolor{block body}{bg=sand}
+% \setbeamercolor{block body}{fg=black}
 
-\setbeamertemplate{footline}[frame number]
+%\setbeamertemplate{footline}[frame number]
 
-\usefonttheme{serif}
+\usetheme{default}
+%\usetheme{Montpellier}
+\usefonttheme{professionalfonts}
+\usecolortheme{dove}
 
 \newenvironment{fnverbatim}{\begin{alltt}\scriptsize}{\normalsize\end{alltt}}
 \newcommand{\mean}[1]{\langle#1\rangle}
@@ -73,17 +76,16 @@
 
 \logo{}
 
-\title{ArmoredSoftware}
-\subtitle{User-Space Remote Attestation}
+\title{Remote Attestation for Cloud-Based Systems}
 
 \author{Dr. Perry Alexander\inst{1} \and Dr. Andrew Gill\inst{1} \and Dr. Prasad
   Kulkarni\inst{1} \and
   Adam Petz\inst{1} \and Paul Kline\inst{1} \and Justin Dawson\inst{1}
   \and Jason~Gevargizian\inst{1} 
-  \and Leon Searl\inst{1} \and Edward Komp\inst{1} \and
-  Edward~Bishop\inst{2} \and Ciro Pinto-Coelho\inst{2}} 
+  \and Mark Grebe\inst{1} \and Edward Komp\inst{1} \and
+  Edward~Bishop\inst{2}} 
 
-\date{{\color{kugray}May 1, 2015}}
+\date{May 6, 2015}
 
 % turns off navigation symbols
 \setbeamertemplate{navigation symbols}{}
@@ -109,24 +111,22 @@
 %   \tableofcontents
 % \end{frame}
 
-\section{Introduction and Project Goals}
-
 \begin{frame}
   \frametitle{Clouds and Trust}
   \begin{itemize}
-  \item The promises of ``the cloud'' are substantial
+  \item The promises of the cloud are substantial
     \begin{itemize}
     \item reduced hardware and software costs
     \item reduced resource consumption
     \item improved availability and reliability
     \end{itemize}
-  \item The promises of ``the cloud'' complicate assurance
+  \item The structure of the cloud complicates assurance
     \begin{itemize}
     \item not under the desk
     \item ambiguous and changing runtime environment
     \item unknown and unknowable actors in the same environment
     \end{itemize}
-  \item Is trust possible in ``the cloud'' environment?
+  \item Is trust possible in the cloud environment?
     \begin{itemize}
     \item unambiguous identification
     \item confirmation of uninhibited execution
@@ -136,161 +136,31 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Program Goals}
-  \framesubtitle{Virtual Blinking Lights}
-  \begin{block}{Trust in the Cloud}
-    Provide new capabilities that establish and maintain trustworthy
-    cloud-based application deployment
-  \end{block}
+%%  \frametitle{Program Goals}
+  \frametitle{Virtual Blinking Lights}
+  Provide new capabilities that establish and maintain trustworthy
+  cloud-based application deployment
+  \medskip
+  \medskip
   \begin{itemize}
-  \item Establish trust among cloud components
+  \item Establish trust in cloud applications
     \begin{itemize}
-    \item trust among cohorts of processes
-    \item trust among processes and environment
+    \item trust in cloud infrastructure
+    \item trust in user-space applications 
+    \item trust in application cohorts
     \end{itemize}
   \item Promote informed decision making
     \begin{itemize}
-    \item data confidentiality can be confirmed
-    \item execution and data integrity can be confirmed
+    \item confirm data confidentiality
+    \item confirm execution and data integrity
     \end{itemize}
   \item Autonomous run-time response and reconfiguration
     \begin{itemize}
-    \item responds to attack, failure, reconfiguration, and repair 
-    \item response varies based on measurement
+    \item respond to attack, failure, reconfiguration, and repair 
+    \item appraisal informs response
     \end{itemize}
   \end{itemize}
 \end{frame}
-
-\begin{frame}
-  \frametitle{Delivery Platform}
-  \framesubtitle{Open source, standards compliant}
-
-  \begin{itemize}
-  \item Lightweight integration with existing cloud infrastructure
-    \begin{itemize}
-    \item OpenStack cloud infrastructure
-    \item Xen+XSM VM infrastructure
-    \item Fedora, HotSpot JVM, GHC
-    \end{itemize}
-  \item Trusted Computing Group standards compliant
-    \begin{itemize}
-    \item Trusted Platform Module 1.2
-    \item TCG vTPM (in principle)
-    \item Trusted OS infrastructure
-    \end{itemize}
-  \item Standard communication mechanisms
-    \begin{itemize}
-    \item JSON structures for all exchanged data
-    \item \textsl{vchan} for on-platform communication
-    \item TCP/IP for off-platform communication
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{New Technologies}
-  \begin{itemize}
-  \item Trustworthy protocol execution
-    \begin{itemize}
-    \item executable protocol representation
-    \item protocol execution generates evidence of trustworthiness
-    \item highly focused protocols
-    \item strand space formal semantics
-    \end{itemize}
-  \item Application specific measurement
-    \begin{itemize}
-    \item managed and traditional execution environments
-    \item compile-time assistance for measurer synthesis
-    \item specialized measurement bundled with applications
-    \end{itemize}
-  \item Attestation driven cloud application and data management
-    \begin{itemize}
-    \item health monitoring
-    \item problem mitigation
-    \item application migration
-    \item access control
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-% \begin{frame}
-%   \frametitle{Research \& Development Plan}
-%   \begin{itemize}
-%   \item Development and integrate measurement capabilities
-%     \begin{itemize}
-%     \item hosted languages (Java)
-%     \item traditional compiled languages (C, C++)
-%     \item integrate with environment measurers (Xen,OpenStack,OS)
-%     \end{itemize}
-%   \item Develop attestation capabilities
-%     \begin{itemize}
-%     \item flexible, user configurable protocol representation
-%     \item measured protocol execution
-%     \item protocol execution appraisal
-%     \end{itemize}
-%   \item Develop infrastructure trust argument
-%     \begin{itemize}
-%     \item develop lightweight vTPM infrastructure supporting mobility
-%     \item launch from known roots of trust
-%     \item maintain trust evidence at run time
-%     \item maintain trust over migration
-%     \end{itemize}
-%   \end{itemize}
-% \end{frame}
-
-% \begin{frame}
-%   \frametitle{Research \& Development Plan}
-%   \begin{itemize}
-%   \item Automated synthesis and verification
-%     \begin{itemize}
-%     \item measurer synthesis at application compile time
-%     \item automated evidence appraisal from protocols
-%     \item formal trust argument
-%     \end{itemize}
-%   \item Demonstrations
-%     \begin{itemize}
-%     \item initial simple infrastructure demonstrations
-%     \item cloud-based ``big data'' environment demonstration
-%     \item federated trust demonstration
-%     \item \emph{demonstrations as discovered/directed}
-%     \end{itemize}
-%   \item Scale up and roll out
-%     \begin{itemize}
-%     \item integration with Xen, OpenStack, Linux
-%     \item installation management and packaging
-%     \item effective web presence
-%     \end{itemize}
-%   \end{itemize}
-% \end{frame}
-
-\begin{frame}
-  \frametitle{Trusted Platform Module}
-  \begin{itemize}
-  \item Provides and Protects Roots of Trust
-    \begin{itemize}
-    \item Storage Root Key (SRK) - root of trust for storage
-    \item Endorsement Key (EK) - root of trust for reporting
-    \end{itemize}
-  \item Quote generation
-    \begin{itemize}
-    \item high integrity quotes - (\sign{RS}{AIK}, SML, \sign{n,PCRComp}{AIK})
-    \item high integrity evidence - (\tuple{E,n}, \sign{\hash{\tuple{E,n}},PCR}{AIK}
-    \end{itemize}
-  \item Sealing data to state
-    \begin{itemize}
-    \item \encrypt{D,PCR}{K} will not decrypt unless PCR = current PCR
-    \item data is safe even in the presence of malicious machine
-    \end{itemize}
-  \item Binding data to TPMs and machines
-    \begin{itemize}
-    \item (\encrypt{\private{K}}{SRK},K) - \encrypt{D}{K} cannot be decrypted unless \private{SRK} is installed
-    \item (\encrypt{\private{J}}{K},J) - \encrypt{D}{J} cannot be decrypted
-      unless \private{K} and \private{SRK} are installed
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\section{System Architecture}
 
 \begin{frame}
   \frametitle{Semantic Remote Attestation}
@@ -328,14 +198,106 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Trusted Platform Module}
+  \begin{itemize}
+  \item Provides and Protects Roots of Trust
+    \begin{itemize}
+    \item Storage Root Key (SRK) - root of trust for storage
+    \item Endorsement Key (EK) - root of trust for reporting
+    \end{itemize}
+  \item Quote generation
+    \begin{itemize}
+    \item high integrity quotes - (\sign{RS}{AIK}, SML, \sign{n,PCRComp}{AIK})
+    \item high integrity evidence - (\tuple{E,n}, \sign{\hash{\tuple{E,n}},PCR}{AIK}
+    \end{itemize}
+  \item Sealing data to state
+    \begin{itemize}
+    \item \encrypt{D,PCR}{K} will not decrypt unless PCR = current PCR
+    \item data is safe even in the presence of malicious machine
+    \end{itemize}
+  \item Binding data to TPMs and machines
+    \begin{itemize}
+    \item (\encrypt{\private{K}}{SRK},K) - \encrypt{D}{K} cannot be decrypted unless \private{SRK} is installed
+    \item (\encrypt{\private{J}}{K},J) - \encrypt{D}{J} cannot be decrypted
+      unless \private{K} and \private{SRK} are installed
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The Cloud Challenge}
+  \framesubtitle{Chasing the bottom turtle}
+  \begin{center}
+  \only<1>{\includegraphics[width=0.75\textwidth]{figures/cloud-1.pdf}}
+  \only<2>{\includegraphics[width=0.75\textwidth]{figures/cloud-2.pdf}}
+  \only<3>{\includegraphics[width=0.75\textwidth]{figures/cloud-3.pdf}}
+  \only<4>{\includegraphics[width=0.75\textwidth]{figures/cloud-4.pdf}}
+  \only<5>{\includegraphics[width=0.75\textwidth]{figures/cloud-5.pdf}}
+  \only<6>{\includegraphics[width=0.90\textwidth]{figures/cloud-full.pdf}}
+  \end{center}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{Delivery Platform}
+%   \framesubtitle{Open source, standards compliant}
+
+%   \begin{itemize}
+%   \item Lightweight integration with existing cloud infrastructure
+%     \begin{itemize}
+%     \item OpenStack cloud infrastructure
+%     \item Xen+XSM VM infrastructure
+%     \item Fedora, HotSpot JVM, GHC
+%     \end{itemize}
+%   \item Trusted Computing Group standards compliant
+%     \begin{itemize}
+%     \item Trusted Platform Module 1.2
+%     \item TCG vTPM (in principle)
+%     \item Trusted OS infrastructure
+%     \end{itemize}
+%   \item Standard communication mechanisms
+%     \begin{itemize}
+%     \item JSON structures for all exchanged data
+%     \item \textsl{vchan} for on-platform communication
+%     \item TCP/IP for off-platform communication
+%     \end{itemize}
+%   \end{itemize}
+% \end{frame}
+
+
+\begin{frame}
+  \frametitle{Enabling Technologies}
+  \begin{itemize}
+  \item Trustworthy protocol execution
+    \begin{itemize}
+    \item executable and analyzable protocol representation
+    \item generates evidence of trustworthiness
+    \item negotiates attestation details
+    \item designed for highly focused appraisal
+    \end{itemize}
+  \item Application specific measurement
+    \begin{itemize}
+    \item managed and traditional execution environments
+    \item compile-time assistance for measurer synthesis
+    \item specialized measurement bundled with applications
+    \end{itemize}
+  \item Lightweight trust infrastructure
+    \begin{itemize}
+    \item abstract communications capability
+    \item migration support
+    \item strong identity
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Armored Application Architecture}
+  \framesubtitle{M\&A targeted to an application}
   \begin{columns}[c]
     \column{.60\textwidth}
     \begin{itemize}
-    \item Focus is user-space applications
-    \item Assesses the cloud infrastructure and environment
-    \item Attests to the state of its application
-    \item High-assurance, lightweight infrastructure
+    \item Appraiser makes attestation requests
+    \item Attester responds to attestation requests
+    \item Measurer gathers evidence from application
     \item Influenced by the \emph{Trusted Research Platform} and
       \emph{Principles of Remote Attestation}
     \end{itemize}
@@ -347,20 +309,11 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Measurement and Attestation}
-  \begin{center}
-  \includegraphics[width=0.9\textwidth]{figures/ap-1.pdf}
-  \end{center}
-\end{frame}
-
-\begin{frame}
   \frametitle{System-Level Architecture}
   \begin{center}
-  \includegraphics[width=0.9\textwidth]{figures/system.pdf}
+  \includegraphics[width=1.0\textwidth]{figures/system.pdf}
   \end{center}
 \end{frame}
-
-\section{Prototype demonstration and discussion}
 
 % \begin{frame}
 %   \frametitle{What We Are Demonstrating}
@@ -612,50 +565,6 @@
 %     \end{itemize}
 % \end{frame}
 
-% \begin{frame}[fragile]
-%   \frametitle{Generating and Certifying an AIK}
-
-%   \begin{columns}[c]
-%     \column{.45\textwidth}
-%     \begin{small}
-%     \begin{itemize}
-%     \item Request a new $AIK$ from TPM (optional)
-%     \item Receive $AIK$ handle
-%     \item Request $\public{AIK}$ signed by CA ($AIK$ cert)
-%     \item Receive $AIK$ cert encrypted with session key $K$
-%     \item Receive $K$ encrypted with public $EK$
-%     \end{itemize}
-%     \end{small}
-%     \column{.55\textwidth}
-%     \begin{small}
-%     \begin{tikzpicture}[
-%       implies/.style={double,double equal sign distance,-implies},
-%       dot/.style={shape=circle,fill=black,minimum size=4pt,
-%         inner sep=0pt,outer sep=4pt}]
-%       \matrix[matrix of nodes] {
-%         |[dot,label=above:$\att$] (B2)| {}
-%         &[3.5cm] |[dot,label=above:$\tp$] (T2)| {}\\[1.0cm]
-%         &[0.5cm] |[] (C2)| {}\\[0.5cm]
-%         |[dot] (B3)| {}
-%         & |[dot] (T3)| {}\\  [0.5cm]
-%         |[dot] (B4)| {}
-%         &
-%         & |[dot,label=above:$\ca$] (C4)| {} \\ [1.0cm]
-%         |[dot] (B5)| {}
-%         &
-%         & |[dot] (C5)| {} \\ [0.5cm]
-%       };
-% \draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2);
-% \draw (T3) edge[->] node[above] {$\aikh$} (B3)
-%            edge[implies,implies-] (T2);
-% \draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
-%            edge[implies,implies-] (B3);
-% \draw (C5) edge[->] node[above] {$\encrypt{K, \hash{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
-%            edge[implies,implies-] (C4);
-%     \end{tikzpicture}
-%     \end{small}
-%   \end{columns}
-% \end{frame}
 
 % \begin{frame}[fragile]
 %   \frametitle{Activating the AIK}
@@ -1030,123 +939,320 @@
 
 % \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Negotiation}
+% \begin{frame}[fragile]
+%   \frametitle{Remote Monads}
+%   \framesubtitle{Principled communication}
 
-  \begin{block}{Protocol}
+%   \begin{columns}[c]
+%     \column{0.6\textwidth}
+%     \begin{itemize}
+%     \item Principled RPC-style capability
+%       \begin{itemize}
+%       \item Requests remote execution
+%       \item Defines \verb+send+ and \verb+receive+ operations
+%       \end{itemize}
+%     \item Abstracts away communication mechanism
+%       \begin{itemize}
+%       \item Creates http, TCP/IP, vchan channels
+%       \item Caches channels for efficiency
+%       \end{itemize}
+%     \end{itemize}
+%     \column{0.4\textwidth}
+%   \begin{alltt}
+%   do \{
+%        p <- do \{ ... \}
+%        send a \$ p;
+%        e <- receive a
+%   \}
+%   \end{alltt}
+%   \end{columns}
+% \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{EDSL for Protocol}
+  \framesubtitle{First-class protocol structures}
+
+  \begin{columns}[c]
+    \column{0.6\textwidth}
+    \begin{itemize}
+    \item First-class structure for protocols
+      \begin{itemize}
+      \item encapsulates a protocol-centered computation
+      \item semantics provide a basis for static analysis
+      \item based loosely on the \verb+Reader+ monad
+      \end{itemize}
+    \item Abstract communication primitives
+      \begin{itemize}
+      \item extended RPC-style capability
+      \item requests remote execution
+      \item defines \verb+send+ and \verb+receive+ operations
+      \item abstracts away communication details
+      \end{itemize}
+%    \item Creates http, TCP/IP, vchan channels
+%    \item Caches channels for efficiency
+    \end{itemize}
+    \column{0.4\textwidth}
   \begin{alltt}
-  do \{ send t \$ r;
+  do \{
+       f(x);
+       y <- f(x);
+       send a x;
+       y <- receive a
+  \}
+  \end{alltt}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiating a Protocol}
+  \framesubtitle{Respecting privacy}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+ %   \begin{small}
+    \begin{itemize}
+    \item Typical negotiation
+      \begin{itemize}
+      \item request sent to Attester
+      \item Attester generates proposal
+      \item Appraiser selects protocol
+      \item Attester executes protocol
+      \end{itemize}
+    \item Three kinds of requests
+      \begin{itemize}
+      \item execute protocol \verb+22+
+      \item provide \verb+{OS_config+, \verb+http_stat+, \verb+firewall_stat}+
+      \item execute protocol \verb+do { ... }+
+      \end{itemize}
+    \item Three negotiation criteria
+      \begin{itemize}
+      \item ability to satisfy the request
+      \item satisfaction of appraiser and attester privacy policies
+      \item previously obtained evidence
+      \end{itemize}
+    \end{itemize}
+%    \end{small}
+    \column{0.45\textwidth}
+    \begin{small}
+    \begin{tikzpicture}[
+      implies/.style={double,double equal sign distance,-implies},
+      dot/.style={shape=circle,fill=black,minimum size=4pt,
+        inner sep=0pt,outer sep=4pt}]
+      \matrix[matrix of nodes] {
+        |[dot,label=above:$\app$] (B2)| {}
+        &[3.5cm] |[dot,label=above:$\att$] (T2)| {}\\[1.0cm]
+        |[dot] (B3)| {}
+        & |[dot] (T3)| {}\\  [1.0cm]
+        |[dot] (B4)| {}
+        & |[dot] (T4)| {} \\ [1.0cm]
+        |[dot] (B5)| {}
+        & |[dot] (T5)| {} \\ [0.5cm]
+      };
+\draw (B2) edge[->] node[above] {Attestation Request} (T2)
+           edge[implies] (B3);
+\draw (T3) edge[->] node[above] {Proposal Set} (B3)
+           edge[implies,implies-] (T2)
+           edge[implies] (T4);
+\draw (B4) edge[->] node[above] {Accepted Proposal} (T4)
+           edge[implies,implies-] (B3)
+           edge[implies] (B5);
+\draw (T5) edge[->] node[above] {Evidence} (B5)
+           edge[implies,implies-] (T4);
+    \end{tikzpicture}
+    \end{small}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiation Protocol}
+  \framesubtitle{Request and Select}
+
+  \begin{itemize}
+  \item Requests an attestation
+  \item Receives proposals
+  \item Selects from proposals
+  \end{itemize}
+
+  \begin{alltt}
+  do \{ send t r;
        q <- receive t;
-       e <- case \{p:q | policy?(p)\} of
+       e <- case \{p:q | (policy? p)\} of
               \(\emptyset\) : None
-              p : send t \$ choose(p)
+              p : send t (choose p)
             end;
        case e of 
-         Some v : appraise(v)
+         Some v : (appraise v)
          None : None
-       end
-  \}
+       end \}
 \end{alltt}
-\end{block}
 
-\begin{block}{Proposals}
-  \[
-  \{\tuple{E_0,P_0},\tuple{E_1,P_1},\ldots,\tuple{E_n,P_n}\}
-  \]
-\end{block}
+\begin{center}
+  Negotiation is a protocol that can itself be selected or negotiated
+\end{center}
 
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Negotiation Results}
+
+  \begin{itemize}
+  \item Evidence and Protocol pairs
+  \item Satisfies privacy policy of attester
+  \item Provide some or all of requested information
+  \end{itemize}
+
+  \begin{alltt}
+   ((ID,SIGHASH,SIGSRC),
+    do \{ id <- getVCID;
+         sig <- getSigFileEvidence;
+         src <- getSigFileSrc;
+         e <- createEvidence(id,sig,src);
+         returnEvidence(e) \})
+  \end{alltt}
+
+
+  % \begin{block}{Proposals}
+  %   \[
+  %   \{\tuple{E_0,P_0},\tuple{E_1,P_1},\ldots,\tuple{E_n,P_n}\}
+  %   \]
+  % \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Reified Protocol}
+
+  Generated negotiation protocol code (currently by hand):
+
+  \begin{small}
+  \begin{alltt}
+P = CreateChannel (AChannel "attesterChan") Target	      
+    $ Send ANRequest (AChannel "attesterChan")
+    $ Receive (Var "counterOffer") (AChannel "attesterChan")
+    $ CalculateFinalRequest (Var "finalReq")
+                            ANRequest
+                            (Var "counterOffer")
+    $ Send (Var "finalReq") (AChannel "attesterChan")
+    $ Receive (Var "finalConfirmation")
+              (AChannel "attesterChan")
+    $ Case (Var "finalConfirmation") [(Var "finalReq")]
+           (HandleFinalChoice (Var "result") (Var "finalReq")
+           (Result (Var "result")))
+           (Stuck "finalConf and finalReq match error")
+  \end{alltt}
+  \end{small}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Performing Measurement and Attestation}
+  \begin{center}
+  \includegraphics[width=0.95\textwidth]{figures/ap-1.pdf}
+  \end{center}
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Single Realm Attestation}
 
-\begin{block}{Protocol}
+Protocol for gathering virus checker evidence
+
 \begin{alltt}
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
        e <- createEvidence(id,sig,src);
-       returnEvidence(e)
-  \}
+       returnEvidence(e) \}
 \end{alltt}
-\end{block}
 
-\begin{block}{Evidence}
+\noindent and generates evidence of the form:
+
 \[\evidence{(id,sig,src)}{\hash{(id,sig,src)},PCRComp_0}{AIK_0}\]
-\end{block}
+
+\noindent Appraisal replays the protocol up to crypto operations with
+known good measurements
 
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Multi-Realm Attestation}
 
-\begin{block}{Protocol}
+Nested attestation requests evidence from the signature server directly:
+
 \begin{alltt}
   do \{ id <- getVCID;
        sig <- getSigFileEvidence;
        src <- getSigFileSrc;
-       srcEvidence <- send src \$ r;
+       srcEvidence <- send src r;
        e <- createEvidence(id,sig,src,srcEvidence)
        returnEvidence(e)
   \}
 \end{alltt}
-\end{block}
 
-\begin{block}{Evidence}
-\[b=\evidence{(e)}{\hash{e},PCRComp_1}{AIK_1}\]
-\[\evidence{(id,sig,src,b)}{\hash{(id,sig,src,b)},PCRComp_0}{AIK_0}\]
-\end{block}
+\noindent and generates bundled evidence:
 
+\begin{eqnarray*}
+  \mathsf{let} & b & = \evidence{(e)}{\hash{e},PCRComp_1}{AIK_1}\; \mathsf{in} \\
+  & & \evidence{(id,sig,src,b)}{\hash{(id,sig,src,b)},PCRComp_0}{AIK_0}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Trusting Evidence}
+  \framesubtitle{Why bundling is hard}
+  \begin{itemize}
+  \item Trusting evidence
+    \begin{itemize}
+    \item hashes and TPM quotes
+    \item measure and appraise the attestation infrastructure
+    \item gather evidence of good protocol execution
+    \end{itemize}
+  \item Trusting bundled evidence
+    \begin{itemize}
+    \item appraisers do not know the source of evidence \emph{a
+        priori}
+    \item no global name space for evidence sources
+    \item bundled appraisals vs bundled evidence
+    \end{itemize}
+  \item Trusting the appraiser
+    \begin{itemize}
+    \item negotiated protocols must satisfy privacy policies
+    \item trust may not be transitive for applications and
+      infrastructure
+    \item global policy is not an answer
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Current Status}
-
-  \begin{center}
-  \emph{\color{kublue}Completed four demonstrations culminating in
-    running an attestation protocol in response to an attestation
-    request.}
-  \end{center}
+  \framesubtitle{Demos available}
 
   \begin{itemize}
   \item Attestation and Appraisal development
     \begin{itemize}
     \item CA-Based attestation protocol execution example
-    \item integration with Berlios TPM 1.2 emulator
     \item simple dynamic appraisal of attestation results
+    \item integrated negotiation protocol and attestation protocols
     \end{itemize}
   \item Measurement development
     \begin{itemize}
-    \item on demand Java program measurement
     \item HotSpot-based Java VM run time measurements
+    \item detect and report several runtime anomalies
     \item standard mechanism for extending measurement capabilities
     \end{itemize}
-  \item Communication infrastructure
+  \item Infrastructure development
     \begin{itemize}
     \item vchan, TCP/IP and socket communication infrastructure
+    \item initial certificate authority implementation
     \item language-based interface with TPM 1.2
+    \item integrated Berlios TPM emulator
     \item JSON-based data exchange formats
-    \item initial certificate authority API
     \end{itemize}
   \end{itemize}
 \end{frame}
 
-\section{Year 2 Goals and Milestones}
-
 \begin{frame}
-  \frametitle{Goals and Milestones for 2015}
-
-  \begin{center}
-    {\color{kublue}Increased functionality and robustness}
-  \end{center}
+  \frametitle{Ongoing Work}
+  \framesubtitle{Goals for 2015}
 
   \begin{itemize}
-  \item Push to the cloud
-    \begin{itemize}
-    \item integration with OpenStack
-    \item migration across Xen instances
-    \item vTPM function migration
-    \end{itemize}
   \item Establish roots-of-trust and trust argument
     \begin{itemize}
     \item measured launch and remeasurement of ArmoredSoftware
@@ -1154,68 +1260,26 @@
     \end{itemize}
   \item Executable protocol representation and protocol semantics
     \begin{itemize}
-    \item richer protocol collection
     \item evidence of proper execution
+    \item static trust analysis
     \item protocol-centered appraisal
-    \end{itemize}
-  \item Operational, integrated vTPM prototype
-    \begin{itemize}
-    \item integration with TPM 1.2
-    \item find and integrate, not build (we hope)
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Goals and Milestones for 2015}
-
-  \begin{itemize}
-  \item More robust communication and system services
-    \begin{itemize}
-    \item Armor Authority prototype
-    \item Certificate Authority integration
-    \item communications management
     \end{itemize}
   \item More capable measurement
     \begin{itemize}
     \item compiler directed measurement
-    \item continuous measurement of trends
+    \item continuous measurement---tripping and trending
     \end{itemize}
-  \item More interesting download-able demonstration
-    \begin{itemize}
-    \item sponsor-defined problem
-    \item more realistic attacker model
-    \end{itemize}
+  \item Publicly available libraries and infrastructure
   \end{itemize}
 \end{frame}
 
-% \section{Questions and guidance}
-
-% \begin{frame}
-%   \frametitle{Questions and Guidance}
-
-%   \begin{itemize}
-%   \item What should we be watching and integrating with?
-%     \begin{itemize}
-%     \item operational vTPM infrastructure
-%     \item infrastructure measured boot
-%     \item certificate authorities
-%     \end{itemize}
-%   \item What demonstration problems are relevant?
-%     \begin{itemize}
-%     \item federated trust
-%     \item trust in the infrastructure
-%     \item trust among application collections
-%     \end{itemize}
-%   \item What would convince you to work a problem with us?
-%   \end{itemize}
-% \end{frame}
-
-\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa,Ryan:09:Introduction-to}
+\nocite{Coker::Principles-of-R,Haldar:04:Semantic-Remote,Fabrega:1999aa,Ryan:09:Introduction-to,Loscocco:98:The-Inevitabili}
 
 \begin{frame}
   \frametitle{References}
+  \begin{small}
   \bibliography{overview}
+  \end{small}
 \end{frame}
 
 \end{document}
