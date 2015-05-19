@@ -1,0 +1,86 @@
+\documentclass[10pt]{article}
+
+%\usepackage{hyperref}
+\usepackage{alltt}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\usepackage{trust}
+\usepackage{subfigure}
+\usepackage{ifthen}
+
+%\newcommand{\squash}{}{\itemsep=0pt\parskip=0pt}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,shadows}
+\usepackage[underline=false]{pgf-umlsd}
+
+\lhead{Musings on Protocols and Monads}
+\rhead{ArmoredSofware Team}
+\lfoot{\copyright The University of Kansas, 2015}
+\cfoot{\thepage}
+
+\newboolean{submission}  %%set to true for the submission version
+\setboolean{submission}{false}
+%\setboolean{submission}{true}
+\ifthenelse
+{\boolean{submission}}
+{ \newcommand{\todo}[1]{ } } % hide todo
+{ \newcommand{\todo}[1]{ % show todo
+   \marginpar{\raggedright\footnotesize{#1}}
+               }}
+
+\newcommand{\squash}{\parskip=0pt\itemsep=0pt}
+
+\newtheorem{assertion}{Assertion}
+\newtheorem{definition}{Definition}
+
+\parskip=\medskipamount
+\parindent=0pt
+
+
+\bibliographystyle{abbrvnat}
+
+\title{Musings on Protocols and Monads}
+\author{ArmoredSoftware Team \\
+ \url{palexand@ku.edu}}
+
+\begin{document}
+
+\maketitle
+%\tableofcontents
+%\listoffigures
+%\listoftables
+
+\begin{abstract}
+  This document captures discussions on formally representing
+  protocols using monadic constructs.  This is a living document and
+  will be updated frequently.
+\end{abstract}
+
+\section*{Notation}
+
+Throughout we use a trivial monadic notation for protocols that serves
+as our ``assembly language'' target for protocol compilation.
+The following conventions hold:
+
+\begin{alltt}
+  do \{                % evaluate functions in sequence
+       f(x);          % calculate f(x) and discard the result
+       y <- f(x);     % calculate f(x) and bind the result to y
+       send a \$ x;    % evaluate x and send the result to a
+       y <- receive a % receive data from a and the result to y
+  \}
+\end{alltt}
+
+This is early work, so we play fast and loose with specific syntax and
+semantics.  \Verb+send+ and \Verb+receive+ operate synchronously.
+Each \Verb+send+ must have a corresponding \Verb+receive+ to complete
+its operation.
+
+\bibliography{bundling}
+
+\end{document}
