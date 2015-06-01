@@ -205,8 +205,26 @@ its operation.
   & \sndmsg{\att}{\tp} {quote(\;{AIK_{h}, \pmask, \exdata}\;)} & \\
   & \sndmsg{\tp}{\att} {\pcomp, \sign{\hashe{\pcomp}, \exdata}{AIK}}  & \\
   & \sndmsg{\att}{\app} {\eve, \nonce{\app}, \pcomp, \cacert}  & \\
-  & \sndmsg{\att}{\app} {\sign{\hashe{\pcomp}, \exdata}{AIK}}  & 
+  & \sndmsg{\att}{\app} {\sign{\hashe{\pcomp}, \exdata}{AIK}}  & \\  \\
 \end{align*}
+
+
+
+\begin{tabular}{l  l  l}
+\underline{KEY}  & & \\
+\app  & :  &  Appraiser \\
+\att  & :  &  Attestation Agent\\
+\tp  & :  &  TPM\\
+\ca  & :  &  Certificate Authority\\
+\mea  & :  &  Measurer\\
+d & : & desired evidence \\
+e & : & gathered evidence \\
+$N_A$ & : & nonce \\
+$\pmask$ & : & pcr mask indicating desired pcr registers \\
+$\pcomp$  & : & pcr composite structure containing select pcr register values \\
+$\aikh$ & : & AIK key handle(used by TPM to reference loaded keys) \\
+$\k$ & : & Session key created by \ca \\
+\end{tabular}
 
 \subsubsection*{Strand Space Diagram}
 
@@ -300,72 +318,59 @@ its operation.
 
 \subsubsection*{Monadic Representation}
 
+\def \appm {a}
+\def \attm {b}
+\def \cam {c}
+\def \meam {m}
+\def \tpm {t}
+
 \begin{alltt}
   Appraiser:
   do \{     
-       send \att \$ \{ \evd, Na, PCRm \} ;    % 
-       \{ e, na, pcrc, cacert, sig \}  <- receive \att
+       send \attm \$ \{ \evd, Na, PCRm \} ;    % 
+       \{ e, na, pcrc, cacert, sig \}  <- receive \attm;
   \}
 \end{alltt}
 
 \begin{alltt}
   Attester:
   do \{     
-       \{ \evd, na, pcrm \}  <- receive \app;
-       send \tp \$ \{ make\_and\_load\_identity \};
-       \{ aikpub, aikh \} <- receive \tp;
-       send \ca \$ \{ \att, aikpub \};
-       \{ ekCipher, kCipher \} <- receive \ca;
-       send \tp \$ \{ activate_identity(aikh, ekCipher) \};
-       \{ k \} <- receive \tp;
+       \{ \evd, na, pcrm \}  <- receive \appm;
+       send \tpm \$ \{ make\_and\_load\_identity \};
+       \{ aikpub, aikh \} <- receive \tpm;
+       send \cam \$ \{ \attm, aikpub \};
+       \{ ekCipher, kCipher \} <- receive \cam;
+       send \tpm \$ \{ activate_identity(aikh, ekCipher) \};
+       \{ k \} <- receive \tpm;
        cacert <- decrypt(kCipher, k);
-       send \mea \$ \{ \evd \};
-       \{ \eve \} <- receive \tp;
-       send \tp \$ \{ quote(aikh, pcrm, \hashe{\eve, na, cacert} \};
-       \{ pcrc, sig \} <- receive \tp;
-       send \app \$ \{ \eve, na, pcrc, cacert, sig \};
+       send \meam \$ \{ \evd \};
+       \{ \eve \} <- receive \meam;
+       send \tpm \$ \{ quote(aikh, pcrm, \hashe{\eve, na, cacert} \};
+       \{ pcrc, sig \} <- receive \tpm;
+       send \appm \$ \{ \eve, na, pcrc, cacert, sig \};
   \}
 \end{alltt}
 
 \begin{alltt}
   Measurer:
   do \{     
-       \{ \evd \}  <- receive \att;
+       \{ \evd \}  <- receive \attm;
        \eve <- measure(\evd);
-       send \att \$ \{ \eve \};
+       send \attm \$ \{ \eve \};
   \}
 \end{alltt}
 
 \begin{alltt}
   CA:
   do \{     
-       \{ b, aikpub \}  <- receive \att;
-       ekPub <- lookupEkPub(b);
+       \{ bId, aikpub \}  <- receive \attm;
+       ekPub <- lookupEkPub(bId);
        cacert <- sign(aikpub, c);
        ekCipher <- encrypt( \{ K, \hashe{aikpub} \}, ekPub );
        kCipher <- encrypt( cacert, K);
-       send \att \$ \{ ekCipher, kCipher \};
+       send \attm \$ \{ ekCipher, kCipher \};
   \}
 \end{alltt}
-
-
-\newpage
-
-\begin{tabular}{l  l  l}
-\underline{KEY}  & & \\
-\app  & :  &  Appraiser \\
-\att  & :  &  Attestation Agent\\
-\tp  & :  &  TPM\\
-\ca  & :  &  Certificate Authority\\
-\mea  & :  &  Measurer\\
-d & : & desired evidence \\
-e & : & gathered evidence \\
-$N_A$ & : & nonce \\
-$\pmask$ & : & pcr mask indicating desired pcr registers \\
-$\pcomp$  & : & pcr composite structure containing select pcr register values \\
-$\aikh$ & : & AIK key handle(used by TPM to reference loaded keys) \\
-$\k$ & : & Session key created by \ca \\
-\end{tabular}
 
 \bibliography{bundling}
 
