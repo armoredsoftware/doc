@@ -13,6 +13,10 @@
 \usepackage{ifthen}
 \usepackage{verbatim}
 
+%\usepackage[T1] {fontenc}
+%\AtBeginDocument{\catcode`\_=12 \mathcode`\_=\string"715F }
+%\DeclareMathAlphabet{\mathtt}{\encodingdefault}{\ttdefault}{m}{n}
+
 %\newcommand{\squash}{}{\itemsep=0pt\parskip=0pt}
 
 \usepackage{tikz}
@@ -240,7 +244,7 @@ its operation.
            edge[implies,implies-] (B1);
 \draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
            edge[implies,implies-] (T2);
-\draw (B4) edge[->] node[above] {$\public{AIK}, \aikh$} (C4)
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
            edge[implies,implies-] (B3);
 \draw (C5) edge[->] node[above] {$\encrypt{K, \hashe{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
            edge[implies,implies-] (C4);
@@ -266,10 +270,76 @@ its operation.
            edge[implies,implies-] (B12);
 \end{tikzpicture}
 
+\newpage
 
 \subsubsection*{Monadic Representation}
 
+\begin{alltt}
+  Appraiser:
+  do \{     
+       send \att \$ \{ \evd, Na, PCRm \} ;    % 
+       \{ e, na, pcrc, cacert, sig \}  <- receive \att
+  \}
+\end{alltt}
 
+\begin{alltt}
+  Attester:
+  do \{     
+       \{ \evd, na, pcrm \}  <- receive \app;
+       send \tp \$ \{ make\_and\_load\_identity \};
+       \{ aikpub, aikh \} <- receive \tp;
+       send \ca \$ \{ \att, aikpub \};
+       \{ ekCipher, kCipher \} <- receive \ca;
+       send \tp \$ \{ activate_identity(aikh, ekCipher) \};
+       \{ k \} <- receive \tp;
+       cacert <- decrypt(kCipher, k);
+       send \mea \$ \{ \evd \};
+       \{ \eve \} <- receive \tp;
+       send \tp \$ \{ quote(aikh, pcrm, \hashe{\eve, na, cacert} \};
+       \{ pcrc, sig \} <- receive \tp;
+       send \app \$ \{ \eve, na, pcrc, cacert, sig \};
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Measurer:
+  do \{     
+       \{ \evd \}  <- receive \att;
+       \eve <- measure(\evd);
+       send \att \$ \{ \eve \};
+  \}
+\end{alltt}
+
+\begin{alltt}
+  CA:
+  do \{     
+       \{ b, aikpub \}  <- receive \att;
+       ekPub <- lookupEkPub(b);
+       cacert <- sign(aikpub, c);
+       ekCipher <- encrypt( \{ K, \hashe{aikpub} \}, ekPub );
+       kCipher <- encrypt( cacert, K);
+       send \att \$ \{ ekCipher, kCipher \};
+  \}
+\end{alltt}
+
+
+\newpage
+
+\begin{tabular}{l  l  l}
+\underline{KEY}  & & \\
+\app  & :  &  Appraiser \\
+\att  & :  &  Attestation Agent\\
+\tp  & :  &  TPM\\
+\ca  & :  &  Certificate Authority\\
+\mea  & :  &  Measurer\\
+d & : & desired evidence \\
+e & : & gathered evidence \\
+$N_A$ & : & nonce \\
+$\pmask$ & : & pcr mask indicating desired pcr registers \\
+$\pcomp$  & : & pcr composite structure containing select pcr register values \\
+$\aikh$ & : & AIK key handle(used by TPM to reference loaded keys) \\
+$\k$ & : & Session key created by \ca \\
+\end{tabular}
 
 \bibliography{bundling}
 
