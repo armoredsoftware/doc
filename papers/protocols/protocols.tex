@@ -139,6 +139,32 @@ its operation.
 \end{align*}
 \subsubsection*{Monadic Representation}
 
+\begin{alltt}
+  Principal A:
+  do \{                
+       aCipher <- encrypt(\{ Na, b, Kab \}, Kas);
+       send s \$ aCipher;    
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Principal S:
+  do \{               
+       aCihper <- receive a;
+       \{ na, b, kab \} <- decrypt(aCipher, Kas);
+       kbs <- lookupKey(b);   
+       sCipher <- encrypt(\{ Ns, a, kab \}, kbs); 
+       send b \$ sCipher;
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Principal B:
+  do \{                
+       sCipher <- receive s;
+       \{ ns, a, kab \} <- decrypt(sCipher, Kbs);	    
+  \}
+\end{alltt}
 
 \newpage
 
