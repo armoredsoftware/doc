@@ -445,7 +445,33 @@
 % \end{small}
 % \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Trustworthy Protocol Execution}
+  \framesubtitle{Negotiation and execution}
 
+  \begin{itemize}
+  \item Representation and execution
+    \begin{itemize}
+    \item protocols as first-class language structures
+    \item generates evidence of trusted execution
+    \item respects privacy policies
+    \item formal semantics
+    \end{itemize}
+  \item Attestation Protocol Negotiation
+    \begin{itemize}
+    \item appraiser and attester agree on an attestation protocol
+    \item appraiser needs information for assessment
+    \item attester protects target assets
+    \end{itemize}
+  \item Attestation Protocol Execution
+    \begin{itemize}
+    \item invokes measurement routines to gather evidence of behavior
+    \item packages evidence to ensure evidence integrity and confidentiality
+    \item generates meta-evidence to ensure process integrity
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Privacy CA Attestation}
@@ -969,7 +995,7 @@
 % \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{EDSL for Protocol}
+  \frametitle{EDSL for Trusted Protocols}
   \framesubtitle{First-class protocol structures}
 
   \begin{columns}[c]
@@ -988,15 +1014,13 @@
       \item defines \verb+send+ and \verb+receive+ operations
       \item abstracts away communication details
       \end{itemize}
-%    \item Creates http, TCP/IP, vchan channels
-%    \item Caches channels for efficiency
     \end{itemize}
     \column{0.4\textwidth}
   \begin{alltt}
   do \{
        f(x);
        y <- f(x);
-       send a x;
+       z <- send a y;
        y <- receive a
   \}
   \end{alltt}

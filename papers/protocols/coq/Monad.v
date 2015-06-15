@@ -12,8 +12,10 @@ Class Monad (M: Type -> Type):Type :=
               bind (bind ma f) g = bind ma (fun a => bind (f a) g)
 }.
 
+Print option.
 
 (* Declaring built-in option to be a monad *)
+
 Instance Maybe : Monad option :=
 {
   unit A a := Some a
@@ -25,9 +27,53 @@ Instance Maybe : Monad option :=
 }.
 Proof.
   intros. reflexivity.
-  intros. destruct ma. reflexivity. reflexivity.
-  intros. destruct ma. reflexivity. reflexivity.
+  intros. destruct ma; reflexivity.
+  intros. destruct ma; reflexivity.
 Defined.
+
+(* Creating an error monad that can be instantiated as a monad *)
+
+Inductive error (A : Type) : Type :=
+| V : A -> error A
+| E : nat -> error A.
+
+Print error.
+
+Instance Error : Monad error :=
+{
+  unit A a := V A a
+  ; bind A B ma f :=
+      match ma with
+        | V a => f a
+        | E n => E B n
+      end
+}.
+Proof.
+  intros. reflexivity.
+  intros. destruct ma. reflexivity. reflexivity.
+  intros. destruct ma. reflexivity. reflexivity.
+Qed.
+
+Inductive state (S A : Type) : Type :=
+  runState : S -> A * S -> state S A.
+
+Definition S := nat.
+
+Instance State : Monad (state S) :=
+{
+  unit A a := runState (fun s => (a,s))
+  ; bind s f := state(fun (s0:S) =>
+                        match runState(s)(s0) with
+                            | (a,s1) => runState(f a)(s1)
+                        end)
+}.
+
+(*
+ State : DATATYPE
+ BEGIN
+   state(runState:[S->[A,S]]):state?
+ END State
+*)
 
 Class State (M:Type -> Type): Type := 
 {
@@ -42,7 +88,7 @@ Class State (M:Type -> Type): Type :=
                bindS (bindS ma f) g = bindS ma (fun a => bindS (f a) g)
   ; state1 : forall {A} (s s':A), seqS (putS s) (putS s') = putS s'
   ; state2 : forall {A} (s:A), seqS (putS s) (getS) = seqS (putS s) (unitS s)
-  (* ; state3 : forall {A}, bind getS putS = unitS *)
+  ; state3 : forall {A:Type}, bindS getS putS = unitS A
   (* ; state4 : forall {A} (s:A), bindS getS (fun x => (bindS getS k x)) = bind get (fun x => k x x) *)
 }.
 
@@ -66,3 +112,12 @@ Eval compute in (Some 1 >>= (fun x => unit (x + 1))).
 Eval compute in (None >>= (fun x => unit (x + 1))).
 
 Print option.
+
+Inductive state {A B:Type} : Type :=
+{
+  runState : A -> (A * B)
+}.
+
+Instance S {A B:Type} : State A B :=
+{
+}.
