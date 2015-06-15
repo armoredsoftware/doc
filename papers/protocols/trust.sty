@@ -3,8 +3,9 @@
 
 \usepackage{amsmath}
 \usepackage{semantic}
+\usepackage{verbatim}
 
-\newcommand{\nonce}[1]{N\textsubscript{#1}}
+\newcommand{\nonce}[1]{N_{#1}}
 \newcommand{\crypt}[2]{\ensuremath{\{#1\}_{#2}}}
 \newcommand{\hashe}[1]{\ensuremath{\lvert #1 \rvert}}
 \newcommand{\extend}[2]{\ensuremath{#1\vert#2}}
@@ -20,6 +21,7 @@
 \newcommand{\proposal}[2]{\ensuremath{ \langle #1,#2\rangle}}
 \newcommand{\public}[1]{\ensuremath{#1^{+}}}
 \newcommand{\private}[1]{\ensuremath{#1^{-}}}
+\newcommand{\symm}[1]{\ensuremath{K_{#1}}}
 \newcommand{\seal}[2]{\ensuremath{seal(#1,\{#2\})}}
 \newcommand{\wrap}[2]{\ensuremath{wrap(#1,\{#2\})}}
 
@@ -62,7 +64,8 @@
 
 %%% Message notation
 
-\newcommand{\sndmsg}[4]{\ensuremath{#1\rightarrow #2:#3}\;
-  \mathsf{on}\; #4}
+\newcommand{\sndmsg}[3]{\ensuremath{#1\rightarrow #2:#3}\;}
+ 
+\begin{comment} \mathsf{on}\; #4} \end{comment}
 
 \newcommand{\channel}[1]{\ensuremath{C_{#1}}}

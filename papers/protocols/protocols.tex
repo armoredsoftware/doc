@@ -11,11 +11,16 @@
 \usepackage{trust}
 \usepackage{subfigure}
 \usepackage{ifthen}
+\usepackage{verbatim}
+
+%\usepackage[T1] {fontenc}
+%\AtBeginDocument{\catcode`\_=12 \mathcode`\_=\string"715F }
+%\DeclareMathAlphabet{\mathtt}{\encodingdefault}{\ttdefault}{m}{n}
 
 %\newcommand{\squash}{}{\itemsep=0pt\parskip=0pt}
 
 \usepackage{tikz}
-\usetikzlibrary{arrows,shadows}
+\usetikzlibrary{arrows,shadows, matrix}
 \usepackage[underline=false]{pgf-umlsd}
 
 \lhead{Musings on Protocols and Monads}
@@ -80,6 +85,292 @@ This is early work, so we play fast and loose with specific syntax and
 semantics.  \Verb+send+ and \Verb+receive+ operate synchronously.
 Each \Verb+send+ must have a corresponding \Verb+receive+ to complete
 its operation.
+
+\section*{Example Protocols}
+
+\subsection*{Needham-Schroeder-Lowe}
+
+\subsubsection*{Message Sequence}
+\begin{align*}
+& \sndmsg{A}{B} {\encrypt {\nonce{A}, A} {B} } & \\
+& \sndmsg{B}{A} {\encrypt {\nonce{A}, \nonce{B}, B} {A}} & \\
+& \sndmsg{A}{B} {\encrypt {\nonce{B}} {B}} & \\
+\end{align*}
+
+\subsubsection*{Monadic Representation}
+
+\begin{alltt}
+  Notes:  
+  -Identifiers "a" and "b" serve as principal identity \emph{handles}
+  -na, nb, m1, m2, m3 are variables
+  -Assume Na and Nb are generated fresh by principals A and B respectively for each run
+  -Only A can decrypt using a, and B likewise with b
+  -Public keys are known a priori
+ 
+  
+  Principal A:
+  do \{                
+       m1 <- encrypt(\{Na, a\}, b);     % encrypt a's nonce and its i.d. with b's public key
+       send b \$ m1;    			              % send result to b
+       m2 <- receive b;               % receive (encrypted) message from b
+       (na, nb, x) <- decrypt(m2, a); % decrypt m2 using private key of a
+       m3 <- encrypt(nb, b);          % encrypt b's nonce with b's public key
+       send b \$ m3;                   % send result to b
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Principal B:
+  do \{                
+       m1 <- receive                  % receive initial (encrypted) message
+       (na, a) <- decrypt(m1, b);     % decrypt m1 using b's private key
+       m2 <- encrypt(\{na, Nb, b\}, a); % build m2 using na and a
+       send a \$ m2;    			              % send result to a
+       m3 <- receive a;               % receive (encrypted) message from b
+       (nb) <- decrypt(m3, b);        % decrypt it
+  \}
+\end{alltt}
+
+\subsection*{Wide-Mouthed Frog}
+\subsubsection*{Message Sequence}
+\begin{align*}
+& \sndmsg{A}{S} {\crypt {\nonce{A}, B, \symm{AB}} {\symm{AS}} }& \\
+& \sndmsg{S}{B} {\crypt {\nonce{S}, A, \symm{AB}} {\symm{BS}} }& \\
+\end{align*}
+\subsubsection*{Monadic Representation}
+
+\begin{alltt}
+  Principal A:
+  do \{                
+       aCipher <- encrypt(\{ Na, b, Kab \}, Kas);
+       send s \$ aCipher;    
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Principal S:
+  do \{               
+       aCihper <- receive a;
+       \{ na, b, kab \} <- decrypt(aCipher, Kas);
+       kbs <- lookupKey(b);   
+       sCipher <- encrypt(\{ Ns, a, kab \}, kbs); 
+       send b \$ sCipher;
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Principal B:
+  do \{                
+       sCipher <- receive s;
+       \{ ns, a, kab \} <- decrypt(sCipher, Kbs);	    
+  \}
+\end{alltt}
+
+\newpage
+
+\subsection*{CA Protocol}
+
+\subsubsection*{Message Sequence}
+
+%begin constants
+\def \pmask {PCR_{m}}
+\def \pcomp {PCR_{c}}
+\def \evd {d}
+\def \eve {e}
+\def \cacert {\sign {\public{AIK}}{CA}}
+\def \exdata {\hashe{(\eve, \nonce{A}, \cacert ) }}
+\def \aikh {AIK_{h}}
+
+\def \app {A}
+\def \att {B}
+\def \ca {C}
+\def \mea {M}
+\def \tp {T}
+
+\def \req {R}
+\def \resp {P}
+\def \k {K}
+%end constants
+
+\begin{align*}
+  & \sndmsg {\app}{\att} {\evd, \nonce{\app}, \pmask}  & \\
+    & \sndmsg{\att}{\tp} {make\_and\_load\_identity} & \\
+      & \sndmsg{\tp}{\att} {\aikh} & \\
+        & \sndmsg{\att}{\ca} {\att, \public{AIK}}  & \\
+  & \sndmsg{\ca}{\att} {\encrypt{K, \hashe{AIK}}{EK}, \encrypt{\cacert}{K}} & \\
+    & \sndmsg{\att}{\tp} {activate\_identity({\aikh, \hashe{AIK})}} & \\
+  & \sndmsg{\tp}{\att} {K} & \\
+    & \sndmsg{\att}{\mea} {\evd}  & \\
+  & \sndmsg{\mea}{\att} {\eve}  & \\
+  & \sndmsg{\att}{\tp} {quote(\;{AIK_{h}, \pmask, \exdata}\;)} & \\
+  & \sndmsg{\tp}{\att} {\pcomp, \sign{\hashe{\pcomp}, \exdata}{AIK}}  & \\
+  & \sndmsg{\att}{\app} {\eve, \nonce{\app}, \pcomp, \cacert}  & \\
+  & \sndmsg{\att}{\app} {\sign{\hashe{\pcomp}, \exdata}{AIK}}  & \\  \\
+\end{align*}
+
+
+
+\begin{tabular}{l  l  l}
+\underline{KEY}  & & \\
+\app  & :  &  Appraiser \\
+\att  & :  &  Attestation Agent\\
+\tp  & :  &  TPM\\
+\ca  & :  &  Certificate Authority\\
+\mea  & :  &  Measurer\\
+d & : & desired evidence \\
+e & : & gathered evidence \\
+$N_A$ & : & nonce \\
+$\pmask$ & : & pcr mask indicating desired pcr registers \\
+$\pcomp$  & : & pcr composite structure containing select pcr register values \\
+$\aikh$ & : & AIK key handle(used by TPM to reference loaded keys) \\
+$\k$ & : & Session key created by \ca \\
+\end{tabular}
+
+\subsubsection*{Strand Space Diagram}
+
+\begin{tikzpicture}[
+  implies/.style={double,double equal sign distance,-implies},
+  dot/.style={shape=circle,fill=black,minimum size=4pt,
+    inner sep=0pt,outer sep=4pt}]
+
+\matrix[matrix of nodes] {
+  |[dot,label=above:$\app$] (A1)| {}
+  &[4cm] |[dot,label=above:$\att$] (B1)| {}
+  &[3.5cm] |[label=above:$\mea$] (M1)| {} 
+  &[3.5cm] |[label=above:$\tp$] (T1)| {}
+  &[3cm] |[label=above:$\ca$] (C1)| {}\\[1cm]
+  & |[dot] (B2)| {}
+  &
+  & |[dot] (T2)| {}\\[1cm]
+  &
+  |[dot] (B3)| {}
+  &
+  & |[dot] (T3)| {}\\  [1cm]
+  &
+  |[dot] (B4)| {}
+  &
+  &
+  & |[dot] (C4)| {} \\ [1 cm]
+  &
+  |[dot] (B5)| {}
+  &
+  &
+  & |[dot] (C5)| {} \\ [1 cm]
+  &
+  |[dot] (B6)| {}
+  &
+  & |[dot] (T6)| {} \\ [1 cm]
+  &
+  |[dot] (B7)| {}
+  &
+  & |[dot] (T7)| {} \\ [1 cm]
+  &
+  |[dot] (B8)| {}
+  & |[dot] (M8)| {} \\ [1 cm]
+  &
+  |[dot] (B9)| {}
+  & |[dot] (M9)| {} \\ [1 cm]
+  &
+  |[dot] (B10)| {}
+  &
+  & |[dot] (T10)| {} \\ [1 cm]
+  &
+  |[dot] (B11)| {}
+  &
+  & |[dot] (T11)| {} \\ [1 cm]
+  |[dot] (A12)| {}
+  & |[dot] (B12)| {} \\ [1 cm]
+  |[dot] (A13)| {}
+  & |[dot] (B13)| {} \\ [1 cm]
+};
+\draw (A1) edge[->] node[above] {$\evd, \nonce{\app}, \pmask$} (B1);
+\draw (B2) edge[->] node[above] {$make\_and\_load\_identity$} (T2)
+           edge[implies,implies-] (B1);
+\draw (T3) edge[->] node[above] {$\public{AIK}, \aikh$} (B3)
+           edge[implies,implies-] (T2);
+\draw (B4) edge[->] node[above] {$\public{AIK}$} (C4)
+           edge[implies,implies-] (B3);
+\draw (C5) edge[->] node[above] {$\encrypt{K, \hashe{\public{AIK}}}{EK}, \crypt{\cacert}{K}$} (B5)
+           edge[implies,implies-] (C4);
+\draw (B6) edge[->] node[above] {$activate\_identity(\aikh, \encrypt{K, \hashe{\public{AIK}})}{EK})$} (T6)
+           edge[implies,implies-] (B5);
+\draw (T7) edge[->] node[above] {$K$} (B7)
+           edge[implies,implies-] (T6);
+\draw (B8) edge[->] node[above] {$\evd$} (M8)
+           edge[implies,implies-] (B7);
+\draw (M9) edge[->] node[above] {$\eve$} (B9)
+           edge[implies,implies-] (M8);
+\draw (B10) edge[->] node[above] {$quote(\;\aikh, \pmask, \exdata \;)$} (T10)
+% quote(\;{AIK\textsubscript{h}, \pmask, \exdata}\;)
+           edge[implies,implies-] (B9);
+\draw (T11) edge[->] node[above] {$\pcomp, \sign{\hashe{\pcomp}, \exdata}{AIK}$} (B11)
+% \pcomp, sig(\hash{\pcomp}, ed) AIK
+           edge[implies,implies-] (T10);
+\draw (B12) edge[->] node[above] {$\eve, \nonce{\app}, \pcomp, \cacert$} (A12)
+% \eve, \nonce{\app}, \pcomp, \cacert
+           edge[implies,implies-] (B11);
+\draw (B13) edge[->] node[above] {$\sign{\hashe{\pcomp}, \exdata}{AIK}$} (A13) 
+% sig(hash(\pcomp), ed) AIK
+           edge[implies,implies-] (B12);
+\end{tikzpicture}
+
+\newpage
+
+\subsubsection*{Monadic Representation}
+
+\def \appm {a}
+\def \attm {b}
+\def \cam {c}
+\def \meam {m}
+\def \tpm {t}
+
+\begin{alltt}
+  Appraiser:
+  do \{     
+       send \attm \$ \{ \evd, Na, PCRm \} ;    % 
+       \{ e, na, pcrc, cacert, sig \}  <- receive \attm;
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Attester:
+  do \{     
+       \{ \evd, na, pcrm \}  <- receive \appm;
+       send \tpm \$ \{ make\_and\_load\_identity \};
+       \{ aikpub, aikh \} <- receive \tpm;
+       send \cam \$ \{ \attm, aikpub \};
+       \{ ekCipher, kCipher \} <- receive \cam;
+       send \tpm \$ \{ activate_identity(aikh, ekCipher) \};
+       \{ k \} <- receive \tpm;
+       cacert <- decrypt(kCipher, k);
+       send \meam \$ \{ \evd \};
+       \{ \eve \} <- receive \meam;
+       send \tpm \$ \{ quote(aikh, pcrm, \hashe{\eve, na, cacert} \};
+       \{ pcrc, sig \} <- receive \tpm;
+       send \appm \$ \{ \eve, na, pcrc, cacert, sig \};
+  \}
+\end{alltt}
+
+\begin{alltt}
+  Measurer:
+  do \{     
+       \{ \evd \}  <- receive \attm;
+       \eve <- measure(\evd);
+       send \attm \$ \{ \eve \};
+  \}
+\end{alltt}
+
+\begin{alltt}
+  CA:
+  do \{     
+       \{ bId, aikpub \}  <- receive \attm;
+       ekPub <- lookupEkPub(bId);
+       cacert <- sign(aikpub, c);
+       ekCipher <- encrypt( \{ K, \hashe{aikpub} \}, ekPub );
+       kCipher <- encrypt( cacert, K);
+       send \attm \$ \{ ekCipher, kCipher \};
+  \}
+\end{alltt}
 
 \bibliography{bundling}
 
