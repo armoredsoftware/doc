@@ -142,6 +142,33 @@ Proof.
   unfold bind. reflexivity.
 Qed.
 
+Definition S := Type.
+Definition M := (State S).
+
+Print bind.
+
+(* This should be parameterized over both A and B allowing f:A->State S B,
+   but something is fouling that up.  Will come back to it later.
+*)
+
+Theorem left_unit : forall {A} (a:A) (f:A -> (State S A)), bind (unit a) f = f a.
+Proof.
+  intros. unfold bind. reflexivity.
+Qed.
+
+Theorem right_unit : forall {A} (ma:M A), bind ma unit = ma.
+Proof.
+  intros. unfold bind.
+Admitted.
+
+(* Again should be parameterized over B and C to allow types to change *)
+
+Theorem assoc : forall {A} (ma:M A) (f:A -> (State S A)) (g:A -> (State S A)),
+              bind (bind ma f) g = bind ma (fun a => bind (f a) g).
+Proof.
+  intros. unfold bind.
+Admitted.
+
 End definition3.
 
 Module definition4.
@@ -160,7 +187,9 @@ Class Monad (M: Type -> Type):Type :=
 
 Definition State (S A:Type) := S -> A * S.
 
-Instance StateMonad : Monad (State nat) :=
+Definition S := Type.
+
+Instance StateMonad : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
   ; bind S A m f := (fun s0 =>
@@ -169,7 +198,8 @@ Instance StateMonad : Monad (State nat) :=
                        end)
 }.
 Proof.
-  intros. reflexivity.
+  intros.
+  intros.
 Admitted.
 
 Example unit_ex1 : unit(0)(1) = (0,1).
