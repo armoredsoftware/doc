@@ -1,3 +1,5 @@
+Require Import FunctionalExtensionality.
+
 (*
 Definition A := Type.
 Definition S := Type.
@@ -158,16 +160,23 @@ Qed.
 
 Theorem right_unit : forall {A} (ma:M A), bind ma unit = ma.
 Proof.
-  intros. unfold bind.
-Admitted.
+  intros. unfold bind. extensionality x.
+  unfold unit.
+  destruct (ma x) as (a,s1).
+  reflexivity.
+Qed.
 
 (* Again should be parameterized over B and C to allow types to change *)
 
 Theorem assoc : forall {A} (ma:M A) (f:A -> (State S A)) (g:A -> (State S A)),
               bind (bind ma f) g = bind ma (fun a => bind (f a) g).
 Proof.
-  intros. unfold bind.
-Admitted.
+  intros. unfold bind. extensionality x.
+  destruct (ma x) as (a,s1).
+  reflexivity.
+Qed.
+
+Eval compute in unit 0 1.
 
 End definition3.
 
@@ -187,9 +196,10 @@ Class Monad (M: Type -> Type):Type :=
 
 Definition State (S A:Type) := S -> A * S.
 
-Definition S := Type.
+(* Something going haywire with types in this instance definition. Proofs
+   pop out, but I can't get functions to evaluate properly. *)
 
-Instance StateMonad : Monad (State S) :=
+Instance StateMonad (S:Type) : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
   ; bind S A m f := (fun s0 =>
@@ -198,15 +208,20 @@ Instance StateMonad : Monad (State S) :=
                        end)
 }.
 Proof.
-  intros.
-  intros.
-Admitted.
+  intros. extensionality x. reflexivity.
+  intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
+  intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
+Qed.
 
-Example unit_ex1 : unit(0)(1) = (0,1).
+Eval compute in ((unit 0) 1).
+
+Example unit_ex1 : (unit 0)(1) = (0,1).
 Proof.
   unfold unit.
-  reflexivity.
-Qed.
+  destruct (StateMonad nat) as (unit0,bind0,_,_,_).
+Admitted.
+
+(*
 
 Example bind_ex1: ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0) = (0,1).
 Proof.
@@ -220,3 +235,6 @@ Example bind_ex2 : ((bind
 Proof.
   unfold bind. reflexivity.
 Qed.
+*)
+
+End definition4.
