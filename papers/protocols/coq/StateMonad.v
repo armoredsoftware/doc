@@ -125,16 +125,29 @@ Definition sequence{S A:Type}(m:(State S A))(n:(State S A)):(State S A) :=
            | (a,s1) => n s1
      end).
 
+(* Definition get{S A:Type}. *)
+
+Definition put{S A:Type}(a:A)(s1:S):(State S A) := (fun (s0:S) => (a,s1)).
+
+Eval compute in unit 0 1.
+
 Example unit_ex1 : unit(0)(1) = (0,1).
 Proof.
   unfold unit.
   reflexivity.
 Qed.
 
+Eval compute in ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0).
+
 Example bind_ex1: ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0) = (0,1).
 Proof.
   unfold bind. reflexivity.
 Qed.
+
+Eval compute in ((bind
+                   (bind
+                      (unit 0) (fun a => (fun s => (0,(s+1)))))
+                   (fun a => (fun s => (0,(s+1))))) 0).
 
 Example bind_ex2 : ((bind
                        (bind
@@ -144,21 +157,31 @@ Proof.
   unfold bind. reflexivity.
 Qed.
 
-Definition S := Type.
-Definition M := (State S).
+Eval compute in (put 0 1).
 
-Print bind.
+Eval compute in ((bind (unit 0) (fun a => (put 0 1))) 50).
 
-(* This should be parameterized over both A and B allowing f:A->State S B,
-   but something is fouling that up.  Will come back to it later.
+Example bind_put  : ((bind (unit 0) (fun a => (put 0 1))) 50) = (0,1).
+Proof.
+  unfold bind, unit, put. reflexivity.
+Qed.
+
+Print bind_put.
+
+(*
+   This should be parameterized over both A and B allowing f:A->State S B,
+   but something is fouling that up.  Will come back to it later.  Right now
+   State and its functions are monoids and not monads.  Specifically, the
+   associative operator is closed.
 *)
 
-Theorem left_unit : forall {A} (a:A) (f:A -> (State S A)), bind (unit a) f = f a.
+Theorem left_unit :
+  forall {S A} (a:A) (f:A -> (State S A)), bind (unit a) f = f a.
 Proof.
   intros. unfold bind. reflexivity.
 Qed.
 
-Theorem right_unit : forall {A} (ma:M A), bind ma unit = ma.
+Theorem right_unit : forall {S A} (ma:(State S A)), bind ma unit = ma.
 Proof.
   intros. unfold bind. extensionality x.
   unfold unit.
@@ -168,8 +191,9 @@ Qed.
 
 (* Again should be parameterized over B and C to allow types to change *)
 
-Theorem assoc : forall {A} (ma:M A) (f:A -> (State S A)) (g:A -> (State S A)),
-              bind (bind ma f) g = bind ma (fun a => bind (f a) g).
+Theorem assoc :
+  forall {S A} (ma:(State S A)) (f:A -> (State S A)) (g:A -> (State S A)),
+    bind (bind ma f) g = bind ma (fun a => bind (f a) g).
 Proof.
   intros. unfold bind. extensionality x.
   destruct (ma x) as (a,s1).
@@ -199,6 +223,9 @@ Definition State (S A:Type) := S -> A * S.
 (* Something going haywire with types in this instance definition. Proofs
    pop out, but I can't get functions to evaluate properly. *)
 
+(* Definition put{S A:Type}(a:A)(s1:S):(State S A) := (fun (s0:S) => (a,s1)). *)
+
+
 Instance StateMonad (S:Type) : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
@@ -211,18 +238,19 @@ Proof.
   intros. extensionality x. reflexivity.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
-Qed.
+Defined.
 
 Eval compute in ((unit 0) 1).
 
-Example unit_ex1 : (unit 0)(1) = (0,1).
+Example unit_ex1 : ((unit 0) 1) = (0,1).
 Proof.
-  unfold unit.
-  destruct (StateMonad nat) as (unit0,bind0,_,_,_).
-Admitted.
+  compute.
+  reflexivity.
+Qed.
+
+Eval compute in ((bind (unit 0) (fun a => (fun s => (a, (s+1))))) 0).
 
 (*
-
 Example bind_ex1: ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0) = (0,1).
 Proof.
   unfold bind. reflexivity.
