@@ -229,7 +229,7 @@ Definition State (S A:Type) := S -> A * S.
 Instance StateMonad (S:Type) : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
-  ; bind S A m f := (fun s0 =>
+  ; bind A B m f := (fun s0 =>
                        match (m s0) with
                          | (a,s1) => (f a) s1
                        end)
@@ -240,22 +240,43 @@ Proof.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
 Defined.
 
+Print StateMonad.
+
+Eval compute in (StateMonad nat).
+
+Eval compute in unit.
+
+Eval compute in (unit 0).
+
 Eval compute in ((unit 0) 1).
+
+(* Proof used to ouse compute instead of simpl, but now works with simpl. *)
 
 Example unit_ex1 : ((unit 0) 1) = (0,1).
 Proof.
-  compute.
+  unfold unit.
+  simpl.
   reflexivity.
 Qed.
 
+Eval compute in bind.
+
+Eval compute in (bind (unit 0)).
+
+Eval compute in ((bind (unit 0) (fun (a:nat) => (unit a)))).
+
+Eval compute in ((bind (unit 0) (fun a => (unit 1))) 1).
+
+Eval compute in (fun (a:nat) => (unit 1)).
+
 Eval compute in ((bind (unit 0) (fun a => (fun s => (a, (s+1))))) 0).
 
-(*
 Example bind_ex1: ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0) = (0,1).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
+(*
 Example bind_ex2 : ((bind
                        (bind
                           (unit 0) (fun a => (fun s => (0,(s+1)))))
