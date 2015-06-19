@@ -266,4 +266,15 @@ Proof.
   unfold bind. reflexivity.
 Qed.
 
+Definition addInput:(nat -> (State nat nat)) :=
+  (fun a => (fun s => (a,(a+s)))).
+
+Example bind_ex3 : ((bind
+                       (bind
+                          (unit 1) addInput)
+                       addInput) 0) = (1,2).
+Proof.
+  unfold bind. reflexivity.
+Qed.
+
 End definition4.
