@@ -240,16 +240,6 @@ Proof.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
 Defined.
 
-Print StateMonad.
-
-Eval compute in (StateMonad nat).
-
-Eval compute in unit.
-
-Eval compute in (unit 0).
-
-Eval compute in ((unit 0) 1).
-
 (* Proof used to ouse compute instead of simpl, but now works with simpl. *)
 
 Example unit_ex1 : ((unit 0) 1) = (0,1).
@@ -259,23 +249,7 @@ Proof.
   reflexivity.
 Qed.
 
-Eval compute in bind.
-
-Eval compute in (bind (unit 0)).
-
-Eval compute in ((bind (unit 2) (fun (a:nat) => (unit a)))).
-
-Eval compute in ((bind (unit 2) (fun a => (unit a))) 1).
-
-Eval compute in ((bind (bind (unit 2) (fun a => (unit a))) (fun b => (unit 3))) 1).
-
-Eval compute in (unit 0).
-
-Eval compute in (fun s => (0, s)).
-
 Definition incState:(State nat nat) := (fun s => (0, (s+1))).
-
-Eval compute in incState.
 
 Eval compute in ((bind (unit 2) (fun a => incState)) 0).
 
