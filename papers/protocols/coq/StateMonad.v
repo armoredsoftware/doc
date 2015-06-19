@@ -263,27 +263,33 @@ Eval compute in bind.
 
 Eval compute in (bind (unit 0)).
 
-Eval compute in ((bind (unit 0) (fun (a:nat) => (unit a)))).
+Eval compute in ((bind (unit 2) (fun (a:nat) => (unit a)))).
 
-Eval compute in ((bind (unit 0) (fun a => (unit 1))) 1).
+Eval compute in ((bind (unit 2) (fun a => (unit a))) 1).
 
-Eval compute in (fun (a:nat) => (unit 1)).
+Eval compute in ((bind (bind (unit 2) (fun a => (unit a))) (fun b => (unit 3))) 1).
 
-Eval compute in ((bind (unit 0) (fun a => (fun s => (a, (s+1))))) 0).
+Eval compute in (unit 0).
 
-Example bind_ex1: ((bind (unit 0) (fun a => (fun s => (a,(s+1))))) 0) = (0,1).
+Eval compute in (fun s => (0, s)).
+
+Definition incState:(State nat nat) := (fun s => (0, (s+1))).
+
+Eval compute in incState.
+
+Eval compute in ((bind (unit 2) (fun a => incState)) 0).
+
+Example bind_ex1: ((bind (unit 0) (fun a => incState)) 0) = (0,1).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
-(*
 Example bind_ex2 : ((bind
                        (bind
-                          (unit 0) (fun a => (fun s => (0,(s+1)))))
-                       (fun a => (fun s => (0,(s+1))))) 0) = (0,2).
+                          (unit 0) (fun a => incState))
+                       (fun a => incState) 0)) = (0,2).
 Proof.
   unfold bind. reflexivity.
 Qed.
-*)
 
 End definition4.
