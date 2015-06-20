@@ -1,8 +1,8 @@
 (*
  TODO:
  + add put and get
- - add <<
- - add standard bind and sequence notations
+ + add >>
+ + convert to use >>= and >> notations
  - create StateMonad class by extending monad class
 *)
 
@@ -220,6 +220,7 @@ Class Monad (M: Type -> Type):Type :=
 {
   unit: forall {A}, A -> M A
   ; bind: forall {A B}, M A -> (A -> (M B)) -> M B
+  ; sequence: forall {A B}, M A -> M B -> M B
   ; left_unit : forall {A B} (a:A) (f:A -> M B), bind (unit a) f = f a
   ; right_unit : forall {A} (ma:M A), bind ma unit = ma
   ; assoc : forall {A B C} (ma:M A) (f:A -> M B) (g:B -> M C),
@@ -238,6 +239,10 @@ Instance StateMonad (S:Type) : Monad (State S) :=
                        match (m s0) with
                          | (a,s1) => (f a) s1
                        end)
+  ; sequence A B m1 m2 := (fun s0 =>
+                             match (m1 s0) with
+                               | (a,s1) => m2 s1
+                             end)
 }.
 Proof.
   intros. extensionality x. reflexivity.
@@ -245,7 +250,11 @@ Proof.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
 Defined.
 
-(* Proof used to ouse compute instead of simpl, but now works with simpl. *)
+Notation "m >>= f" :=
+  (bind m f) (left associativity, at level 49).
+
+Notation "m >> f" :=
+  (sequence m f) (left associativity, at level 49).
 
 Example unit_ex1 : ((unit 0) 1) = (0,1).
 Proof.
@@ -256,17 +265,27 @@ Qed.
 
 Definition incState:(State nat nat) := (fun s => (0, (s+1))).
 
-Eval compute in ((bind (unit 2) (fun a => incState)) 0).
+Eval compute in ((unit 2) >>= (fun a => incState)) 0.
 
-Example bind_ex1: ((bind (unit 0) (fun a => incState)) 0) = (0,1).
+Eval compute in ((unit 2) >> incState) 0.
+
+Example bind_ex1: ((unit 0) >>= (fun a => incState)) 0 = (0,1).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
-Example bind_ex2 : ((bind
-                       (bind
-                          (unit 0) (fun a => incState))
-                       (fun a => incState) 0)) = (0,2).
+Example sequence_ex1: ((unit 0) >> incState) 0 = (0,1).
+Proof.
+  unfold sequence. reflexivity.
+Qed.
+
+Example bind_ex2 :
+  ((unit 0) >>= (fun a => incState) >>= (fun a => incState)) 0 = (0,2).
+Proof.
+  unfold bind. reflexivity.
+Qed.
+
+Example sequence_ex2 : ((unit 0) >> incState >> incState) 0 = (0,2).
 Proof.
   unfold bind. reflexivity.
 Qed.
@@ -274,24 +293,22 @@ Qed.
 Definition addInput:(nat -> (State nat nat)) :=
   (fun a => (fun s => (a,(a+s)))).
 
-Example bind_ex3 : ((bind
-                       (bind
-                          (unit 1) addInput)
-                       addInput) 0) = (1,2).
+Example bind_ex3 :
+  ((unit 1) >>= addInput >>= addInput) 0 = (1,2).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
 Definition put{S A:Type}(s:S)(a:A):(State S A) := (fun (_:S) => (a,s)).
 
-Example put_ex1 : ((bind (unit 1) (put 10)) 0) = (1,10).
+Example put_ex1 : ((unit 1) >>= (put 10)) 0 = (1,10).
 Proof.
   unfold bind. simpl. unfold put. reflexivity.
 Qed.
 
 Definition get{S:Type}(a:S):(State S S) := (fun (s:S) => (s,s)).
 
-Example get_ex1 : ((bind (unit 10) get) 10) = (10,10).
+Example get_ex1 : ((unit 10) >>= get) 10 = (10,10).
 Proof.
   unfold bind. simpl. unfold get. reflexivity.
 Qed.
