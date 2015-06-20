@@ -1,9 +1,6 @@
 Require Import FunctionalExtensionality.
 
-(*
-Definition A := Type.
-Definition S := Type.
-*)
+(** First attempt that simply copies the PVS implementation *)
 
 Module definition1.
 
@@ -33,6 +30,9 @@ Proof.
 Qed.
 
 End definition1.
+
+(** Second attempt that removes the constructed type in favor of a simple
+    type definition. *)
 
 Module definition2.
 
@@ -105,9 +105,9 @@ Qed.
 
 End definition2.
 
-Module definition3.
+(** Third attempt that parameterizes State over types. *)
 
-(* Let's parameterize State over types *)
+Module definition3.
 
 Definition State (S A:Type) := S -> A * S.
 
@@ -206,7 +206,7 @@ End definition3.
 
 Module definition4.
 
-(* Let's make this puppy a monad using a typeclass *)
+(** Making the StateMonad a Monad using the Monad typeclass. *)
 
 Class Monad (M: Type -> Type):Type := 
 {
