@@ -1,3 +1,11 @@
+(*
+ TODO:
+ + add put and get
+ - add <<
+ - add standard bind and sequence notations
+ - create StateMonad class by extending monad class
+*)
+
 Require Import FunctionalExtensionality.
 
 (** First attempt that simply copies the PVS implementation *)
@@ -223,9 +231,6 @@ Definition State (S A:Type) := S -> A * S.
 (* Something going haywire with types in this instance definition. Proofs
    pop out, but I can't get functions to evaluate properly. *)
 
-(* Definition put{S A:Type}(a:A)(s1:S):(State S A) := (fun (s0:S) => (a,s1)). *)
-
-
 Instance StateMonad (S:Type) : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
@@ -275,6 +280,20 @@ Example bind_ex3 : ((bind
                        addInput) 0) = (1,2).
 Proof.
   unfold bind. reflexivity.
+Qed.
+
+Definition put{S A:Type}(s:S)(a:A):(State S A) := (fun (_:S) => (a,s)).
+
+Example put_ex1 : ((bind (unit 1) (put 10)) 0) = (1,10).
+Proof.
+  unfold bind. simpl. unfold put. reflexivity.
+Qed.
+
+Definition get{S:Type}(a:S):(State S S) := (fun (s:S) => (s,s)).
+
+Example get_ex1 : ((bind (unit 10) get) 10) = (10,10).
+Proof.
+  unfold bind. simpl. unfold get. reflexivity.
 Qed.
 
 End definition4.
