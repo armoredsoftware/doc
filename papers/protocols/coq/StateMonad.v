@@ -133,8 +133,6 @@ Definition sequence{S A:Type}(m:(State S A))(n:(State S A)):(State S A) :=
            | (a,s1) => n s1
      end).
 
-(* Definition get{S A:Type}. *)
-
 Definition put{S A:Type}(a:A)(s1:S):(State S A) := (fun (s0:S) => (a,s1)).
 
 Eval compute in unit 0 1.
@@ -229,9 +227,6 @@ Class Monad (M: Type -> Type):Type :=
 
 Definition State (S A:Type) := S -> A * S.
 
-(* Something going haywire with types in this instance definition. Proofs
-   pop out, but I can't get functions to evaluate properly. *)
-
 Instance StateMonad (S:Type) : Monad (State S) :=
 {
   unit A x := (fun s => (x,s))
@@ -308,7 +303,7 @@ Qed.
 
 Definition get{S:Type}(a:S):(State S S) := (fun (s:S) => (s,s)).
 
-Example get_ex1 : ((unit 10) >>= get) 10 = (10,10).
+Example get_ex1 : ((unit 0) >>= get) 10 = (10,10).
 Proof.
   unfold bind. simpl. unfold get. reflexivity.
 Qed.
