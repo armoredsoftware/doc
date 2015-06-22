@@ -312,6 +312,27 @@ End definition4.
 
 Module definition5.
 
+(** Example from web discussion *)
+
+Class Semigroup {A : Type} (op : A -> A -> A) : Type := {
+  op_associative : forall x y z : A, op x (op y z) = op (op x y) z
+}.
+
+Print Semigroup.
+
+Class Monoid `(M : Semigroup) (id : A) : Type := {
+  id_ident_left  : forall x : A, op id x = x;
+  id_ident_right : forall x : A, op x id = x
+}.
+
+Print Monoid.
+
+Class AbelianMonoid `(M : Monoid) : Type := {
+  op_commutative : forall x y : A, op x y = op y x
+}.
+
+Print AbelianMonoid.
+
 Class Monad (M: Type -> Type):Type := 
 {
   unit: forall {A}, A -> M A
