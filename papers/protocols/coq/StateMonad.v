@@ -330,3 +330,5 @@ Class StateMonad (S:Type) (M:Type -> Type -> Type) `(N:Monad (M S))  : Type :=
 }.
 
 Print StateMonad.
+
+End definition5.
