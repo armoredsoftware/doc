@@ -309,3 +309,24 @@ Proof.
 Qed.
 
 End definition4.
+
+Module definition5.
+
+Class Monad (M: Type -> Type):Type := 
+{
+  unit: forall {A}, A -> M A
+  ; bind: forall {A B}, M A -> (A -> (M B)) -> M B
+  ; sequence: forall {A B}, M A -> M B -> M B
+  ; left_unit : forall {A B} (a:A) (f:A -> M B), bind (unit a) f = f a
+  ; right_unit : forall {A} (ma:M A), bind ma unit = ma
+  ; assoc : forall {A B C} (ma:M A) (f:A -> M B) (g:B -> M C),
+              bind (bind ma f) g = bind ma (fun a => bind (f a) g)
+}.
+
+Class StateMonad (S:Type) (M:Type -> Type -> Type) `(N:Monad (M S))  : Type :=
+{
+  get: forall {A}, S -> M S A
+  ; put: forall {A}, M S A
+}.
+
+Print StateMonad.
