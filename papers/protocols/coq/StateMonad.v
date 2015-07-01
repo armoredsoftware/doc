@@ -66,10 +66,6 @@ Qed.
 
 Definition incState:(State nat nat) := (fun s => (0, (s+1))).
 
-Eval compute in ((unit 2) >>= (fun a => incState)) 0.
-
-Eval compute in ((unit 2) >> incState) 0.
-
 Example bind_ex1: ((unit 0) >>= (fun a => incState)) 0 = (0,1).
 Proof.
   unfold bind. reflexivity.
