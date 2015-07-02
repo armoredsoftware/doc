@@ -1,9 +1,10 @@
-(*
+(**
+ [StateMonad] type class definition
+
+ Provides a simple type class for defining structures to be of the form
+ of a state monad.
+
  TODO:
- + add put and get
- + add >>
- + convert to use >>= and >> notations
- + create StateMonad class by extending monad class
  - add state monad laws for put and get
 *)
 
@@ -48,7 +49,7 @@ Proof.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
 Defined.
 
-(** Creatre an instance of [StateMonad] using [State] as the type constructor
+(** Create an instance of [StateMonad] using [State] as the type constructor
   and [StateMonadI] as a witness to something being of type [(Monad (State S))]   called [StateMonadX].  Note that PVS would have done some of the type-foo
   automatically. *)
 Instance StateMonadEx {S A:Type} : StateMonad State StateMonadI :=

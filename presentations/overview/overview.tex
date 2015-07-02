@@ -112,25 +112,56 @@
 % \end{frame}
 
 \begin{frame}
-  \frametitle{Clouds and Trust}
+  \frametitle{When should you trust my system?}
+
   \begin{itemize}
-  \item The promises of the cloud are substantial
+  \item You know its identity 
     \begin{itemize}
-    \item reduced hardware and software costs
-    \item reduced resource consumption
-    \item improved availability and reliability
+    \item strong, unambiguous identification
+    \item asymmetric key cryptography
+    \item secret key strongly bound to the platform
     \end{itemize}
-  \item The structure of the cloud complicates assurance
+  \item You know it is built from good parts
     \begin{itemize}
-    \item not under the desk
-    \item ambiguous and changing runtime environment
-    \item unknown and unknowable actors in the same environment
+    \item strong identification of system configuration
+    \item boot-time hashes stored in protected memory
+    \item trusted configuration delivery mechanism
     \end{itemize}
-  \item Is trust possible in the cloud environment?
+  \item You know it is behaving as expected
     \begin{itemize}
-    \item unambiguous identification
-    \item confirmation of uninhibited execution
-    \item direct or trusted indirect observation of good behavior  
+    \item direct or trusted indirect observation of good behavior
+    \item contextual evidence gathered during system operation
+    \item trusted evidence delivery, storage and evaluation mechanism
+    \end{itemize}
+  \end{itemize}
+
+  Trust is grounded in knowing \emph{identity} and \emph{behavior}.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Clouds and Trust}
+
+  Cloud structure complicates knowing identity and behavior
+
+  \begin{itemize}
+  \item Applications no longer run ``under the desk''
+    \begin{itemize}
+    \item platform ownership is gone
+    \item difficult to directly observe behavior
+    \item no access to hardware
+    \end{itemize}
+  \item Anonymous and changing operating environment
+    \begin{itemize}
+    \item hardware is virtualized and invisible
+    \item migration moves applications and systems
+    \item identity and measurement cannot be rooted in hardware
+    \end{itemize}
+  \item Unknown actors in the same operating environment
+    \begin{itemize}
+    \item many virtual platforms on the same physical platform
+    \item many applications accessing the same resources
+    \item significant trust in the cloud to separate virtual platforms
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -140,30 +171,35 @@
   \frametitle{Virtual Blinking Lights}
   Provide new capabilities that establish and maintain trustworthy
   cloud-based application deployment
-  \medskip
-  \medskip
+
   \begin{itemize}
   \item Establish trust in cloud applications
     \begin{itemize}
-    \item trust in cloud infrastructure
     \item trust in user-space applications 
+    \item trust in cloud infrastructure
     \item trust in application cohorts
     \end{itemize}
-  \item Promote informed decision making
+  \item Provide a common trust infrastructure
     \begin{itemize}
-    \item confirm data confidentiality
-    \item confirm execution and data integrity
+    \item standard application architecture
+    \item flexible communication mechanisms
+    \item application-specific measurement
+    \item formally verifiable trust protocols
+    \item roots-of-trust for storage and reporting
     \end{itemize}
-  \item Autonomous run-time response and reconfiguration
+  \item Integration with existing standards and practices
     \begin{itemize}
-    \item respond to attack, failure, reconfiguration, and repair 
-    \item appraisal informs response
+    \item Integration with RedHat Linux, Xen, and OpenStack
+    \item Uses Trusted Computing Group's TPM and vTPM guidelines
+    \item Developed in concert with NSA R2X and R2D
     \end{itemize}
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Semantic Remote Attestation}
+
+  A basic four step process for establishing trust:
 
   \begin{columns}[c]
     \column{0.55\textwidth}
@@ -265,26 +301,28 @@
 
 
 \begin{frame}
-  \frametitle{Enabling Technologies}
+  \frametitle{New Enabling Technologies}
+
+  ArmoredSoftware will provide new technologies for system trust
+  
   \begin{itemize}
   \item Trustworthy protocol execution
     \begin{itemize}
     \item executable and analyzable protocol representation
-    \item generates evidence of trustworthiness
-    \item negotiates attestation details
-    \item designed for highly focused appraisal
+    \item privacy policy compliant attestation protocol negotiation
+    \item verifiable remote attestation protocol execution
     \end{itemize}
   \item Application specific measurement
     \begin{itemize}
-    \item managed and traditional execution environments
+    \item scriptable general purpose measurement engine
     \item compile-time assistance for measurer synthesis
     \item specialized measurement bundled with applications
     \end{itemize}
   \item Lightweight trust infrastructure
     \begin{itemize}
+    \item strong identity establishment and maintenance
     \item abstract communications capability
-    \item migration support
-    \item strong identity
+    \item migration-sensitive vTPM infrastructure
     \end{itemize}
   \end{itemize}
 \end{frame}
