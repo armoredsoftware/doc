@@ -87,14 +87,6 @@ Proof.
   unfold sequence. reflexivity.
 Qed.
 
-(** [sequence] is a specialization of [bind]. *)
-
-Lemma bind_seq_eq : forall (A S:Type) (f g:(State S A)),
-                      (f >> g) = (f >>= (fun a => g)).
-Proof.
-  intros. unfold unit, incState. simpl. extensionality x. reflexivity.
-Qed.
-
 Example bind_ex2 :
   ((unit 0) >>= incState >>= incState) 0 = (0,2).
 Proof.
