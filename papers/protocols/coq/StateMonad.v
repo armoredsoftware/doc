@@ -16,7 +16,9 @@ Require Import Monad.
   that [StateMonad S] is the monad, not just [StateMonad].  This will be
   important when we instantiate the [Monad] typeclass.  *)
 
-(** [State] is the classic definition of the state monad type *)
+(** [State] is the classic definition of the state monad type.  Note that
+  although its name is [State] its really a next state function.  Keeping
+  the tradition name here. *)
 Definition State (S A:Type) := S -> A * S.
 
 (** Extend the [Monad] class with [put] and [get].  Still need to add the
@@ -65,6 +67,9 @@ Proof.
   reflexivity.
 Qed.
 
+(** [incState] is a simple [f] that increments a state value consisting of 
+  a natural numnber.  It ignores its [A] input. *)
+
 Definition incState:(State nat nat) := (fun s => (0, (s+1))).
 
 Example bind_ex1: ((unit 0) >>= (fun a => incState)) 0 = (0,1).
@@ -75,6 +80,14 @@ Qed.
 Example sequence_ex1: ((unit 0) >> incState) 0 = (0,1).
 Proof.
   unfold sequence. reflexivity.
+Qed.
+
+(** [sequence] is a specialization of [bind]. *)
+
+Lemma bind_seq_eq : forall (A S:Type) (f g:(State S A)),
+                      (f >> g) = (f >>= (fun a => g)).
+Proof.
+  intros. unfold unit, incState. simpl. extensionality x. reflexivity.
 Qed.
 
 Example bind_ex2 :
