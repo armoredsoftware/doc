@@ -1,0 +1,31 @@
+%crypto extensions
+\newcommand{\nonce}[1]{N\textsubscript{#1}}
+
+%spi extensions
+\newcommand{\channel}[1]{\ensuremath{C\textsubscript{#1}}}
+
+
+%constants
+\newcommand{\pmask} {PCR\textsubscript{m}}
+\newcommand{\pcomp} {PCR\textsubscript{c}}
+\newcommand{\evd} {d}
+\newcommand{\eve} {e}
+\newcommand{\cacert} {\sign {\public{AIK}}{CA}}
+\newcommand{\exdata} {\hash{[ \eve, \nonce{A}, \cacert ] }}
+\newcommand{\aikh} {AIK\textsubscript{h}}
+
+\def \app {A}
+\def \att {B}
+\def \ca {C}
+\def \mea {M}
+\def \tp {T}
+
+
+\def \req {R}
+\def \resp {P}
+\def \k {K}
+
+%\newcommand{\tpm}[2] {tpm\_#1 ( #2 )}
+
+
+
