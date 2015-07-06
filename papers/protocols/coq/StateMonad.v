@@ -49,6 +49,7 @@ Proof.
   intros. extensionality x. reflexivity.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
   intros. extensionality x. destruct (ma x) as (a,s1). reflexivity.
+  intros. extensionality x. reflexivity.
 Defined.
 
 (** Create an instance of [StateMonad] using [State] as the type constructor
