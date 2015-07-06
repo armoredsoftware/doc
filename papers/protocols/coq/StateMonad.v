@@ -68,16 +68,20 @@ Proof.
 Qed.
 
 (** [incState] is a simple [f] that increments a state value consisting of 
-  a natural numnber.  It ignores its [A] input. *)
+  a natural numnber. *)
 
-Definition incState:(State nat nat) := (fun s => (0, (s+1))).
+Definition incState:nat->(State nat nat) := (fun _ => (fun s => (0, (s+1)))).
 
-Example bind_ex1: ((unit 0) >>= (fun a => incState)) 0 = (0,1).
+(** [incStateCurry] is a [State] resuting from currying [f]. *)
+
+Definition incStateCurry:(State nat nat) := (incState 0).
+
+Example bind_ex1: ((unit 0) >>= incState) 0 = (0,1).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
-Example sequence_ex1: ((unit 0) >> incState) 0 = (0,1).
+Example sequence_ex1: ((unit 0) >> incStateCurry) 0 = (0,1).
 Proof.
   unfold sequence. reflexivity.
 Qed.
@@ -91,15 +95,18 @@ Proof.
 Qed.
 
 Example bind_ex2 :
-  ((unit 0) >>= (fun a => incState) >>= (fun a => incState)) 0 = (0,2).
+  ((unit 0) >>= incState >>= incState) 0 = (0,2).
 Proof.
   unfold bind. reflexivity.
 Qed.
 
-Example sequence_ex2 : ((unit 0) >> incState >> incState) 0 = (0,2).
+Example sequence_ex2 : ((unit 0) >> incStateCurry >> incStateCurry) 0 = (0,2).
 Proof.
   unfold bind. reflexivity.
 Qed.
+
+(** [addInput] is a simple [f] that adds the result of a previous execution
+  to the current state *)
 
 Definition addInput:(nat -> (State nat nat)) :=
   (fun a => (fun s => (a,(a+s)))).
