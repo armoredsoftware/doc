@@ -13,6 +13,8 @@ Class Monad (M: Type -> Type):Type :=
   ; right_unit : forall {A} (ma:M A), bind ma unit = ma
   ; assoc : forall {A B C} (ma:M A) (f:A -> M B) (g:B -> M C),
               bind (bind ma f) g = bind ma (fun a => bind (f a) g)
+  ; bind_seq_eq : forall {A B} (f:M A) (g:M B),
+                    (sequence f g) = (bind f (fun (a:A) => g))
 }.
 
 Notation "m >>= f" :=
