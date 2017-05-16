@@ -102,35 +102,109 @@
     \item Guessing $\sign{X}{Y}$ from $X$ is impossible
     \end{itemize}
   \item $\extend{M}{\hash{X}}$ --- Extend $M$ with $\hash{X}$
-  \begin{itemize}
-  \item Concatenate $M$ with $\hash{X}$ and hash the result
-  \item Ideal $\extend{M}{\hash{X}}$ unique for $M$ and $X$	
-  \end{itemize}
-
+    \begin{itemize}
+    \item Concatenate $M$ with $\hash{X}$ and hash the result
+    \item Ideal $\extend{M}{\hash{X}}$ unique for $M$ and $X$	
+    \end{itemize}
   \end{itemize}
 }
 
 \frame{\frametitle{Tools for Trust}
-\begin{itemize}
-  \item $\wrap{X}{\public{Y}}$ --- Wrap $X$ with $\public{Y}$
-  	\begin{itemize}
-  	\item Can use $\public{X}$ for encryption and signature checking
-  	\item Cannot use $\private{X}$ for decryption or signing without $\private{Y}$
-  	\item Supports chaining keys from a base key
-  	\end{itemize}	
-\item $\envelope{\public{K}}{D}$ --- Envelop $D$ with $\public{K}$
+  \begin{itemize}
+  \item $\wrap{X}{\private{Y}}$ --- Wrap $X$ with $\private{Y}$
+    \begin{itemize}
+    \item Can use $\public{X}$ for encryption and signature checking
+    \item Cannot use $\private{X}$ for decryption or signing without $\private{Y}$
+    \end{itemize}
+  \item $\seal{D}{C}$ --- Seal $D$ to configuration $C$
+    \begin{itemize}
+    \item $D$ is not available if system is not in configuration $C$
+    \item Usually accompanied by encryption
+    \end{itemize}
+  \item $\envelope{\public{K}}{D}$ --- Envelope $D$ with $\public{K}$
     \begin{itemize}
     \item Encrypt large data $D$ with session key $SK$
     \item Encrypt $SK$ with $\public{K}$
     \item $D$ behaves as if encrypted with $\public{K}$
+    \end{itemize}
+  \item $\cert{(A,B)}{\private{Y}}$ --- Certify binding of $A$ and $B$ with $\private{Y}$ 
+    \begin{itemize}
+    \item $Y$ signs $(A,B)$ with private key $\private{Y}$
+    \item Certificate is checked using $\public{Y}$
+    \item Valid signature provides evidence $A$ and $B$ are bound together
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame{\frametitle{Wrapping and Chaining Keys}
+  
+  \begin{block}{Wrapping A Key}
+    $wrap(X,Y) = \wrap{X}{\private{Y}}$
+  \end{block}
+
+  \begin{itemize}
+  \item $\private{X}$ is encrypted with $\private{Y}$ while
+    $\public{X}$ is clear 
+  \item $\encrypt{D}{X}$ and checking $\sign{D}{X}$ may be done
+    without $Y$
+  \item Decrypting $\encrypt{D}{X}$ and generating $\sign{D}{X}$
+    require $Y$
+  \end{itemize}
+  
+  \begin{block}{Chaining Keys}
+    $\wrap{X_0}{\private{X_1}}$,$\wrap{X_1}{\private{X_2}}$ $\ldots$
+    $\wrap{X_{n-1}}{\private{X_n}}$
+  \end{block}
+
+  \begin{itemize}
+  \item Each key depends on the previous key
+  \item If the root key is trustworthy the chain is trustworthy
+  \end{itemize}
+
+}
+
+\frame{\frametitle{Sealing Data}
+
+\begin{block}{Sealing to State}
+  $\seal{D}{C}$ --- Seal $D$ to configuration $C$
+\end{block}
+
+\begin{itemize}
+\item $D$ is protected by a key or other mechanism
+\item $C$ describes an acceptable system state
+\item $D$ cannot be accessed if system is not in state $C$
+\item Used to protect data even when system is mis-configured
 \end{itemize}
-\item $\cert{(A,B)}{\private{Y}}$ --- Certify binding of $A$ and $B$ with $\private{Y}$ 
-	\begin{itemize}
-	\item $Y$ signs $(A,B)$ with private key $\private{Y}$
-	\item Certificate is checked using $\public{Y}$
-	\item Valid signature provides evidence $A$ and $B$ are bound together
-\end{itemize}
-\end{itemize}
+
+}
+
+\frame{\frametitle{Enveloping Data}
+
+  \begin{block}{Enveloping}
+    $envelop(K,D) = \envelope{\public{K}}{D}$
+  \end{block}
+
+  \begin{itemize}
+  \item $SK$ is a symmetric session key for bulk encryption
+  \item $D$ is encrypted with $SK$
+  \item $SK$ is encrypted with $\public{K}$
+  \item $D$ is protected as if encrypted with $K$
+  \end{itemize}
+
+}
+
+\frame{\frametitle{Certificates}
+  \begin{block}{Certificates and Certification}
+    $\cert{(A,B)}{\private{Y}} = \sign{(A,B)}{Y}$
+  \end{block}
+
+  \begin{itemize}
+  \item $(A,B)$ associates $A$ with $B$
+  \item $Y$ certifies the association by signing with $\private{Y}$
+  \item Certificate is checked using $\public{Y}$
+  \item If we trust $Y$, then we trust the binding of $A$ to $B$
+  \end{itemize}
+
 }
 
 \frame{\frametitle{Chaining Measurement --- Gathering Evidence}
@@ -226,11 +300,18 @@ Measured Boot gathers evidence to check trust relationships.
 
 \frame{\frametitle{Trust is a Preorder}
 
-A \emph{chain of trust} from $X_0$ to $X_n$ establishes that $X_0$ trusts $X_n$
+A \emph{chain of trust} from $X_0$ to $X_n$:
 
-\[\trusts{X_0}{X_1}\wedge\trusts{X_1}\wedge\ldots\wedge\trusts{X_{n-1}}{X_n}\]
+\[\trusts{X_0}{X_1}\wedge\trusts{X_1}{X_2}\wedge\ldots\wedge\trusts{X_{n-1}}{X_n}\]
 
-$X_0$ is the \emph{root of trust}.  If $X_0$ is trusted, the entire chain is trusted.
+\begin{itemize}
+\item If $X_0$ is trusted, then $X_n$ is trusted
+\item $X_0$ is called a \texttt{root-of-trust}
+\item Establishing trust chains defines a framework for measurement
+\item Measurement provides evidence that trust chains are not violated
+\item Appraisal checks evidence to assess trust chains
+\end{itemize}
+
 }
 
 \frame{\frametitle{Trusted Platform Module}
