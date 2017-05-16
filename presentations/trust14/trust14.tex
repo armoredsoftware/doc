@@ -54,7 +54,7 @@
 \begin{frame}
   \titlepage
 
-{\footnotesize\color{kugray} Formatted with the Beamer Class for \LaTeXe}
+{\footnotesize\color{kugray} Formatted with the KU Beamer Class for \LaTeXe}
 \end{frame}
 
 \frame{\frametitle{What is Trust?}
@@ -72,13 +72,14 @@
     \end{itemize}
 }
 
-\frame{\frametitle{Capabilities for Establishing Trust}
+\frame{\frametitle{Required Capabilities for Establishing Trust}
   \begin{itemize}
   \item \emph{Strong Identification} --- An unambiguous, immutable
     identifier associated with the platform.
   \item \emph{Reporting Configuration} --- An unambiguous
     identification mechanism for software and hardware running on the
     platform.
+  \item \emph{Reporting Behavior} --- A mechanism for observing and reporting execution behavior.
   \end{itemize}
 }
 
@@ -97,15 +98,44 @@
     \end{itemize}
   \item $\sign{X}{Y}$ --- Sign $X$ with $\private{Y}$
     \begin{itemize}
-    \item $\sign{X}{Y}$ is unique for every $X$ and $Y$ pair
+    \item $\sign{X}{Y}$ is unique for every $X$ and $\private{Y}$ pair
     \item Guessing $\sign{X}{Y}$ from $X$ is impossible
     \end{itemize}
+  \item $\extend{M}{\hash{X}}$ --- Extend $M$ with $\hash{X}$
+  \begin{itemize}
+  \item Concatenate $M$ with $\hash{X}$ and hash the result
+  \item Ideal $\extend{M}{\hash{X}}$ unique for $M$ and $X$	
+  \end{itemize}
+
   \end{itemize}
 }
 
-\frame{\frametitle{Measurement --- Chaining Evidence}
+\frame{\frametitle{Tools for Trust}
+\begin{itemize}
+  \item $\wrap{X}{\public{Y}}$ --- Wrap $X$ with $\public{Y}$
+  	\begin{itemize}
+  	\item Can use $\public{X}$ for encryption and signature checking
+  	\item Cannot use $\private{X}$ for decryption or signing without $\private{Y}$
+  	\item Supports chaining keys from a base key
+  	\end{itemize}	
+\item $\envelope{\public{K}}{D}$ --- Envelop $D$ with $\public{K}$
+    \begin{itemize}
+    \item Encrypt large data $D$ with session key $SK$
+    \item Encrypt $SK$ with $\public{K}$
+    \item $D$ behaves as if encrypted with $\public{K}$
+\end{itemize}
+\item $\cert{(A,B)}{\private{Y}}$ --- Certify binding of $A$ and $B$ with $\private{Y}$ 
+	\begin{itemize}
+	\item $Y$ signs $(A,B)$ with private key $\private{Y}$
+	\item Certificate is checked using $\public{Y}$
+	\item Valid signature provides evidence $A$ and $B$ are bound together
+\end{itemize}
+\end{itemize}
+}
+
+\frame{\frametitle{Chaining Measurement --- Gathering Evidence}
   
-  We would like to start $A$ and $B$ while gathering evidence of trust
+  We would like to start $A$ and $B$ while gathering evidence for determining trust
 
     \begin{columns}[c]
     \column{.53\textwidth}
@@ -162,7 +192,7 @@
 
   \begin{itemize}
   \item Trusted Measurer and Trusted Store are trusted \emph{a priori}
-  \item $A$ is trusted to be $A$ because its measurement is:
+  \item A is trusted to be A because its measurement is:
     \begin{itemize}
     \item Correct
     \item Taken by a trusted party (Trusted Measurer)
@@ -183,17 +213,25 @@
 \frame{\frametitle{Trust is a Preorder}
 
   $\trusts{x}{y}$ is an homogeneous relation over actors that is true
-  when \emph{x trusts y}.  $\trusts{x}{y}$ is a preorer:
+  when \emph{x trusts y}.  $\trusts{x}{y}$ is by definition a preorer:
 
   \begin{itemize}
-  \item Reflexive - $\forall x \cdot \trusts{x}{x}$
-  \item Transitive - $\forall x,y,z\cdot\trusts{x}{y}\wedge\trusts{y}{z}  \Rightarrow
+  \item Reflexive --- $\forall x \cdot \trusts{x}{x}$
+  \item Transitive --- $\forall x,y,z\cdot\trusts{x}{y}\wedge\trusts{y}{z}  \Rightarrow
   \trusts{x}{z}$
   \end{itemize}
 
-  \alert{Measured Boot gathers evidence of these chains}
+Measured Boot gathers evidence to check trust relationships.
 }
 
+\frame{\frametitle{Trust is a Preorder}
+
+A \emph{chain of trust} from $X_0$ to $X_n$ establishes that $X_0$ trusts $X_n$
+
+\[\trusts{X_0}{X_1}\wedge\trusts{X_1}\wedge\ldots\wedge\trusts{X_{n-1}}{X_n}\]
+
+$X_0$ is the \emph{root of trust}.  If $X_0$ is trusted, the entire chain is trusted.
+}
 
 \frame{\frametitle{Trusted Platform Module}
   The \emph{Trusted Platform Module (TPM)} is a cryptographic

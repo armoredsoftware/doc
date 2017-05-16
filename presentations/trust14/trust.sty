@@ -12,8 +12,9 @@
 \newcommand{\proposal}[2]{\ensuremath{ \langle #1,#2\rangle}}
 \newcommand{\public}[1]{\ensuremath{#1}}
 \newcommand{\private}[1]{\ensuremath{#1^{-1}}}
-\newcommand{\seal}[2]{\ensuremath{seal(#1,\{#2\})}}
-\newcommand{\wrap}[2]{\ensuremath{wrap(#1,\{#2\})}}
+\newcommand{\seal}[2]{\ensuremath{(#1,\{#2\})}}
+\newcommand{\wrap}[2]{\ensuremath{(\public{#1},\encrypt{\private{#1}}{#2})}}
+\newcommand{\envelope}[2]{(\encrypt{SK}{#1},\encrypt{#2}{SK})}
 \newcommand{\authdata}[1]{\ensuremath{\mathit{AUTH}#1}}
 \newcommand{\msg}[3]{\ensuremath{#1\rightarrow#2 : #3}}
 
